@@ -1,4 +1,4 @@
-#include "../../src/jl_exported_funcs.inc"
+#include EXPORTED_FUNCS_INC
 
 #define XX(name) \
 .global name; \

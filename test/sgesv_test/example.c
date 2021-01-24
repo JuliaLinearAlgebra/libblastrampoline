@@ -2,7 +2,7 @@
 #define size 3				/* dimension of matrix */
 
 extern void set_blas_funcs(char *);
-extern void sgesv_64_(long *, long *, float *, long *, long *, float *, long *, long *);
+extern void SGESV(long *, long *, float *, long *, long *, float *, long *, long *);
 
 void solve()
 {
@@ -27,7 +27,7 @@ c2=1;    			/* to the routine in variables */
 
 /* find solution using LAPACK routine SGESV, all the arguments have to */
 /* be pointers and you have to add an underscore to the routine name */
-sgesv_64_(&c1, &c2, AT, &c1, pivot, b, &c1, &ok);
+SGESV(&c1, &c2, AT, &c1, pivot, b, &c1, &ok);
 
 /*
  parameters in the order as they appear in the function call
@@ -42,7 +42,7 @@ for (j=0; j<size; j++) printf("%e\n", b[j]);	/* print vector x */
 int main()
 {
 #ifdef TRAMPOLINE
-    set_blas_funcs("/Users/viral/julia/usr/lib/libopenblas64_.dylib");
+    set_blas_funcs(LIBBLAS_FWD);
 #endif
     solve();
 }

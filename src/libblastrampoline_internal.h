@@ -23,7 +23,7 @@
 
 // Load in our exported function names, they'll be stored in a macro called
 // JL_EXPORTED_FUNCS(XX), and we'll do item-by-item processing by defining XX.
-#include "jl_exported_funcs.inc"
+#include EXPORTED_FUNCS_INC
 
 // Define holder locations for function addresses as `const void * $(name)_addr`
 #define XX(name)    JL_HIDDEN const void * name##_addr;
