@@ -39,10 +39,16 @@ SGESV(&c1, &c2, AT, &c1, pivot, b, &c1, &ok);
 for (j=0; j<size; j++) printf("%e\n", b[j]);	/* print vector x */
 }
 
-int main()
+int main(int ac, char *av[])
 {
 #ifdef TRAMPOLINE
-    set_blas_funcs(LIBBLAS_FWD);
-#endif
+    if (ac==1) {
+        printf("Usage: av[0] <Full path to BLAS>\n");
+    } else {
+        set_blas_funcs(av[1]);
+        solve();
+    }
+#else
     solve();
+#endif
 }
