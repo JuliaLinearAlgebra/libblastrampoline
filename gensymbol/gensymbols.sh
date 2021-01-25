@@ -1,14 +1,30 @@
 #!/bin/bash
 
-# For BLAS symbols with a suffix, pass suffix in first argument.
-# Example:
-# ./gensymbols.sh 64_
+SYS=osx
+ARCH=x86_64
+BU=_
+EXPRECISION=1
+NO_CBLAS=0
+NO_LAPACK=0
+NO_LAPACKE=0
+NEED2UNDERSCORES=0
+ONLY_CBLAS=0
+SYMBOLPREFIX=""
+SYMBOLSUFFIX=""
+BUILD_LAPACK_DEPRECATED=1
+BUILD_BFLOAT16=1
+BUILD_SINGLE=1
+BUILD_DOUBLE=1
+BUILD_COMPLEX=1
+BUILD_COMPLEX16=1
 
-perl ./gensymbol osx x86_64 _ 1 0  0 0 0 0 "" "" 1 0 1 1 1 1 > tempsymbols.def
+perl ./gensymbol ${SYS} ${ARCH} ${BU} ${EXPRECISION} ${NO_CBLAS}  ${NO_LAPACK} ${NO_LAPACKE} ${NEED2UNDERSCORES} ${ONLY_CBLAS} "" "" ${BUILD_LAPACK_DEPRECATED} ${BUILD_BFLOAT16} ${BUILD_SINGLE} ${BUILD_DOUBLE} ${BUILD_COMPLEX} ${BUILD_COMPLEX16} > tempsymbols.def
+#perl ./gensymbol osx x86_64 _ 1 0  0 0 0 0 "" "" 1 0 1 1 1 1 > tempsymbols.def
 
 echo "#define JL_EXPORTED_FUNCS(XX) \\"
 for s in `cut -b2-100 tempsymbols.def`; do
-    echo XX\(${s}$1\) \\;
+    echo XX\(${s}\) \\;
+    echo XX\(${s}64_\) \\;
 done
 
 rm -f *.def

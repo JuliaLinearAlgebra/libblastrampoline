@@ -1,14 +1,19 @@
 include Make.inc
 
-all: libblastrampoline.$(SHLIB_EXT) libblastrampoline64_.$(SHLIB_EXT)
+# Objects we'll build
+OBJS := main.o trampolines/trampolines_$(ARCH).o
+
+# Include win_utils.c on windows
+ifeq ($(OS),WINNT)
+OBJS += win_utils.o
+endif
+
+all: libblastrampoline.$(SHLIB_EXT)
 %.o: %.c
 	$(CC) -o $@ $(CFLAGS) -c $^
 
-libblastrampoline.$(SHLIB_EXT):
-	$(CC) -DEXPORTED_FUNCS_INC=\"$(abspath .)/jl_exported_funcs.inc\" -o $@ $(CFLAGS) main.c trampolines/trampolines_$(ARCH).S $^ $(LDFLAGS)
-
-libblastrampoline64_.$(SHLIB_EXT):
-	$(CC) -DEXPORTED_FUNCS_INC=\"$(abspath .)/jl_exported_funcs64_.inc\" -o $@ $(CFLAGS) main.c trampolines/trampolines_$(ARCH).S $(LDFLAGS)
+libblastrampoline.$(SHLIB_EXT): $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $^ $(LDFLAGS)
 
 install: libblastrampoline.$(SHLIB_EXT)
 	mkdir -p $(prefix)/include

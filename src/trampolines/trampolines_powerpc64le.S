@@ -1,4 +1,4 @@
-#include EXPORTED_FUNCS_INC
+#include "../jl_exported_funcs.inc"
 
 // Notes:
 // bctr: branch to CTR without LR update (tail-call)

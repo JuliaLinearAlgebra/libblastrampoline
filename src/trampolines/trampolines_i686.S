@@ -1,4 +1,4 @@
-#include EXPORTED_FUNCS_INC
+#include "../jl_exported_funcs.inc"
 
 // On Windows, we need to prepend underscores on symbols
 #if defined(_WIN32)

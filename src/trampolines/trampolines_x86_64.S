@@ -1,4 +1,4 @@
-#include EXPORTED_FUNCS_INC
+#include "../jl_exported_funcs.inc"
 
 // On macOS, we need to prepend underscores on symbols
 #if defined(__APPLE__) && defined(__MACH__)

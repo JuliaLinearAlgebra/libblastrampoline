@@ -28,14 +28,6 @@ else
   SHLIB_EXT := so
 endif
 
-# Objects we'll build
-OBJS := main.o trampolines/trampolines_$(ARCH).o
-
-# Include win_utils.c on windows
-ifeq ($(OS),WINNT)
-OBJS += win_utils.o
-endif
-
 CFLAGS =-O2 -fPIC -DLIBRARY_EXPORTS
 LDFLAGS = -shared
 
