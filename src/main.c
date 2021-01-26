@@ -56,9 +56,16 @@ JL_DLLEXPORT int set_blas_funcs(const char * libblas_name) {
     }
 
     // Once we have libblas loaded, re-export its symbols:
-    for (unsigned int symbol_idx=0; jl_exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
-        (*jl_exported_func_addrs[symbol_idx]) = lookup_symbol(libblas, jl_exported_func_names[symbol_idx]);
+    int nforwards = 0;
+    int symbol_idx = 0;
+    for (symbol_idx=0; jl_exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
+      void *addr = lookup_symbol(libblas, jl_exported_func_names[symbol_idx]);
+      (*jl_exported_func_addrs[symbol_idx]) = addr;
+      //printf("%d: %s: %x\n", symbol_idx, jl_exported_func_names[symbol_idx], addr);
+      if (addr != NULL) ++nforwards;
     }
+
+    //printf("Reserved space for %d symbols; processed %d symbols; forwarded %d symbols\n", sizeof(jl_exported_func_names)/sizeof(char *), symbol_idx, nforwards);
     return 1;
 }
 
