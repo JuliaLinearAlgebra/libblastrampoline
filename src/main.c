@@ -46,7 +46,7 @@ static void * lookup_symbol(const void * lib_handle, const char * symbol_name) {
 }
 
 JL_DLLEXPORT int set_blas_funcs(const char * libblas_name) {
-    printf("Generating forwards to %s\n", libblas_name);
+    // printf("Generating forwards to %s\n", libblas_name);
 
     // Load the BLAS lib
     void * libblas = load_library(libblas_name);
