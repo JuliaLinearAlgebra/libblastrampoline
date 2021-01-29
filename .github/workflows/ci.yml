@@ -39,11 +39,9 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - uses: julia-actions/julia-buildpkg@latest
       - name: Run tests
-        working-directory: ${{runner.workspace}}/test
-        shell: julia --color=yes --project=. {0}
+        shell: julia --color=yes --project=test {0}
         run: |
           using Pkg
           Pkg.instantiate()
-          include("run_tests.jl")
+          include(joinpath(pwd(), "test", "runtests.jl"))
