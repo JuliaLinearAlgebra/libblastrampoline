@@ -98,15 +98,14 @@ end
 dgemm = ("dgemm_test", ("||C||^2 is:  24.3384",))
 sgesv = ("sgesv_test", ("||b||^2 is:   3.0000",))
 
-# Build version that links against vanilla OpenBLAS64
-openblas_name = "openblas"
-interface = :LP64
-if Sys.WORD_SIZE == 64
-    openblas_name = string(openblas_name, "64_")
-    interface = :ILP64
+# Build version that links against vanilla OpenBLAS
+openblas_interface = :LP64
+if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+    openblas_interface = :ILP64
 end
-run_test(dgemm, openblas_name, OpenBLAS_jll.LIBPATH_list, interface, "")
-run_test(sgesv, openblas_name, OpenBLAS_jll.LIBPATH_list, interface, "")
+openblas_jll_libname = splitext(basename(OpenBLAS_jll.libopenblas_path)[4:end])[1]
+run_test(dgemm, openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
+run_test(sgesv, openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
 
 # Build version that links against vanilla OpenBLAS32
 run_test(dgemm, "openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
@@ -116,8 +115,8 @@ run_test(sgesv, "openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
 # the trampoline to forwards calls to `OpenBLAS_jll`
 lbt_dir = joinpath(get_blastrampoline_dir(), binlib)
 libdirs = vcat(OpenBLAS_jll.LIBPATH_list..., lbt_dir)
-run_test(dgemm, "blastrampoline", libdirs, interface, OpenBLAS_jll.libopenblas_path)
-run_test(sgesv, "blastrampoline", libdirs, interface, OpenBLAS_jll.libopenblas_path)
+run_test(dgemm, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+run_test(sgesv, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
 
 # And again, but this time with OpenBLAS32_jll
 libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., lbt_dir)
@@ -125,10 +124,11 @@ run_test(dgemm, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_pat
 run_test(sgesv, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
-# Note that MKL has dependencies itself, so we need to 
-libdirs = vcat(MKL_jll.LIBPATH_list..., lbt_dir)
-run_test(dgemm, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
-run_test(sgesv, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+if MKL_jll.is_available()
+    libdirs = vcat(MKL_jll.LIBPATH_list..., lbt_dir)
+    run_test(dgemm, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+    run_test(sgesv, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+end
 
 # Do we have a `blas64.so` somewhere?  If so, test with that for fun
 blas64 = dlopen("libblas64", throw_error=false)
@@ -145,6 +145,8 @@ if blas64 !== nothing
 end
 
 # Finally the super-crazy test: build a binary that links against BOTH sets of symbols!
-inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"))
-libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., lbt_dir)
-run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path):$(OpenBLAS_jll.libopenblas_path)")
+if openblas_interface == :ILP64
+    inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"))
+    libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., lbt_dir)
+    run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path):$(OpenBLAS_jll.libopenblas_path)")
+end
