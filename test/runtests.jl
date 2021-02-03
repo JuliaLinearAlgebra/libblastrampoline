@@ -1,47 +1,10 @@
 using OpenBLAS_jll, OpenBLAS32_jll, MKL_jll, CompilerSupportLibraries_jll
-using Pkg, Artifacts, Base.BinaryPlatforms, Libdl
+using Pkg, Artifacts, Base.BinaryPlatforms, Libdl, Test
 
 include("utils.jl")
 
-# Get libopenblas (including headers) on all Julia versions
-function get_stdlib_jll_artifacts_toml(stdlib::Module)
-    stdlib_artifacts_toml_path = joinpath(dirname(dirname(Base.pathof(stdlib))), "StdlibArtifacts.toml")
-    if isfile(stdlib_artifacts_toml_path)
-        return stdlib_artifacts_toml_path
-    end
-    artifacts_toml_path = joinpath(dirname(dirname(Base.pathof(stdlib))), "Artifacts.toml")
-    if isfile(artifacts_toml_path)
-        return artifacts_toml_path
-    end
-    error("Unable to find (Stdlib)Artifacts.toml file for $(stdlib)!")
-end
-
-# Returns the artifact directory for OpenBLAS_jll on v1.6+
-function get_stdlib_jll_dir(stdlib::Module)
-    artifacts_toml = get_stdlib_jll_artifacts_toml(stdlib)
-    artifacts = select_downloadable_artifacts(artifacts_toml)
-    @assert length(artifacts) == 1
-    name = first(keys(artifacts))
-    Pkg.Artifacts.ensure_artifact_installed(name, artifacts[name], artifacts_toml)
-    return artifact_path(Base.SHA1(artifacts[name]["git-tree-sha1"]))
-end
-
-function capture_output(cmd::Cmd)
-    out_pipe = Pipe()
-    ld_env = filter(e -> startswith(e, "LBT_") || startswith(e, "LD_") || startswith(e, "DYLD_"), cmd.env)
-    @info("Running $(basename(cmd.exec[1]))", ld_env)
-    p = run(pipeline(ignorestatus(cmd), stdout=out_pipe, stderr=out_pipe), wait=false)
-    close(out_pipe.in)
-    output = @async read(out_pipe, String)
-    wait(p)
-    return fetch(output)
-end
-
 # Compile `dgemm_test.c` and `sgesv_test.c` against the given BLAS/LAPACK
 function run_test((test_name, test_expected_outputs), libblas_name, libdirs, interface, backing_libs)
-    p = HostPlatform()
-    target = triplet(Platform(arch(p), os(p); libc=libc(p)))
-
     # We need to configure this C build a bit
     cflags = String[
         "-g",
@@ -52,32 +15,36 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
     
     ldflags = String[
         # Teach it to find that libblas and its dependencies at build time
-        ("-L$(libdir)" for libdir in libdirs)...,
+        ("-L$(cygpath(libdir))" for libdir in libdirs)...,
         "-l$(libblas_name)",
     ]
 
     if !Sys.iswindows()
         # Teach it to find that libblas and its dependencies at run time
-        append!(ldflags, ("-Wl,-rpath,$(libdir)" for libdir in libdirs))
+        append!(ldflags, ("-Wl,-rpath,$(cygpath(libdir))" for libdir in libdirs))
     end
 
     mktempdir() do dir
         @info("Compiling `$(test_name)` against $(libblas_name) in $(dir)")
         srcdir = joinpath(@__DIR__, test_name)
-        p = run(ignorestatus(`make -sC $(srcdir) prefix=$(dir) CFLAGS="$(join(cflags, " "))" LDFLAGS="$(join(ldflags, " "))"`))
+        p = run(ignorestatus(`make -sC $(cygpath(srcdir)) prefix=$(cygpath(dir)) CFLAGS="$(join(cflags, " "))" LDFLAGS="$(join(ldflags, " "))"`))
         if !success(p)
             @error("compilation failed", srcdir, prefix=dir, cflags=join(cflags, " "), ldflags=join(ldflags, " "))
+            return
         end
+        @test success(p)
+    
         env = Dict(
             # We need to tell it how to find CSL at run-time
-            LIBPATH_env => join(libdirs, ":"),
+            LIBPATH_env => append_libpath(libdirs),
             "LBT_DEFAULT_LIBS" => backing_libs,
         )
         cmd = `$(dir)/$(test_name)`
         output = capture_output(addenv(cmd, env))
 
         # Test to make sure the test ran properly
-        if !all(occursin(expected, output) for expected in test_expected_outputs)
+        has_expected_output = all(occursin(expected, output) for expected in test_expected_outputs)
+        if !has_expected_output
             # Uh-oh, we didn't get what we expected.  Time to debug!
             @error("Test failed, got output:")
             println(output)
@@ -88,9 +55,10 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
                 cmd = `gdb $(cmd)`
                 env["LBT_VERBOSE"] = "1"
                 run(addenv(cmd, env))
-                exit(1)
             end
+            return
         end
+        @test has_expected_output
     end
 end
 
@@ -104,49 +72,65 @@ if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
     openblas_interface = :ILP64
 end
 openblas_jll_libname = splitext(basename(OpenBLAS_jll.libopenblas_path)[4:end])[1]
-run_test(dgemm, openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
-run_test(sgesv, openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
+@testset "Vanilla OpenBLAS_jll ($(openblas_interface))" begin
+    run_test(dgemm, openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
+    run_test(sgesv, openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
+end
 
 # Build version that links against vanilla OpenBLAS32
-run_test(dgemm, "openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
-run_test(sgesv, "openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
+@testset "Vanilla OpenBLAS32_jll (LP64)" begin
+    run_test(dgemm, "openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
+    run_test(sgesv, "openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
+end
 
 # Next, build a version that links against `libblastrampoline`, and tell
 # the trampoline to forwards calls to `OpenBLAS_jll`
 lbt_dir = joinpath(get_blastrampoline_dir(), binlib)
-libdirs = vcat(OpenBLAS_jll.LIBPATH_list..., lbt_dir)
-run_test(dgemm, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
-run_test(sgesv, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+@testset "LBT -> OpenBLAS_jll ($(openblas_interface))" begin
+    libdirs = vcat(OpenBLAS_jll.LIBPATH_list..., lbt_dir)
+    run_test(dgemm, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    run_test(sgesv, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+end
 
 # And again, but this time with OpenBLAS32_jll
-libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., lbt_dir)
-run_test(dgemm, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
-run_test(sgesv, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+@testset "LBT -> OpenBLAS32_jll (LP64)" begin
+    libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., lbt_dir)
+    run_test(dgemm, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+    run_test(sgesv, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
 if MKL_jll.is_available()
-    libdirs = vcat(MKL_jll.LIBPATH_list..., lbt_dir)
-    run_test(dgemm, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
-    run_test(sgesv, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+    @testset "LBT -> MKL_jll (LP64)" begin
+        libdirs = vcat(MKL_jll.LIBPATH_list..., lbt_dir)
+        run_test(dgemm, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+        run_test(sgesv, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+    end
 end
 
 # Do we have a `blas64.so` somewhere?  If so, test with that for fun
 blas64 = dlopen("libblas64", throw_error=false)
 if blas64 !== nothing
-    run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
+    @testset "LBT -> libblas64 (ILP64, BLAS)" begin
+        run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
+    end
     # Can't run `sgesv` here as we don't have LAPACK symbols in `libblas64.so`
 
     # Check if we have a `liblapack` and if we do, run with BOTH
     lapack = dlopen("liblapack64", throw_error=false)
     if lapack !== nothing
-        run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64)):$(dlpath(lapack))")
-        run_test(sgesv, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64)):$(dlpath(lapack))")
+        @testset "LBT -> libblas64 + liblapack64 (ILP64, BLAS+LAPACK)" begin
+            run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64)):$(dlpath(lapack))")
+            run_test(sgesv, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64)):$(dlpath(lapack))")
+        end
     end
 end
 
 # Finally the super-crazy test: build a binary that links against BOTH sets of symbols!
 if openblas_interface == :ILP64
     inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"))
-    libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., lbt_dir)
-    run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path):$(OpenBLAS_jll.libopenblas_path)")
+    @testset "LBT -> OpenBLAS 32 + 64 (LP64 + ILP64)" begin
+        libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., lbt_dir)
+        run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path):$(OpenBLAS_jll.libopenblas_path)")
+    end
 end

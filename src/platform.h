@@ -30,13 +30,12 @@
 # else
 #  define JL_DLLEXPORT __declspec(dllimport)
 # endif
-#define JL_HIDDEN
+# define JL_HIDDEN
 #else
 # if defined(LIBRARY_EXPORTS) && defined(_OS_LINUX)
 #  define JL_DLLEXPORT __attribute__ ((visibility("protected")))
 # else
 #  define JL_DLLEXPORT __attribute__ ((visibility("default")))
 # endif
+# define JL_HIDDEN    __attribute__ ((visibility("hidden")))
 #endif
-
-#define JL_HIDDEN    __attribute__ ((visibility("hidden")))
