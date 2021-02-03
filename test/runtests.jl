@@ -69,7 +69,8 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
             @error("compilation failed", srcdir, prefix=dir, cflags=join(cflags, " "), ldflags=join(ldflags, " "))
         end
         env = Dict(
-            LIBPATH_env => join(dirs, pathsep),
+            # We need to tell it how to find CSL at run-time
+            LIBPATH_env => join(libdirs, ":"),
             "LBT_DEFAULT_LIBS" => backing_libs,
         )
         cmd = `$(dir)/$(test_name)`
