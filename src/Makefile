@@ -32,9 +32,9 @@ $(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
 # Install both libraries and our headers
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	@mkdir -p $(prefix)/include/libblastrampoline
-	@cp -rd $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
+	@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
 	@mkdir -p $(prefix)/lib
-	@cp -d $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/lib
+	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/lib
 
 clean:
 	@rm -rf $(builddir)

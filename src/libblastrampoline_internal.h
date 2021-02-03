@@ -20,6 +20,7 @@
 
 #ifdef _OS_DARWIN_
 #include <mach-o/dyld.h>
+#include <sys/syslimits.h>
 #endif
 
 #ifdef _OS_FREEBSD_

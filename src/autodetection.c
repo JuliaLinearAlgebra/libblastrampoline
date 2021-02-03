@@ -72,7 +72,7 @@ int autodetect_lapack_interface(void * dpotrf_addr) {
     char uplo = 'U';
     int64_t m = 2;
     int64_t lda = 0;
-    uint64_t info = 0;
+    int64_t info = 0;
     dpotrf(&uplo, &m, testmat, &lda, &info);
 
     if (info == 0xfffffffffffffffc) {
