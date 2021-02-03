@@ -1,7 +1,15 @@
-CC ?= gcc
+include ../../src/Make.inc
 
-dgemm_test:
-	$(CC) -I../../src -o $@ $(CFLAGS) $@.c $(LDFLAGS)
+all: $(prefix)/dgemm_test$(EXE)
 
-run: dgemm_test
-	./dgemm_test
+$(prefix):
+	@mkdir -p $@
+
+$(prefix)/dgemm_test$(EXE): dgemm_test.c | $(prefix)
+	@$(CC) -o $@ $(CFLAGS) $^ $(LDFLAGS)
+
+clean:
+	@rm -f $(prefix)/dgemm_test$(EXE)
+
+run: $(prefix)/dgemm_test$(EXE)
+	@$(prefix)/dgemm_test$(EXE)

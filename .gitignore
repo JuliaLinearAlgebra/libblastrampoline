@@ -4,3 +4,7 @@
 *.dylib
 
 .vscode/
+
+# Build and output
+src/build/
+src/prefix/

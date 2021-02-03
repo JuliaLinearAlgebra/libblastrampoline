@@ -5,26 +5,25 @@ Proof-of-concept of using trampolines to provide a BLAS muxing library.
 ## Basic usage
 
 Build `libblastrampoline.so`, then link your BLAS-using library against it instead of `libblas.so`.
-When `libblastrampoline` is loaded, it will inspect the `LIBBLAS_NAME` environment variable and attempt to forward BLAS calls made to it on to that library.
-At any time, you may call `set_blas_funcs(libname)` to redirect forwarding to a new BLAS library.
+When `libblastrampoline` is loaded, it will inspect the `LBT_DEFAULT_LIBS` environment variable and attempt to forward BLAS calls made to it on to that library (this can be a list of colon-separated libraries if your backing implementation is split across multiple libraries, such as in the case of separate `BLAS` and `LAPACK` libraries).
+At any time, you may call `load_blas_funcs(libname, clear, verbose)` to redirect forwarding to a new BLAS library.
+If you set `clear` to `1` it will clear out all previous mappings before setting new mappings, while if it is set to `0` it will leave symbols that do not exist within the given `libname` alone.
+This is used to implement layering of libraries, such as between a split BLAS and LAPACK library:
+```
+load_blas_funcs("libblas.so", 1, 0);
+load_blas_funcs("liblapack.so", 0, 0);
+```
 
-## Future work
+## ABI standard
 
-* Ergonomics of generating API:
-    - Right now we're only redirecting `cblas_dgemm64_()`; we need to come up with a clever way to enumerate all of them.
-    - We also need to provide header files for clients to compile against us with.
-    - Perhaps we just steal the OpenBLAS or MKL header files, then parse those to generate `src/jl_exported_funcs.inc`?
+`libblastrampoline` exports a consistent ABI for applications to link against.
+In particular, we export both a 32-bit (LP64) and 64-bit (ILP64) interface, allowing applications that use one or the other (or both!) to link against the library.
+Applications that wish to use the 64-bit interface must append `_64` to their function calls, e.g. instead of calling `dgemm()` they must call `dgemm_64()`.
+The BLAS/LAPACK symbol list we re-export comes from the `gensymbol` script contained within `OpenBLAS`.
+See [`ext/gensymbol`](ext/gensymbol) for more.
+We note that we have an experimental `Clang.jl`-based symbol extractor that extracts only those symbols that are defined within the headers shipped with OpenBLAS, however as there are hundreds of symbols that `gensymbol` knows about (and are indeed exported from the shared library `libopenblas.so`) that are not included in the public C headers, we take the conservative approach and export the `gensymbol`-sourced symbols.
 
-* Split APIs
-    - I believe MKL partitions symbols differently from OpenBLAS; we may need to allow for looking up BLAS symbols in one library, LAPACK symbols in another, et c...
+Because we export both the 32-bit (LP64) and 64-bit (ILP64) interfaces, if clients need header files defining the various BLAS/LAPACK functions, they must include headers defining the appropriate ABI.
+We provide headers broken down by interface (`LP64` vs. `ILP64`) as well as target (e.g. `x86_64-linux-gnu`), so to properly compile your code with headers provided by `libblastrampoline` you must add the appropriate `-I${prefix}/include/${interface}/${target}` flags.
 
-* Name mangling
-    - We should allow for runtime-settable (and possibly auto-detected) name-mangling behavior, e.g. we should be able to map `dgemm_64 -> dlsym(libmkl, dgemm)`, there's no reason the names have to be identical.
-
-* ILP64 management
-    - We should be able to auto-detect whether a BLAS library is ILP64 or not by following this recipe:
-        - If `dgemm_64` exists within it, it's ILP64
-        - If `dgemm` does not exist within it, it's not a BLAS library?
-        - Call `dpotrf` with a purposefully incorrect `lda` in order to get a negative return code of type `BlasInt`, and see if the result looks like a 32-bit or 64-bit error code.  [Example code here](https://github.com/JuliaLang/julia/blob/f8ff854e99f4a05a1abeafaac22ad88c77b1f677/stdlib/LinearAlgebra/src/blaslib.jl#L55-L95).
-
-
+When `libblastrampoline` loads a BLAS/LAPACK library, it will inspect it to determine whether it is a 32-bit (LP64) or 64-bit (ILP64) library, and depending on the result, it will forward from its own 32-bit/64-bit names to the names declared in the library its forwarding to.  This allows automatic usage of multiple libraries with different interfaces but the same symbol names.

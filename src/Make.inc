@@ -16,25 +16,37 @@ endif
 
 # Figure out OS and architecture (used to set `shlib_ext`)
 OS := $(shell uname)
-ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS)))
+ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(OS)))
   OS := WINNT
 endif
 
 ifeq ($(OS), WINNT)
   SHLIB_EXT := dll
+  EXE := .exe
 else ifeq ($(OS), Darwin)
   SHLIB_EXT := dylib
 else
   SHLIB_EXT := so
 endif
 
-CFLAGS =-O2 -fPIC -DLIBRARY_EXPORTS
-LDFLAGS = -shared
+CFLAGS := -g -O0 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE
+LDFLAGS := -shared
 
 # On linux, we need to link `libdl` to get `dlopen`
 ifeq ($(OS),Linux)
 LDFLAGS += -ldl
 endif
 
+ifeq ($(VERBOSE),0)
+ENDCOLOR := "\033[0m"
+CCCOLOR := "\033[34m"
+SRCCOLOR:="\033[33m"
+
+PRINT_CC = printf '%b %b\n' $(CCCOLOR)CC$(ENDCOLOR) $(SRCCOLOR)$@$(ENDCOLOR); $(1)
+else
+PRINT_CC = echo $(1); $(1)
+endif
+
 # Default installation location; we expect you to be overriding this
-prefix ?= build
+prefix ?= prefix
+builddir ?= build

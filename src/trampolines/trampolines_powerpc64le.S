@@ -1,4 +1,5 @@
-#include "../jl_exported_funcs.inc"
+#include "preprocessor_hacks.h"
+#include "../exported_funcs.inc"
 
 // Notes:
 // bctr: branch to CTR without LR update (tail-call)
@@ -7,19 +8,27 @@
 // See 64-Bit ELF V2 ABI Specification: Power Architecture v1.4
 
 #define XX(name) \
-.global name; \
-.type name##, @function; \
+.global CNAME(name); \
+.type CNAME(name)##, @function; \
 .cfi_startproc; \
-name##: ; \
-    addis 2, 12, .TOC.-name##@ha; \
-    addi 2, 2, .TOC.-name##@l; \
-    .localentry name##,.-name##; \
-    addis 9,2,name##_addr@toc@ha; \
-    ld 12,name##_addr@toc@l(9); \
+CNAME(name)##: ; \
+    addis 2, 12, .TOC.-CNAME(name)##@ha; \
+    addi 2, 2, .TOC.-CNAME(name)##@l; \
+    .localentry CNAME(name)##,.-CNAME(name)##; \
+    addis 9,2,CNAMEADDR(name)##@toc@ha; \
+    ld 12,CNAMEADDR(name)##@toc@l(9); \
     mtctr 12; \
     bctr; \
 .cfi_endproc; \
-.size name##,.-name##; \
+.size CNAME(name)##,.-CNAME(name)##; \
 
-JL_EXPORTED_FUNCS(XX)
+// Once for the 32-bit version
+#define CNAME(x)    x
+EXPORTED_FUNCS(XX)
+#undef CNAME
+
+// Once for the 64-bit version
+#define CNAME(x)    x##64_
+EXPORTED_FUNCS(XX)
+#undef CNAME
 #undef XX

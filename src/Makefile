@@ -1,26 +1,40 @@
-include Make.inc
+LBT_ROOT := $(dir $(abspath $(dir $(lastword $(MAKEFILE_LIST)))))
+include $(LBT_ROOT)/src/Make.inc
+
+# Default target
+all: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 
 # Objects we'll build
-OBJS := main.o trampolines/trampolines_$(ARCH).o
+MAIN_OBJS := libblastrampoline.o dl_utils.o autodetection.o trampolines/trampolines_$(ARCH).o
 
-# Include win_utils.c on windows
+# Include win_utils.c on windws
 ifeq ($(OS),WINNT)
-OBJS += win_utils.o
+MAIN_OBJS += win_utils.o
 endif
 
-all: libblastrampoline.$(SHLIB_EXT)
-%.o: %.c
-	$(CC) -o $@ $(CFLAGS) -c $^
+# Place the `.o` files into `$(builddir)`
+MAIN_OBJS := $(addprefix $(builddir)/,$(MAIN_OBJS))
 
-libblastrampoline.$(SHLIB_EXT): $(OBJS)
-	$(CC) -o $@ $(CFLAGS) $^ $(LDFLAGS)
+$(builddir) $(builddir)/trampolines:
+	@mkdir -p $@
 
-install: libblastrampoline.$(SHLIB_EXT)
-	mkdir -p $(prefix)/include
-	cp -vd cblas.h $(prefix)/include
-	mkdir -p $(prefix)/lib
-	cp -vd $< $(prefix)/lib
+$(builddir)/%.o: %.c | $(builddir) $(builddir)/trampolines
+	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $^)
+$(builddir)/trampolines/%.o: trampolines/%.S | $(builddir)/trampolines
+	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $^)
+
+dump-trampolines: trampolines/trampolines_$(ARCH).S
+	$(CC) $< -S | sed -E 's/ ((%%)|;) /\n/g' | sed -E 's/.global/\n.global/g'
+
+$(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
+	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) $^ $(LDFLAGS))
+
+# Install both libraries and our headers
+install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
+	@mkdir -p $(prefix)/include/libblastrampoline
+	@cp -rd $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
+	@mkdir -p $(prefix)/lib
+	@cp -d $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/lib
 
 clean:
-	rm -f $(OBJS)
-	rm -f *.$(SHLIB_EXT)
+	@rm -rf $(builddir)

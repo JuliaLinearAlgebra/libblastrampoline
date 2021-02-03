@@ -1,4 +1,5 @@
-#include "../jl_exported_funcs.inc"
+#include "preprocessor_hacks.h"
+#include "../exported_funcs.inc"
 
 // On macOS, we need to prepend underscores on symbols
 #if defined(__APPLE__) && defined(__MACH__)
@@ -18,10 +19,23 @@
 .cfi_startproc SEP \
 .p2align    2 SEP \
 CNAME(name)##: SEP \
-    adrp x16, PAGE(CNAME(name##_addr)) SEP \
-    ldr x16, [x16, PAGEOFF(CNAME(name##_addr))] SEP \
+    adrp x16, PAGE(CNAMEADDR(name)) SEP \
+    ldr x16, [x16, PAGEOFF(CNAMEADDR(name))] SEP \
     br x16 SEP \
 .cfi_endproc SEP \
 
-JL_EXPORTED_FUNCS(XX)
+
+// Once for the 32-bit versions
+EXPORTED_FUNCS(XX)
+#undef CNAME
+
+// Once for the 64-bit versions
+#if defined(__APPLE__) && defined(__MACH__)
+#define CNAME(x)    _##x##64_
+#else
+#define CNAME(x)    x##64_
+#endif
+
+EXPORTED_FUNCS(XX)
+#undef CNAME
 #undef XX

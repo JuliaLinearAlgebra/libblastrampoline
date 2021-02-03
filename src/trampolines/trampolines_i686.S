@@ -1,4 +1,5 @@
-#include "../jl_exported_funcs.inc"
+#include "preprocessor_hacks.h"
+#include "../exported_funcs.inc"
 
 // On Windows, we need to prepend underscores on symbols
 #if defined(_WIN32)
@@ -19,14 +20,26 @@
 #endif
 
 #define XX(name) \
-DEBUGINFO(name); \
+DEBUGINFO(CNAME(name)); \
 .global CNAME(name); \
 .cfi_startproc; \
 CNAME(name)##:; \
     CET_START(); \
-    jmpl *(CNAME(name##_addr)); \
+    jmpl *(CNAMEADDR(name)); \
     ud2; \
 .cfi_endproc; \
 
-JL_EXPORTED_FUNCS(XX)
+// Once for the 32-bit versions
+EXPORTED_FUNCS(XX)
+#undef CNAME
+
+
+// Once for the 64-bit versions
+#if defined(_WIN32)
+#define CNAME(x) _##x##64_
+#else
+#define CNAME(x) x##64_
+#endif
+EXPORTED_FUNCS(XX)
+#undef CNAME
 #undef XX

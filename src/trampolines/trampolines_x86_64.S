@@ -1,4 +1,5 @@
-#include "../jl_exported_funcs.inc"
+#include "preprocessor_hacks.h"
+#include "../exported_funcs.inc"
 
 // On macOS, we need to prepend underscores on symbols
 #if defined(__APPLE__) && defined(__MACH__)
@@ -40,12 +41,23 @@ SEH_START1(name); \
 CNAME(name)##:; \
 SEH_START2(); \
     CET_START(); \
-    mov CNAME(name##_addr)(%rip),%r11; \
+    mov CNAMEADDR(name)(%rip),%r11; \
     jmpq *%r11; \
     ud2; \
 SEH_END(); \
 .cfi_endproc; \
 EXPORT(name); \
 
-JL_EXPORTED_FUNCS(XX)
+// Once for the 32-bit version
+EXPORTED_FUNCS(XX)
+#undef CNAME
+
+// Once for the 64-bit version
+#if defined(__APPLE__) && defined(__MACH__)
+#define CNAME(x) _##x##64_
+#else
+#define CNAME(x) x##64_
+#endif
+EXPORTED_FUNCS(XX)
+#undef CNAME
 #undef XX
