@@ -1,3 +1,4 @@
+#include "libblastrampoline_internal.h"
 
 /* Utilities to convert from Windows' wchar_t stuff to UTF-8 */
 int wchar_to_utf8(const wchar_t * wstr, char *str, size_t maxlen) {

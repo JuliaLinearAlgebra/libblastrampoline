@@ -23,10 +23,13 @@ endif
 ifeq ($(OS), WINNT)
   SHLIB_EXT := dll
   EXE := .exe
+  binlib := bin
 else ifeq ($(OS), Darwin)
   SHLIB_EXT := dylib
+  binlib := lib
 else
   SHLIB_EXT := so
+  binlib := lib
 endif
 
 CFLAGS := -g -O0 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <dlfcn.h>
 
 // Load in platform-detection macros
 #include "platform.h"
@@ -11,6 +10,7 @@
 #ifdef _OS_LINUX_
 #include <linux/limits.h>
 #include <libgen.h>
+#include <dlfcn.h>
 #endif
 
 #ifdef _OS_WINDOWS_
@@ -21,11 +21,13 @@
 #ifdef _OS_DARWIN_
 #include <mach-o/dyld.h>
 #include <sys/syslimits.h>
+#include <dlfcn.h>
 #endif
 
 #ifdef _OS_FREEBSD_
 #include <stddef.h>
 #include <sys/sysctl.h>
+#include <dlfcn.h>
 #endif
 
 // This is the maximum length of a symbol that we'll allow

@@ -42,7 +42,7 @@ cc = something(
     Sys.which("clang"),
 )
 
-@static if Sys.iswindows() && endswith(strip(capture_output(`$(cc) -dumpmachine`)), "-cygwin")
+@static if Sys.iswindows() && Sys.which("cygpath") !== nothing
     cygpath(path::String) = strip(capture_output(`cygpath $(path)`))
 else
     cygpath(path::String) = path

@@ -33,8 +33,8 @@ $(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	@mkdir -p $(prefix)/include/libblastrampoline
 	@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
-	@mkdir -p $(prefix)/lib
-	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/lib
+	@mkdir -p $(prefix)/$(binlib)
+	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/$(binlib)
 
 clean:
 	@rm -rf $(builddir)
