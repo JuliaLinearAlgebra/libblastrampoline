@@ -120,8 +120,8 @@ if blas64 !== nothing
     lapack = dlopen("liblapack64", throw_error=false)
     if lapack !== nothing
         @testset "LBT -> libblas64 + liblapack64 (ILP64, BLAS+LAPACK)" begin
-            run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64)):$(dlpath(lapack))")
-            run_test(sgesv, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64)):$(dlpath(lapack))")
+            run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
+            run_test(sgesv, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
         end
     end
 end
@@ -131,6 +131,6 @@ if openblas_interface == :ILP64
     inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"))
     @testset "LBT -> OpenBLAS 32 + 64 (LP64 + ILP64)" begin
         libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., lbt_dir)
-        run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path):$(OpenBLAS_jll.libopenblas_path)")
+        run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")
     end
 end

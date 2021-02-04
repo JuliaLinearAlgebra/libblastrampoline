@@ -27,7 +27,7 @@ dump-trampolines: trampolines/trampolines_$(ARCH).S
 	$(CC) $< -S | sed -E 's/ ((%%)|;) /\n/g' | sed -E 's/.global/\n.global/g'
 
 $(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
-	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) $^ $(LDFLAGS))
+	@$(call PRINT_CC,$(CC) -o $@ $(call IMPLIB_FLAGS,$@) $(CFLAGS) $^ $(LDFLAGS))
 
 # Install both libraries and our headers
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
@@ -35,6 +35,10 @@ install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
 	@mkdir -p $(prefix)/$(binlib)
 	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/$(binlib)
+ifeq ($(OS),WINNT)
+	@mkdir -p $(prefix)/lib
+	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT).a $(prefix)/lib
+endif
 
 clean:
 	@rm -rf $(builddir)

@@ -14,9 +14,10 @@
                             .type 32; \
                             .endef
 #define EXPORT(name)        .section .drectve,"r"; \
-                            .ascii " -export:"#name""; \
+                            .ascii STR(-export:##I(CNAME(name))); \
+                            .ascii " "; \
                             .section .text
-#define SEH_START1(name)    .seh_proc name
+#define SEH_START1(name)    .seh_proc CNAME(name)
 #define SEH_START2()        .seh_endprologue
 #define SEH_END()           .seh_endproc
 #else

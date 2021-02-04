@@ -92,8 +92,10 @@ __attribute__((constructor)) void init(void) {
     const char * verbose_str = getenv("LBT_VERBOSE");
     if (verbose_str != NULL && strcmp(verbose_str, "1") == 0) {
         verbose = 1;
+        printf("libblastrampoline initializing\n");
     }
 
+    // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries
     const char * default_libs = getenv("LBT_DEFAULT_LIBS");
     if (default_libs != NULL) {
         const char * curr_lib_start = default_libs;
@@ -102,7 +104,7 @@ __attribute__((constructor)) void init(void) {
         while (curr_lib_start[0] != '\0') {
             // Find the end of this current library name
             const char * end = curr_lib_start;
-            while (*end != ':' && *end != '\0')
+            while (*end != ';' && *end != '\0')
                 end++;
 
             // Copy it into a temporary location
@@ -110,7 +112,7 @@ __attribute__((constructor)) void init(void) {
             memcpy(curr_lib, curr_lib_start, len);
             curr_lib[len] = '\0';
             curr_lib_start = end;
-            while (curr_lib_start[0] == ':')
+            while (curr_lib_start[0] == ';')
                 curr_lib_start++;
 
             // Load functions from this library, clearing only the first time.

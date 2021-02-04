@@ -40,6 +40,21 @@ ifeq ($(OS),Linux)
 LDFLAGS += -ldl
 endif
 
+# On windows, we need to enable unicode mode
+ifeq ($(OS),WINNT)
+CFLAGS += -municode
+endif
+
+# On windows, we must generate import libraries
+ifeq ($(OS),WINNT)
+define IMPLIB_FLAGS
+  -Wl,--out-implib,$(1).a
+endef
+else
+define IMPLIB_FLAGS
+endef
+endif
+
 ifeq ($(VERBOSE),0)
 ENDCOLOR := "\033[0m"
 CCCOLOR := "\033[34m"
