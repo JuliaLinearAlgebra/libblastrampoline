@@ -1,17 +1,6 @@
 #include "preprocessor_hacks.h"
 #include "../exported_funcs.inc"
 
-// On macOS, we need to prepend underscores on symbols
-#if defined(__APPLE__) && defined(__MACH__)
-#define PAGE(x)     x##@PAGE
-#define PAGEOFF(x)  x##@PAGEOFF
-#define SEP         %%
-#else
-#define PAGE(x)     x
-#define PAGEOFF(x)  #:lo12:##x
-#define SEP         ;
-#endif
-
 #define XX(name) \
 .global CNAME(name) SEP \
 .cfi_startproc SEP \
