@@ -27,3 +27,8 @@ Because we export both the 32-bit (LP64) and 64-bit (ILP64) interfaces, if clien
 We provide headers broken down by interface (`LP64` vs. `ILP64`) as well as target (e.g. `x86_64-linux-gnu`), so to properly compile your code with headers provided by `libblastrampoline` you must add the appropriate `-I${prefix}/include/${interface}/${target}` flags.
 
 When `libblastrampoline` loads a BLAS/LAPACK library, it will inspect it to determine whether it is a 32-bit (LP64) or 64-bit (ILP64) library, and depending on the result, it will forward from its own 32-bit/64-bit names to the names declared in the library its forwarding to.  This allows automatic usage of multiple libraries with different interfaces but the same symbol names.
+
+
+### Version History
+
+v1.0.0 - Feburary 2021: Initial release with basic autodetection, LP64/ILP64 mixing and trampoline support.
