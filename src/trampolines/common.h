@@ -60,7 +60,7 @@
 #define SEP         %%
 #else
 #define PAGE(x)     x
-#define PAGEOFF(x)  #:lo12:##x
+#define PAGEOFF(x)  :lo12:##x
 #define SEP         ;
 #endif
 #endif

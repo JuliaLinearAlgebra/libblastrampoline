@@ -1,4 +1,4 @@
-#include "preprocessor_hacks.h"
+#include "common.h"
 #include "../exported_funcs.inc"
 
 #define XX(name) \
