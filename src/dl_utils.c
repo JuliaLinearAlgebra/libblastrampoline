@@ -35,7 +35,7 @@ void * load_library(const char * path) {
         exit(1);
     }
     new_handle = (void *)LoadLibraryExW(wpath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-#elif defined(_OS_DARWIN_)
+#elif defined(_OS_DARWIN_) || defined(_OS_FREEBSD_)
     new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
 #else
     new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);

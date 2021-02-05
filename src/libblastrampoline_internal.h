@@ -28,6 +28,7 @@
 #include <stddef.h>
 #include <sys/sysctl.h>
 #include <dlfcn.h>
+#include <limits.h>
 #endif
 
 // This is the maximum length of a symbol that we'll allow

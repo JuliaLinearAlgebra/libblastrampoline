@@ -63,8 +63,8 @@ function get_blastrampoline_dir()
 
     dir = mktempdir()
     srcdir = joinpath(dirname(@__DIR__), "src")
-    run(`make -sC $(cygpath(srcdir)) clean`)
-    run(`make -sC $(cygpath(srcdir)) install builddir=$(cygpath(dir))/build prefix=$(cygpath(dir))/output`)
+    run(`$(make) -sC $(cygpath(srcdir)) clean`)
+    run(`$(make) -sC $(cygpath(srcdir)) install builddir=$(cygpath(dir))/build prefix=$(cygpath(dir))/output`)
     global blastrampoline_build_dir = joinpath(dir, "output")
     return blastrampoline_build_dir
 end
