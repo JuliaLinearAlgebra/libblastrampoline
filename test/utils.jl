@@ -48,6 +48,12 @@ else
     cygpath(path::String) = path
 end
 
+@static if Sys.isfreebsd()
+    make = "gmake"
+else
+    make = "make"
+end
+
 # Build blastrampoline into a temporary directory, and return that
 blastrampoline_build_dir = nothing
 function get_blastrampoline_dir()
