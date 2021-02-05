@@ -30,7 +30,6 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
         p = run(ignorestatus(`$(make) -sC $(cygpath(srcdir)) prefix=$(cygpath(dir)) CFLAGS="$(join(cflags, " "))" LDFLAGS="$(join(ldflags, " "))"`))
         if !success(p)
             @error("compilation failed", srcdir, prefix=dir, cflags=join(cflags, " "), ldflags=join(ldflags, " "))
-            return
         end
         @test success(p)
     
@@ -56,7 +55,6 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
                 env["LBT_VERBOSE"] = "1"
                 run(addenv(cmd, env))
             end
-            return
         end
         @test has_expected_output
     end
