@@ -7,7 +7,7 @@
 #define I(x)            x
 
 // On macOS and 32-bit windows, we need to prepend underscores on symbols to match the C ABI
-#if defined(__APPLE__) || defined(_WIN32)
+#if defined(__APPLE__) || (defined(_WIN32) && !defined(_WIN64))
 #define UNDERSCORE(x) _##x
 #else
 #define UNDERSCORE(x)    x
