@@ -1,39 +1,6 @@
 #include "preprocessor_hacks.h"
 #include "../exported_funcs.inc"
 
-// On macOS, we need to prepend underscores on symbols
-#if defined(__APPLE__) && defined(__MACH__)
-#define CNAME(x) _##x
-#else
-#define CNAME(x) x
-#endif
-
-#if defined(_WIN64)
-#define DEBUGINFO(name)     .def CNAME(name); \
-                            .scl 2; \
-                            .type 32; \
-                            .endef
-#define EXPORT(name)        .section .drectve,"r"; \
-                            .ascii STR(-export:##I(CNAME(name))); \
-                            .ascii " "; \
-                            .section .text
-#define SEH_START1(name)    .seh_proc CNAME(name)
-#define SEH_START2()        .seh_endprologue
-#define SEH_END()           .seh_endproc
-#else
-#define DEBUGINFO(name)
-#define EXPORT(name)
-#define SEH_START1(name)
-#define SEH_START2()
-#define SEH_END()
-#endif
-
-#if defined(__CET__) && __CET__ & 1 != 0
-#define CET_START() endbr64
-#else
-#define CET_START()
-#endif
-
 #define XX(name) \
 DEBUGINFO(name); \
 .global CNAME(name); \
@@ -49,16 +16,6 @@ SEH_END(); \
 .cfi_endproc; \
 EXPORT(name); \
 
-// Once for the 32-bit version
-EXPORTED_FUNCS(XX)
-#undef CNAME
-
-// Once for the 64-bit version
-#if defined(__APPLE__) && defined(__MACH__)
-#define CNAME(x) _##x##64_
-#else
-#define CNAME(x) x##64_
-#endif
-EXPORTED_FUNCS(XX)
-#undef CNAME
+// Generate both `dgemm_` and `dgemm_64_`
+#include "ilp64_doubling.h"
 #undef XX

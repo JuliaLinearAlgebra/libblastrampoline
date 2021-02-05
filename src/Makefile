@@ -20,8 +20,8 @@ $(builddir) $(builddir)/trampolines:
 
 $(builddir)/%.o: %.c | $(builddir) $(builddir)/trampolines
 	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $^)
-$(builddir)/trampolines/%.o: trampolines/%.S | $(builddir)/trampolines
-	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $^)
+$(builddir)/trampolines/%.o: trampolines/%.S exported_funcs.inc | $(builddir)/trampolines
+	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $<)
 
 dump-trampolines: trampolines/trampolines_$(ARCH).S
 	$(CC) $< -S | sed -E 's/ ((%%)|;) /\n/g' | sed -E 's/.global/\n.global/g'

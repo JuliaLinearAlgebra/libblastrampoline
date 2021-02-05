@@ -22,13 +22,6 @@ CNAME(name)##: ; \
 .cfi_endproc; \
 .size CNAME(name)##,.-CNAME(name)##; \
 
-// Once for the 32-bit version
-#define CNAME(x)    x
-EXPORTED_FUNCS(XX)
-#undef CNAME
-
-// Once for the 64-bit version
-#define CNAME(x)    x##64_
-EXPORTED_FUNCS(XX)
-#undef CNAME
+// Generate both `dgemm_` and `dgemm_64_`
+#include "ilp64_doubling.h"
 #undef XX

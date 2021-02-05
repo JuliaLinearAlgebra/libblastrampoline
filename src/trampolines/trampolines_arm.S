@@ -14,14 +14,6 @@ CNAME(name)##:; \
     .word CNAMEADDR(name)##-(.L##name + 8); \
 .cfi_endproc; \
 
-
-// Once for the 32-bit versions
-#define CNAME(x)    x)
-EXPORTED_FUNCS(XX)
-#undef CNAME
-
-// Once for the 64-bit versions
-#define CNAME(x)    x##64_
-EXPORTED_FUNCS(XX)
-#undef CNAME
+// Generate both `dgemm_` and `dgemm_64_`
+#include "ilp64_doubling.h"
 #undef XX

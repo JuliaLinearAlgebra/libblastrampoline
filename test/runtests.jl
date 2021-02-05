@@ -25,7 +25,7 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
     end
 
     mktempdir() do dir
-        @info("Compiling `$(test_name)` against $(libblas_name) in $(dir)")
+        @info("Compiling `$(test_name)` against $(libblas_name) ($(backing_libs)) in $(dir)")
         srcdir = joinpath(@__DIR__, test_name)
         p = run(ignorestatus(`make -sC $(cygpath(srcdir)) prefix=$(cygpath(dir)) CFLAGS="$(join(cflags, " "))" LDFLAGS="$(join(ldflags, " "))"`))
         if !success(p)
@@ -87,14 +87,14 @@ end
 # the trampoline to forwards calls to `OpenBLAS_jll`
 lbt_dir = joinpath(get_blastrampoline_dir(), binlib)
 @testset "LBT -> OpenBLAS_jll ($(openblas_interface))" begin
-    libdirs = vcat(OpenBLAS_jll.LIBPATH_list..., lbt_dir)
+    libdirs = unique(vcat(OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
     run_test(dgemm, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
     run_test(sgesv, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
 end
 
 # And again, but this time with OpenBLAS32_jll
 @testset "LBT -> OpenBLAS32_jll (LP64)" begin
-    libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., lbt_dir)
+    libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
     run_test(dgemm, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
     run_test(sgesv, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
 end
@@ -102,7 +102,7 @@ end
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
 if MKL_jll.is_available()
     @testset "LBT -> MKL_jll (LP64)" begin
-        libdirs = vcat(MKL_jll.LIBPATH_list..., lbt_dir)
+        libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
         run_test(dgemm, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
         run_test(sgesv, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
     end
@@ -130,7 +130,7 @@ end
 if openblas_interface == :ILP64
     inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"))
     @testset "LBT -> OpenBLAS 32 + 64 (LP64 + ILP64)" begin
-        libdirs = vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., lbt_dir)
+        libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
         run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")
     end
 end
