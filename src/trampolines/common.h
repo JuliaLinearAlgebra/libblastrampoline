@@ -20,7 +20,7 @@
                             .type 32; \
                             .endef
 #define EXPORT(name)        .section .drectve,"r"; \
-                            .ascii STR(-export:##I(name)); \
+                            .ascii STR(-export:##I(CNAME(name))); \
                             .ascii " "; \
                             .section .text
 #else

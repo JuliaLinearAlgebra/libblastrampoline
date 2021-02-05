@@ -12,22 +12,28 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
     if interface == :ILP64
         push!(cflags, "-DILP64")
     end
+
+   # If our GCC is 64-bit but Julia is 32-bit, pass -m32
+   if needs_m32()
+       push!(cflags, "-m32")
+   end
     
     ldflags = String[
         # Teach it to find that libblas and its dependencies at build time
-        ("-L$(cygpath(libdir))" for libdir in libdirs)...,
+        ("-L$(pathesc(libdir))" for libdir in libdirs)...,
         "-l$(libblas_name)",
     ]
 
     if !Sys.iswindows()
         # Teach it to find that libblas and its dependencies at run time
-        append!(ldflags, ("-Wl,-rpath,$(cygpath(libdir))" for libdir in libdirs))
+        append!(ldflags, ("-Wl,-rpath,$(pathesc(libdir))" for libdir in libdirs))
     end
 
     mktempdir() do dir
         @info("Compiling `$(test_name)` against $(libblas_name) ($(backing_libs)) in $(dir)")
         srcdir = joinpath(@__DIR__, test_name)
-        p = run(ignorestatus(`$(make) -sC $(cygpath(srcdir)) prefix=$(cygpath(dir)) CFLAGS="$(join(cflags, " "))" LDFLAGS="$(join(ldflags, " "))"`))
+        make_cmd = `$(make) -sC $(pathesc(srcdir)) prefix=$(pathesc(dir)) CFLAGS="$(join(cflags, " "))" LDFLAGS="$(join(ldflags, " "))"`
+        p = run(ignorestatus(make_cmd))
         if !success(p)
             @error("compilation failed", srcdir, prefix=dir, cflags=join(cflags, " "), ldflags=join(ldflags, " "))
         end

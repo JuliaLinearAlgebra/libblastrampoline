@@ -32,7 +32,7 @@ $(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
 # Install both libraries and our headers
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	@mkdir -p $(prefix)/include/libblastrampoline
-	@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
+	-@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
 	@mkdir -p $(prefix)/$(binlib)
 	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/$(binlib)
 ifeq ($(OS),WINNT)
