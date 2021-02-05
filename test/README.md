@@ -1,11 +1,11 @@
-# Simple libblastrampoline test
+# Simple libblastrampoline tests
 
-This test:
+This is a simple battery of tests to ensure the trampolines are working properly.
+We have two simple test programs, `dgemm_test` and `sgesv_test`, which test the FORTRAN interfaces of `dgemm_` and `sgesv_` to ensure proper execution.
+We compile these tests first against vanilla OpenBLAS installations (both LP64 and ILP64, if available) and then against `libblastrampoline` with various backing BLAS libraries.
+If available, we will test against MKL and `libblas64`.
 
-* Downloads OpenBLAS and CompilerSupportLibraries
-* Builds `dgemm_test.c` linking directly against `OpenBLAS`, runs it to verify this can run at all.
-* Builds `libblastrampoline`
-* Re-builds `dgemm_test.c`, this time linking only against `libblastrampoline`, and finally runs `dgemm_test` while defining `LIBBLAS_NAME` to point at `libopenblas`, and showing the same result.
+Running these tests currently requires the latest tip of `master` on Julia, to deal with JLL lib paths properly.
 
 Run via:
 ```
