@@ -14,7 +14,7 @@ EXPORTED_FUNCS(XX_64)
 
 // Generate list of function names
 #define XX(name)    #name,
-static const char *const exported_func_names[] = {
+const char *const exported_func_names[] = {
     EXPORTED_FUNCS(XX)
     NULL
 };
@@ -23,11 +23,11 @@ static const char *const exported_func_names[] = {
 // Generate list of function addresses to tie names -> variables
 #define XX(name)    &name##_addr,
 #define XX_64(name) &name##64__addr,
-static const void ** exported_func32_addrs[] = {
+const void ** exported_func32_addrs[] = {
     EXPORTED_FUNCS(XX)
     NULL
 };
-static const void ** exported_func64_addrs[] = {
+const void ** exported_func64_addrs[] = {
     EXPORTED_FUNCS(XX_64)
     NULL
 };

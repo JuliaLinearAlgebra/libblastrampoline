@@ -1,6 +1,11 @@
 #include "libblastrampoline_internal.h"
 #include "libblastrampoline_trampdata.h"
 
+// Sentinel to tell us if we've got a deepbindless workaround active or not
+#define DEEPBINDLESS_INTERFACE_LP64_LOADED    0x01
+#define DEEPBINDLESS_INTERFACE_ILP64_LOADED   0x02
+uint8_t deepbindless_interfaces_loaded      = 0x00;
+
 /*
  * Load the given `libname`, lookup all registered symbols within our `exported_func_names` list,
  * and `dlsym()` the symbol addresses to load the addresses for forwarding into that library.
@@ -10,6 +15,10 @@
  * keep their previous value, which allows for loading a base library, then overriding some symbols
  * with a second shim library, integrating separate BLAS and LAPACK libraries, merging an LP64 and
  * ILP64 library into one, or all three use cases at the same time.
+ *
+ * Note that on certain platforms (currently musl linux and freebsd) you cannot load a non-suffixed
+ * ILP64 and an LP64 BLAS at the same time.  Read the note below about lacking RTLD_DEEPBIND
+ * support in the system libc for more details.
  *
  * If `verbose` is set to a non-zero value, it will print out debugging information.
  */
@@ -51,6 +60,60 @@ JL_DLLEXPORT int load_blas_funcs(const char * libname, int clear, int verbose) {
         }
     }
 
+    /*
+     * Now, if we are opening a 64-bit library with 32-bit names (e.g. suffix == ""),
+     * we can handle that... as long as we're on a system where we can tell a library
+     * to look up its own symbols before consulting the global symbol table.  This is
+     * important so that when e.g. ILP64 `dgemm_` in this library wants to look up
+     * `foo_`, it needs to find its own `foo_` but it will find the `foo_` trampoline
+     * in this library unless we have `RTLD_DEEPBIND` semantics.  These semantics are
+     * the default on MacOS and Windows, and on glibc Linux we enable it with the
+     * dlopen flag `RTLD_DEEPBIND`, but on musl and FreeBSD we don't have access to
+     * this flag, so we warn the user that they will be unable to load both LP64 and
+     * ILP64 libraries on this system.  I hear support for this is coming in FreeBSD
+     * 13.0, so some day this may be possible, but I sincerely hope that this
+     * capability is not something being designed into new applications.
+     *
+     * If you are on a system without the ability for `RTLD_DEEPBIND` semantics no
+     * sweat, this should work just fine as long as you either (a) only use one
+     * BLAS library at a time, or (b) use two that have properly namespaced their
+     * symbols with a different suffix.  But if you use two different BLAS libraries
+     * with the same suffix, this library will complain.  Loudly.
+     *
+     * We track this by setting flags in `deepbindless_interfaces_loaded` to show
+     * which interfaces have been loaded with an empty suffix; if the user
+     * attempts to load another one without setting the `clear` flag, we refuse to
+     * load it on a deepbindless system, printing out to `stderr` if we're verbose.
+     */
+#if !defined(RTLD_DEEPBIND) && (defined(_OS_LINUX_) || defined(_OS_FREEBSD_))
+    // If `clear` is set, we clear our tracking
+    if (clear) {
+        deepbindless_interfaces_loaded = 0x00;
+    }
+
+    // If we ever load an LP64 BLAS, we mark that interface as being loaded since
+    // we bind to the suffix-"" names, so even if the names of that library
+    // internally are suffixed to something else, we ourselves will interfere with
+    // a future suffix-"" ILP64 BLAS.
+    if (interface == 32) {
+        deepbindless_interfaces_loaded |= DEEPBINDLESS_INTERFACE_LP64_LOADED;
+    }
+
+    // We only mark a loaded ILP64 BLAS if it is a suffix-"" BLAS, since that is
+    // the only case in which it will interfere with our LP64 BLAS symbols.
+    if (lib_suffix[0] == '\0' && interface == 64) {
+        deepbindless_interfaces_loaded |= DEEPBINDLESS_INTERFACE_ILP64_LOADED;
+    }
+
+    // If more than one flag is set, complain.
+    if (deepbindless_interfaces_loaded == (DEEPBINDLESS_INTERFACE_ILP64_LOADED | DEEPBINDLESS_INTERFACE_LP64_LOADED)) {
+        if (verbose) {
+            fprintf(stderr, "ERROR: Cannot load both LP64 and ILP64 BLAS libraries without proper namespacing on an RTLD_DEEPBIND-less system!\n");
+        }
+        return 0;
+    }
+#endif
+
     // Finally, re-export its symbols:
     int nforwards = 0;
     int symbol_idx = 0;
@@ -75,6 +138,12 @@ JL_DLLEXPORT int load_blas_funcs(const char * libname, int clear, int verbose) {
                 (*exported_func32_addrs[symbol_idx]) = addr;
             } else {
                 (*exported_func64_addrs[symbol_idx]) = addr;
+
+                // If we're on an RTLD_DEEPBINDless system and our workaround is activated,
+                // we take over our own 32-bit symbols as well.
+                if (deepbindless_interfaces_loaded & DEEPBINDLESS_INTERFACE_ILP64_LOADED) {
+                    (*exported_func32_addrs[symbol_idx]) = addr;
+                }
             }
             nforwards++;
         }

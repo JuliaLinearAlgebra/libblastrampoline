@@ -34,6 +34,11 @@
 // This is the maximum length of a symbol that we'll allow
 #define MAX_SYMBOL_LEN 64
 
+// Data defined in `libblastrampoline_trampdata.h
+extern const char *const exported_func_names[];
+extern const void ** exported_func32_addrs[];
+extern const void ** exported_func64_addrs[];
+
 // Functions in `win_utils.c`
 int wchar_to_utf8(const wchar_t * wstr, char *str, size_t maxlen);
 int utf8_to_wchar(const char * str, wchar_t * wstr, size_t maxlen);
@@ -47,3 +52,8 @@ const char * autodetect_symbol_suffix(void * handle);
 int autodetect_blas_interface(void * isamax_addr);
 int autodetect_lapack_interface(void * dpotrf_addr);
 int autodetect_interface(void * handle, const char * suffix);
+
+// Functions in surrogates.c
+void push_fake_lsame();
+void pop_fake_lsame();
+int fake_lsame(char * ca, char * cb);
