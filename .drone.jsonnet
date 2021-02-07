@@ -10,14 +10,14 @@ local Pipeline(os, arch, version, alpine=false) = {
             name: "Run tests",
             image: "julia:"+version+(if alpine then "-alpine" else ""),
             commands: [
-                "julia --project=. --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'",
-                "julia --project=. --check-bounds=yes --color=yes -e 'using Pkg; Pkg.instantiate()'",
-                "julia --project=. --check-bounds=yes --color=yes test/runtests.jl"
+                "julia --project=test --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'",
+                "julia --project=test --check-bounds=yes --color=yes -e 'using Pkg; Pkg.instantiate()'",
+                "julia --project=test --check-bounds=yes --color=yes test/runtests.jl"
             ]
         }
     ],
     trigger: {
-        branch: ["master"]
+        branch: ["main"]
     }
 };
 
