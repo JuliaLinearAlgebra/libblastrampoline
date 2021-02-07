@@ -32,7 +32,7 @@ else
   binlib := lib
 endif
 
-CFLAGS := -g -O2 -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE
+CFLAGS := -g -O2 -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS_add)
 LDFLAGS := -shared
 
 # On linux, we need to link `libdl` to get `dlopen`

@@ -42,17 +42,17 @@ cc = something(
     Sys.which("clang"),
 )
 
-@static if Sys.iswindows() && Sys.which("cygpath") !== nothing
-    cygpath(path::String) = strip(capture_output(`cygpath $(path)`))
-else
-    cygpath(path::String) = path
-end
+# Escape paths on windows by using forward slash so we don't get into escaping hell
+pathesc(path::String) = replace(path, "\\" => "/")
 
 @static if Sys.isfreebsd()
     make = "gmake"
 else
     make = "make"
 end
+
+needs_m32() = startswith(capture_output(`$(cc) -dumpmachine`), "x86_64") && Sys.WORD_SIZE == 32
+
 
 # Build blastrampoline into a temporary directory, and return that
 blastrampoline_build_dir = nothing
@@ -61,10 +61,11 @@ function get_blastrampoline_dir()
         return blastrampoline_build_dir
     end
 
+    cflags_add = needs_m32() ? "-m32" : ""
     dir = mktempdir()
     srcdir = joinpath(dirname(@__DIR__), "src")
-    run(`$(make) -sC $(cygpath(srcdir)) clean`)
-    run(`$(make) -sC $(cygpath(srcdir)) install builddir=$(cygpath(dir))/build prefix=$(cygpath(dir))/output`)
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS_add=$(cflags_add) ARCH=$(Sys.ARCH) clean`)
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS_add=$(cflags_add) ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(dir))/output`)
     global blastrampoline_build_dir = joinpath(dir, "output")
     return blastrampoline_build_dir
 end

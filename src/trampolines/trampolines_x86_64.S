@@ -2,7 +2,7 @@
 #include "../exported_funcs.inc"
 
 #define XX(name) \
-DEBUGINFO(name); \
+DEBUGINFO(CNAME(name)); \
 .global CNAME(name); \
 .cfi_startproc; \
 SEH_START1(name); \
