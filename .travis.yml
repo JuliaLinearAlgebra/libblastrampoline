@@ -1,0 +1,21 @@
+language: julia
+os:
+  - freebsd
+julia:
+  - nightly
+matrix:
+  allow_failures:
+    - julia: nightly
+script:
+  - julia --project=. --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'
+  - julia --project=. --check-bounds=yes --color=yes -e 'using Pkg; Pkg.instantiate()'
+  - julia --project=. --check-bounds=yes --color=yes test/runtests.jl
+notifications:
+  email: false
+
+branches:
+  only:
+  - master
+  - gh-pages # For building documentation
+  - /^testing-.*$/ # testing branches
+  - /^v[0-9]+\.[0-9]+\.[0-9]+$/ # version tags

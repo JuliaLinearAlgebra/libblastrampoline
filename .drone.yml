@@ -1,0 +1,21 @@
+---
+kind: pipeline
+name: linux - arm64 - Julia 1.6
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: Run tests
+  image: julia:1.6
+  commands:
+  - "julia --project=. --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'"
+  - "julia --project=. --check-bounds=yes --color=yes -e 'using Pkg; Pkg.instantiate()'"
+  - julia --project=. --check-bounds=yes --color=yes test/runtests.jl
+
+trigger:
+  branch:
+  - master
+
+...
