@@ -15,12 +15,12 @@
 
 // Windows requires some help with the linker when it comes to debuginfo/exporting
 #if defined(_WIN32) || defined(_WIN64)
-#define DEBUGINFO(name)     .def name; \
+#define DEBUGINFO(name)     .def CNAME(name); \
                             .scl 2; \
                             .type 32; \
                             .endef
 #define EXPORT(name)        .section .drectve,"r"; \
-                            .ascii STR(-export:##I(CNAME(name))); \
+                            .ascii STR(-export:##I(name)); \
                             .ascii " "; \
                             .section .text
 #else
