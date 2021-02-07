@@ -2,16 +2,16 @@
 #include "../exported_funcs.inc"
 
 #define XX(name) \
-.global CNAME(name); \
+.global MANGLE(UNDERSCORE(name)); \
 .cfi_startproc; \
-CNAME(name)##:; \
-    ldr ip, CONCAT(.L,CNAME(name)); \
-CONCAT(.L,CNAME(name)): ;\
+MANGLE(UNDERSCORE(name))##:; \
+    ldr ip, CONCAT(.L,MANGLE(UNDERSCORE(name))); \
+CONCAT(.L,MANGLE(UNDERSCORE(name))): ;\
     add ip, pc, ip; \
     ldr pc, [ip]; \
     .align 2; \
-CONCAT(.L,CNAMEADDR(name))##: ; \
-    .word CNAMEADDR(name)##-(CONCAT(.L,CNAME(name)) + 8); \
+CONCAT(.L,NAMEADDR(name))##: ; \
+    .word NAMEADDR(name)##-(CONCAT(.L,MANGLE(UNDERSCORE(name))) + 8); \
 .cfi_endproc; \
 
 // Generate both `dgemm_` and `dgemm_64_`

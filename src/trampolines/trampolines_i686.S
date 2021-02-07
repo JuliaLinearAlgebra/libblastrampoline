@@ -3,11 +3,11 @@
 
 #define XX(name) \
 DEBUGINFO(name); \
-.global CNAME(name); \
+.global MANGLE(UNDERSCORE(name)); \
 .cfi_startproc; \
-CNAME(name)##:; \
+MANGLE(UNDERSCORE(name))##:; \
     CET_START(); \
-    jmpl *(CNAMEADDR(name)); \
+    jmpl *(NAMEADDR(name)); \
     ud2; \
 .cfi_endproc; \
 EXPORT(name); \

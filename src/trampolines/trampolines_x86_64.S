@@ -3,13 +3,13 @@
 
 #define XX(name) \
 DEBUGINFO(name); \
-.global CNAME(name); \
+.global MANGLE(UNDERSCORE(name)); \
 .cfi_startproc; \
 SEH_START1(name); \
-CNAME(name)##:; \
+MANGLE(UNDERSCORE(name))##:; \
 SEH_START2(); \
     CET_START(); \
-    mov CNAMEADDR(name)(%rip),%r11; \
+    mov NAMEADDR(name)(%rip),%r11; \
     jmpq *%r11; \
     ud2; \
 SEH_END(); \
