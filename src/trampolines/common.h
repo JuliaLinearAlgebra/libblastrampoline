@@ -1,7 +1,7 @@
 // Preprocessor annoyances
 #define CONCAT2(x,y)    x##y
 #define CONCAT(x,y)     CONCAT2(x, y)
-#define CNAMEADDR(name) CONCAT(CNAME(name),_addr)
+#define NAMEADDR(name)  CONCAT(MANGLE(UNDERSCORE(name)),_addr)
 #define STR_(x)         #x
 #define STR(x)          STR_(x)
 #define I(x)            x
@@ -15,12 +15,12 @@
 
 // Windows requires some help with the linker when it comes to debuginfo/exporting
 #if defined(_WIN32) || defined(_WIN64)
-#define DEBUGINFO(name)     .def name; \
+#define DEBUGINFO(name)     .def MANGLE(UNDERSCORE(name)); \
                             .scl 2; \
                             .type 32; \
                             .endef
 #define EXPORT(name)        .section .drectve,"r"; \
-                            .ascii STR(-export:##I(CNAME(name))); \
+                            .ascii STR(-export:##I(MANGLE(name))); \
                             .ascii " "; \
                             .section .text
 #else
@@ -30,7 +30,7 @@
 
 // Windows 64-bit uses SEH
 #if defined(_WIN64)
-#define SEH_START1(name)    .seh_proc CNAME(name)
+#define SEH_START1(name)    .seh_proc MANGLE(UNDERSCORE(name))
 #define SEH_START2()        .seh_endprologue
 #define SEH_END()           .seh_endproc
 #else

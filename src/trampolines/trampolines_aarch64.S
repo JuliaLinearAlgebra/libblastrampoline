@@ -2,12 +2,12 @@
 #include "../exported_funcs.inc"
 
 #define XX(name) \
-.global CNAME(name) SEP \
+.global MANGLE(UNDERSCORE(name)) SEP \
 .cfi_startproc SEP \
 .p2align    2 SEP \
-CNAME(name)##: SEP \
-    adrp x16, PAGE(CNAMEADDR(name)) SEP \
-    ldr x16, [x16, PAGEOFF(CNAMEADDR(name))] SEP \
+MANGLE(UNDERSCORE(name))##: SEP \
+    adrp x16, PAGE(NAMEADDR(name)) SEP \
+    ldr x16, [x16, PAGEOFF(NAMEADDR(name))] SEP \
     br x16 SEP \
 .cfi_endproc SEP \
 

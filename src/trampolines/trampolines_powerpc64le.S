@@ -8,19 +8,19 @@
 // See 64-Bit ELF V2 ABI Specification: Power Architecture v1.4
 
 #define XX(name) \
-.global CNAME(name); \
-.type CNAME(name)##, @function; \
+.global MANGLE(UNDERSCORE(name)); \
+.type MANGLE(UNDERSCORE(name))##, @function; \
 .cfi_startproc; \
-CNAME(name)##: ; \
-    addis 2, 12, .TOC.-CNAME(name)##@ha; \
-    addi 2, 2, .TOC.-CNAME(name)##@l; \
-    .localentry CNAME(name)##,.-CNAME(name)##; \
-    addis 12,2,CNAMEADDR(name)##@toc@ha; \
-    ld 12,CNAMEADDR(name)##@toc@l(12); \
+MANGLE(UNDERSCORE(name))##: ; \
+    addis 2, 12, .TOC.-MANGLE(UNDERSCORE(name))##@ha; \
+    addi 2, 2, .TOC.-MANGLE(UNDERSCORE(name))##@l; \
+    .localentry MANGLE(UNDERSCORE(name))##,.-MANGLE(UNDERSCORE(name))##; \
+    addis 12,2,NAMEADDR(name)##@toc@ha; \
+    ld 12,NAMEADDR(name)##@toc@l(12); \
     mtctr 12; \
     bctr; \
 .cfi_endproc; \
-.size CNAME(name)##,.-CNAME(name)##; \
+.size MANGLE(UNDERSCORE(name))##,.-MANGLE(UNDERSCORE(name))##; \
 
 // Generate both `dgemm_` and `dgemm_64_`
 #include "ilp64_doubling.h"
