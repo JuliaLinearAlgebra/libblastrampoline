@@ -22,8 +22,7 @@ void throw_dl_error(const char * path) {
 
 
 /*
- * Load the given `path`, using as close to `RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND`
- * as possible across all platforms.
+ * Load the given `path`, using `RTLD_NOW | RTLD_LOCAL` and `RTLD_DEEPBIND`, if available
  */
 void * load_library(const char * path) {
     void * new_handle = NULL;
@@ -35,10 +34,13 @@ void * load_library(const char * path) {
         exit(1);
     }
     new_handle = (void *)LoadLibraryExW(wpath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-#elif defined(_OS_DARWIN_) || defined(_OS_FREEBSD_)
-    new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
 #else
+    // If we have `RTLD_DEEPBIND`, use it!
+#if defined(RTLD_DEEPBIND)
     new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);
+#else
+    new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+#endif
 #endif
     if (new_handle == NULL) {
         throw_dl_error(path);

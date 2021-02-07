@@ -44,7 +44,11 @@ int autodetect_blas_interface(void * isamax_addr) {
     int64_t n = 0xffffffff00000003;
     float X[3] = {1.0f, 2.0f, 1.0f};
     int64_t incx = 1;
+
+    // Override `lsame_` to point to our `fake_lsame`
+    push_fake_lsame();
     int64_t max_idx = isamax(&n, X, &incx);
+    pop_fake_lsame();
 
     // This means the `isamax()` implementation saw `N < 0`, ergo it's a 64-bit library
     if (max_idx == 0) {
