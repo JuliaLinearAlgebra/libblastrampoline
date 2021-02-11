@@ -26,8 +26,7 @@ jobs:
         exclude:
           - os: macOS-latest
             julia-arch: x86
-          - os: windows-latest
-            julia-arch: x86
+
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
@@ -45,16 +44,26 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - name: Install gcc-multilib
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.julia-arch == 'x86' }}
+        shell: bash
+        run: |
+          sudo apt install -y gcc-multilib
+      - name: Install i686-w64-mingw32-gcc
+        if: ${{ matrix.os == 'windows-latest' && matrix.julia-arch == 'x86' }}
+        shell: bash
+        run: |
+          choco install mingw -y --x86 --force --params "/exception:sjlj"
+          choco install make -y
+          echo "CC=i686-w64-mingw32-gcc" >> "${GITHUB_ENV}"
+      - name: Set compiler for 64-bit Windows
+        if: ${{ matrix.os == 'windows-latest' && matrix.julia-arch == 'x64' }}
+        shell: bash
+        run: |
+          echo "CC=x86_64-w64-mingw32-gcc" >> "${GITHUB_ENV}"
       - name: Run tests
         shell: julia --color=yes --project=test {0}
         run: |
           using Pkg
           Pkg.instantiate()
-          # Using GHA to do this kind of setup is too tedious...
-          if Sys.iswindows()
-              ENV["CC"] = "x86_64-w64-mingw32-gcc"
-          end
-          if Sys.islinux() && Sys.WORD_SIZE == 32
-              run(`sudo apt install -y gcc-multilib`)
-          end
           include(joinpath(pwd(), "test", "runtests.jl"))
