@@ -112,11 +112,13 @@ if MKL_jll.is_available()
     end
 
     # Test that we can set MKL's interface via an environment variable to select ILP64, and LBT detects it properly
-    @testset "LBT -> MKL_jll (ILP64, via env)" begin
-        withenv("MKL_INTERFACE_LAYER" => "ILP64") do
-            libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
-            run_test(dgemm, "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
-            run_test(sgesv, "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path) 
+    if Sys.WORD_SIZE == 64
+        @testset "LBT -> MKL_jll (ILP64, via env)" begin
+            withenv("MKL_INTERFACE_LAYER" => "ILP64") do
+                libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
+                run_test(dgemm, "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
+                run_test(sgesv, "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path) 
+            end
         end
     end
 end
