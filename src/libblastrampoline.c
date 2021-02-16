@@ -22,7 +22,7 @@ uint8_t deepbindless_interfaces_loaded      = 0x00;
  *
  * If `verbose` is set to a non-zero value, it will print out debugging information.
  */
-JL_DLLEXPORT int load_blas_funcs(const char * libname, int clear, int verbose) {
+JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     if (verbose) {
         printf("Generating forwards to %s\n", libname);
     }
@@ -156,7 +156,7 @@ JL_DLLEXPORT int load_blas_funcs(const char * libname, int clear, int verbose) {
 }
 
 __attribute__((constructor)) void init(void) {
-    // If LIBBLAS_VERBOSE == "1", the startup invocation should be verbose
+    // If LBT_VERBOSE == "1", the startup invocation should be verbose
     int verbose = 0;
     const char * verbose_str = getenv("LBT_VERBOSE");
     if (verbose_str != NULL && strcmp(verbose_str, "1") == 0) {
@@ -185,7 +185,7 @@ __attribute__((constructor)) void init(void) {
                 curr_lib_start++;
 
             // Load functions from this library, clearing only the first time.
-            load_blas_funcs(curr_lib, clear, verbose);
+            lbt_forward(curr_lib, clear, verbose);
             clear = 0;
         }
     }

@@ -6,12 +6,12 @@ Proof-of-concept of using trampolines to provide a BLAS muxing library.
 
 Build `libblastrampoline.so`, then link your BLAS-using library against it instead of `libblas.so`.
 When `libblastrampoline` is loaded, it will inspect the `LBT_DEFAULT_LIBS` environment variable and attempt to forward BLAS calls made to it on to that library (this can be a list of semicolon-separated libraries if your backing implementation is split across multiple libraries, such as in the case of separate `BLAS` and `LAPACK` libraries).
-At any time, you may call `load_blas_funcs(libname, clear, verbose)` to redirect forwarding to a new BLAS library.
+At any time, you may call `lbt_forward(libname, clear, verbose)` to redirect forwarding to a new BLAS library.
 If you set `clear` to `1` it will clear out all previous mappings before setting new mappings, while if it is set to `0` it will leave symbols that do not exist within the given `libname` alone.
 This is used to implement layering of libraries, such as between a split BLAS and LAPACK library:
 ```
-load_blas_funcs("libblas.so", 1, 0);
-load_blas_funcs("liblapack.so", 0, 0);
+lbt_forward("libblas.so", 1, 0);
+lbt_forward("liblapack.so", 0, 0);
 ```
 
 ## ABI standard
