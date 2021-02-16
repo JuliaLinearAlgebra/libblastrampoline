@@ -3818,16 +3818,6 @@
     XX(lapack_make_complex_float) \
     XX(lsame_) \
     XX(lsamen_) \
-    XX(openblas_get_config) \
-    XX(openblas_get_corename) \
-    XX(openblas_get_num_procs) \
-    XX(openblas_get_num_procs_) \
-    XX(openblas_get_num_threads) \
-    XX(openblas_get_num_threads_) \
-    XX(openblas_get_parallel) \
-    XX(openblas_get_parallel_) \
-    XX(openblas_set_num_threads) \
-    XX(openblas_set_num_threads_) \
     XX(qamax_) \
     XX(qamin_) \
     XX(qasum_) \
@@ -4957,5 +4947,20 @@
     XX(zunmtr_) \
     XX(zupgtr_) \
     XX(zupmtr_) \
-
+    XX(openblas_get_config) \
+    XX(openblas_get_corename) \
+    XX(openblas_get_num_procs) \
+    XX(openblas_get_num_procs_) \
+    XX(openblas_get_num_threads) \
+    XX(openblas_get_num_threads_) \
+    XX(openblas_get_parallel) \
+    XX(openblas_get_parallel_) \
+    XX(openblas_set_num_threads) \
+    XX(openblas_set_num_threads_) \
+    XX(mkl_get_max_threads) \
+    XX(mkl_get_max_threads_) \
+    XX(MKL_Set_Num_Threads) \
+    XX(MKL_Set_Num_Threads_) \
+    XX(MKL_Set_Interface_Layer) \
+    XX(MKL_Set_Interface_Layer_)
 #endif
