@@ -4957,5 +4957,11 @@
     XX(zunmtr_) \
     XX(zupgtr_) \
     XX(zupmtr_) \
+    XX(mkl_get_max_threads) \
+    XX(mkl_get_max_threads_) \
+    XX(MKL_Set_Num_Threads) \
+    XX(MKL_Set_Num_Threads_) \
+    XX(MKL_Set_Interface_Layer) \
+    XX(MKL_Set_Interface_Layer_) \
 
 #endif
