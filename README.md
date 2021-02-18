@@ -1,6 +1,8 @@
 # libblastrampoline
 
-Proof-of-concept of using trampolines to provide a BLAS muxing library.
+> All problems in computer science can be solved by another level of indirection
+
+Using PLT trampolines to provide a BLAS and LAPACK demuxing library.
 
 ## Basic usage
 
