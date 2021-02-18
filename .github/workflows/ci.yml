@@ -17,7 +17,7 @@ jobs:
         julia-version:
           - "nightly"
         os:
-          - ubuntu-latest
+          - ubuntu-20.04
           - macos-latest
           - windows-latest
         julia-arch:
@@ -45,10 +45,15 @@ jobs:
             ${{ runner.os }}-test-
             ${{ runner.os }}-
       - name: Install gcc-multilib
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.julia-arch == 'x86' }}
+        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.julia-arch == 'x86' }}
         shell: bash
         run: |
           sudo apt install -y gcc-multilib
+      - name: Install libblas64
+        if: ${{ matrix.os == 'ubuntu-20.04' && matrix.julia-arch == 'x64' }}
+        shell: bash
+        run: |
+          sudo apt update && sudo apt install -y libblas64-dev liblapack64-dev
       - name: Install i686-w64-mingw32-gcc
         if: ${{ matrix.os == 'windows-latest' && matrix.julia-arch == 'x86' }}
         shell: bash
