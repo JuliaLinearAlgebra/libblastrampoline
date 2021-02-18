@@ -1,6 +1,10 @@
 #include "libblastrampoline_internal.h"
 #include "libblastrampoline_trampdata.h"
 
+#ifdef F2C_AUTODETECTION
+#include "libblastrampoline_f2cdata.h"
+#endif
+
 // Sentinel to tell us if we've got a deepbindless workaround active or not
 #define DEEPBINDLESS_INTERFACE_LP64_LOADED    0x01
 #define DEEPBINDLESS_INTERFACE_ILP64_LOADED   0x02
@@ -59,6 +63,23 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
             printf(" -> Autodetected interface LP64 (32-bit)\n");
         }
     }
+
+#ifdef F2C_AUTODETECTION
+    // Next, we need to probe to see if this is an f2c-style calling convention library
+    // The only major example of this that we know of is Accelerate on macOS
+    int f2c = autodetect_f2c(handle, lib_suffix);
+    if (f2c == 0) {
+        fprintf(stderr, "Unable to autodetect calling convention of \"%s\"\n", libname);
+        return 0;
+    }
+    if (verbose) {
+        if (f2c == 2) {
+            printf(" -> Autodetected f2c-style calling convention\n");
+        } else {
+            printf(" -> Autodetected gfortran calling convention\n");
+        }
+    }
+#endif
 
     /*
      * Now, if we are opening a 64-bit library with 32-bit names (e.g. suffix == ""),
@@ -152,6 +173,34 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     if (verbose) {
         printf("Processed %d symbols; forwarded %d symbols with %d-bit interface and mangling to a suffix of \"%s\"\n", symbol_idx, nforwards, interface, lib_suffix);
     }
+
+#ifdef F2C_AUTODETECTION
+    if (f2c == 2) {
+        int f2c_symbol_idx = 0;
+        for (f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
+            // Jump through the f2c_func_idxs layer of indirection to find the `exported_func*_addrs` offsets
+            symbol_idx = f2c_func_idxs[f2c_symbol_idx];
+
+            if (verbose) {
+                char exported_name[MAX_SYMBOL_LEN];
+                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == 64 ? "64_" : "");
+                printf(" - [%04d] f2c(%s)\n", symbol_idx, exported_name);
+            }
+
+            // Override these addresses with our f2c wrappers
+            if (interface == 32) {
+                // Save "true" symbol address in `f2c_$(name)_addr`, then set our exported `$(name)` symbol
+                // to call `f2c_$(name)`, which will bounce into the true symbol, but fix the return value.
+                (*f2c_func32_addrs[f2c_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
+                (*exported_func32_addrs[symbol_idx]) = f2c_func32_wrappers[f2c_symbol_idx];
+            } else {
+                (*f2c_func64_addrs[f2c_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
+                (*exported_func64_addrs[symbol_idx]) = f2c_func64_wrappers[f2c_symbol_idx];
+            }
+        }
+    }
+#endif
+
     return nforwards;
 }
 

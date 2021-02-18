@@ -116,3 +116,40 @@ int autodetect_interface(void * handle, const char * suffix) {
     // Otherwise, this is probably not an LAPACK or BLAS library?!
     return 0;
 }
+
+#ifdef F2C_AUTODETECTION
+int autodetect_f2c(void * handle, const char * suffix) {
+    char symbol_name[MAX_SYMBOL_LEN];
+
+    // Attempt BLAS `sdot_()` test
+    sprintf(symbol_name, "sdot_%s", suffix);
+    void * sdot_addr = lookup_symbol(handle, symbol_name);
+    if (sdot_addr == NULL) {
+        return 0;
+    }
+
+    // Typecast to function pointer for easier usage below
+    float  (*sdot_plain)(int64_t *, float *, int64_t *, float *, int64_t *) = sdot_addr;
+    double (*sdot_f2c)(int64_t *, float *, int64_t *, float *, int64_t *)   = sdot_addr;
+
+    // This `sdot_` invocation will return properly in either the `float` or `double` calling conventions
+    float A[1] = {.5};
+    float B[1] = {.5};
+    int64_t n = 1;
+    int64_t inca = 1;
+    int64_t incb = 1;
+    float plain = sdot_plain(&n, &A[0], &inca, &B[0], &incb);
+    float f2c = sdot_f2c(&n, &A[0], &inca, &B[0], &incb);
+
+    if (plain == 0.25) {
+        // "1" means it's normal
+        return 1;
+    }
+    if (f2c == 0.25) {
+        // "2" means it's an f2c style calling convention
+        return 2;
+    }
+    // We have no idea what happened; nothing works
+    return 0;
+}
+#endif

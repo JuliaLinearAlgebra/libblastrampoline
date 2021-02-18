@@ -28,7 +28,10 @@ We provide headers broken down by interface (`LP64` vs. `ILP64`) as well as targ
 
 When `libblastrampoline` loads a BLAS/LAPACK library, it will inspect it to determine whether it is a 32-bit (LP64) or 64-bit (ILP64) library, and depending on the result, it will forward from its own 32-bit/64-bit names to the names declared in the library its forwarding to.  This allows automatic usage of multiple libraries with different interfaces but the same symbol names.
 
+`libblastrampoline` is also cognizant of the f2c calling convention incompatibilities introduced by some libraries such as [Apple's Accelerate](https://developer.apple.com/documentation/accelerate).  It will automatically probe the library to determine its calling convention and employ a return-value conversion routine to fix the `float`/`double` return value differences.  This support is only available on the `x86_64` and `i686` architectures, however these are the only systems on which the incompatibilty exists to our knowledge.
 
 ### Version History
+
+v1.1.0 - Added f2c autodetection for Accelerate.
 
 v1.0.0 - Feburary 2021: Initial release with basic autodetection, LP64/ILP64 mixing and trampoline support.

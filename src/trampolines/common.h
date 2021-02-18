@@ -1,21 +1,23 @@
 // Preprocessor annoyances
 #define CONCAT2(x,y)    x##y
 #define CONCAT(x,y)     CONCAT2(x, y)
-#define NAMEADDR(name)  CONCAT(MANGLE(UNDERSCORE(name)),_addr)
+#define NAMEADDR(name)  CONCAT(UNDERSCORE(MANGLE(name)),_addr)
 #define STR_(x)         #x
 #define STR(x)          STR_(x)
 #define I(x)            x
+#define OP              (
+#define CP              )
 
 // On macOS and 32-bit windows, we need to prepend underscores on symbols to match the C ABI
 #if defined(__APPLE__) || (defined(_WIN32) && !defined(_WIN64))
-#define UNDERSCORE(x) _##x
+#define UNDERSCORE(x)       CONCAT(_,x)
 #else
-#define UNDERSCORE(x)    x
+#define UNDERSCORE(x)       x
 #endif
 
 // Windows requires some help with the linker when it comes to debuginfo/exporting
 #if defined(_WIN32) || defined(_WIN64)
-#define DEBUGINFO(name)     .def MANGLE(UNDERSCORE(name)); \
+#define DEBUGINFO(name)     .def UNDERSCORE(MANGLE(name)); \
                             .scl 2; \
                             .type 32; \
                             .endef
@@ -30,7 +32,7 @@
 
 // Windows 64-bit uses SEH
 #if defined(_WIN64)
-#define SEH_START1(name)    .seh_proc MANGLE(UNDERSCORE(name))
+#define SEH_START1(name)    .seh_proc UNDERSCORE(MANGLE(name))
 #define SEH_START2()        .seh_endprologue
 #define SEH_END()           .seh_endproc
 #else
