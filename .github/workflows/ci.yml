@@ -53,7 +53,7 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.julia-arch == 'x64' }}
         shell: bash
         run: |
-          sudo apt install -y libblas64-dev liblapack64-dev
+          sudo apt update && sudo apt install -y libblas64-dev liblapack64-dev
       - name: Install i686-w64-mingw32-gcc
         if: ${{ matrix.os == 'windows-latest' && matrix.julia-arch == 'x86' }}
         shell: bash
