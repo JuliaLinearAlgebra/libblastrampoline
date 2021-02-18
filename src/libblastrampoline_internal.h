@@ -53,6 +53,10 @@ int autodetect_blas_interface(void * isamax_addr);
 int autodetect_lapack_interface(void * dpotrf_addr);
 int autodetect_interface(void * handle, const char * suffix);
 
+#ifdef F2C_AUTODETECTION
+int autodetect_f2c(void * handle, const char * suffix);
+#endif
+
 // Functions in surrogates.c
 void push_fake_lsame();
 void pop_fake_lsame();

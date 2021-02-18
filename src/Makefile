@@ -12,6 +12,11 @@ ifeq ($(OS),WINNT)
 MAIN_OBJS += win_utils.o
 endif
 
+# If we're on an architecture that supports f2c autodetection, compile that in!
+ifeq ($(F2C_AUTODETECTION),1)
+MAIN_OBJS += f2c_adapters.o
+endif
+
 # Place the `.o` files into `$(builddir)`
 MAIN_OBJS := $(addprefix $(builddir)/,$(MAIN_OBJS))
 

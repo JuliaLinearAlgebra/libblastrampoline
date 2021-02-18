@@ -55,6 +55,15 @@ define IMPLIB_FLAGS
 endef
 endif
 
+# If we're on x86_64 or i686, we may need to convert back f2c-style bindings (such as Apple's Accelerate)
+# from returning doubles to instead return float's.  We enable automatic F2C detection on those platforms.
+F2C_AUTODETECTION := 0
+ifeq ($(ARCH),x86_64)
+  CFLAGS += -DF2C_AUTODETECTION
+  F2C_AUTODETECTION := 1
+endif
+
+
 ifeq ($(VERBOSE),0)
 ENDCOLOR := "\033[0m"
 CCCOLOR := "\033[34m"
