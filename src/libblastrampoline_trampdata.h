@@ -5,8 +5,8 @@
 // Define holder locations for function addresses as `const void * $(name)_addr`
 // We define a second set the same as the first, but with `_64` on the end, to
 // provide our ILP64 interface, which is a perfect clone of the
-#define XX(name)    JL_HIDDEN const void * name##_addr;
-#define XX_64(name) JL_HIDDEN const void * name##64__addr;
+#define XX(name)    LBT_HIDDEN const void * name##_addr;
+#define XX_64(name) LBT_HIDDEN const void * name##64__addr;
 EXPORTED_FUNCS(XX)
 EXPORTED_FUNCS(XX_64)
 #undef XX

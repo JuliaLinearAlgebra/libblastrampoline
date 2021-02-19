@@ -26,7 +26,7 @@ static char * setter_names[MAX_THREADING_NAMES] = {
  * If you have a truly custom BLAS, you can pass in the explicit getter/setter method names here.
  * Note that these names will have the library suffix appended to them!
  */
-JL_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char * setter) {
+LBT_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char * setter) {
     int idx = 0;
     while (getter_names[idx] != NULL) {
         // We refuse to register ridiculous amounts of these
@@ -50,7 +50,7 @@ JL_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char 
  * Returns the number of threads configured in all loaded libraries.
  * In the event of a mismatch, returns the largest value.
  */
-JL_DLLEXPORT int32_t lbt_get_num_threads() {
+LBT_DLLEXPORT int32_t lbt_get_num_threads() {
     int32_t max_threads = 0;
 
     const lbt_config_t * config = lbt_get_config();
@@ -74,7 +74,7 @@ JL_DLLEXPORT int32_t lbt_get_num_threads() {
 /*
  * Sets the given number of threads for all loaded libraries.
  */
-JL_DLLEXPORT int32_t lbt_set_num_threads(int32_t nthreads) {
+LBT_DLLEXPORT int32_t lbt_set_num_threads(int32_t nthreads) {
     const lbt_config_t * config = lbt_get_config();
     for (int lib_idx=0; config->loaded_libs[lib_idx] != NULL; ++lib_idx) {
         lbt_library_info_t * lib = config->loaded_libs[lib_idx];

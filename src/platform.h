@@ -12,30 +12,30 @@
 #endif
 
 // We need to tell the compiler to generate "naked" functions for some things
-#define JL_NAKED     __attribute__ ((naked))
+#define LBT_NAKED     __attribute__ ((naked))
 
 // Borrow definitions from `julia.h`
 #if defined(__GNUC__)
-#  define JL_CONST_FUNC __attribute__((const))
+#  define LBT_CONST_FUNC __attribute__((const))
 #elif defined(_COMPILER_MICROSOFT_)
-#  define JL_CONST_FUNC __declspec(noalias)
+#  define LBT_CONST_FUNC __declspec(noalias)
 #else
-#  define JL_CONST_FUNC
+#  define LBT_CONST_FUNC
 #endif
 
 // Borrow definition from `support/dtypes.h`
 #ifdef _OS_WINDOWS_
 # ifdef LIBRARY_EXPORTS
-#  define JL_DLLEXPORT __declspec(dllexport)
+#  define LBT_DLLEXPORT __declspec(dllexport)
 # else
-#  define JL_DLLEXPORT __declspec(dllimport)
+#  define LBT_DLLEXPORT __declspec(dllimport)
 # endif
-# define JL_HIDDEN
+# define LBT_HIDDEN
 #else
 # if defined(LIBRARY_EXPORTS) && defined(_OS_LINUX)
-#  define JL_DLLEXPORT __attribute__ ((visibility("protected")))
+#  define LBT_DLLEXPORT __attribute__ ((visibility("protected")))
 # else
-#  define JL_DLLEXPORT __attribute__ ((visibility("default")))
+#  define LBT_DLLEXPORT __attribute__ ((visibility("default")))
 # endif
-# define JL_HIDDEN    __attribute__ ((visibility("hidden")))
+# define LBT_HIDDEN    __attribute__ ((visibility("hidden")))
 #endif
