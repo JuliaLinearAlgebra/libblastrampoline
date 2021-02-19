@@ -177,3 +177,6 @@ if openblas_interface == :ILP64
         run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")
     end
 end
+
+# Run our "direct" tests within Julia
+include("direct.jl")

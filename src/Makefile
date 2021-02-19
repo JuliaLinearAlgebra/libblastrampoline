@@ -5,7 +5,7 @@ include $(LBT_ROOT)/src/Make.inc
 all: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 
 # Objects we'll build
-MAIN_OBJS := libblastrampoline.o dl_utils.o autodetection.o surrogates.o trampolines/trampolines_$(ARCH).o
+MAIN_OBJS := libblastrampoline.o dl_utils.o config.o autodetection.o surrogates.o trampolines/trampolines_$(ARCH).o
 
 # Include win_utils.c on windws
 ifeq ($(OS),WINNT)

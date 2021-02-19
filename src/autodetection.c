@@ -36,7 +36,7 @@ const char * autodetect_symbol_suffix(void * handle) {
  * If this is a BLAS library, we'll check interface type by invoking `isamax` with a purposefully
  * incorrect `N` to cause it to change its return value based on how it is interpreting arugments.
  */
-int autodetect_blas_interface(void * isamax_addr) {
+int32_t autodetect_blas_interface(void * isamax_addr) {
     // Typecast to function pointer for easier usage below
     int64_t (*isamax)(int64_t *, float *, int64_t *) = isamax_addr;
 
@@ -56,14 +56,14 @@ int autodetect_blas_interface(void * isamax_addr) {
 
     // This means the `isamax()` implementation saw `N < 0`, ergo it's a 64-bit library
     if (max_idx == 0) {
-        return 64;
+        return LBT_INTERFACE_ILP64;
     }
     // This means the `isamax()` implementation saw `N == 3`, ergo it's a 32-bit library
     if (max_idx == 2) {
-        return 32;
+        return LBT_INTERFACE_LP64;
     }
     // We have no idea what happened; `max_idx` isn't any of the options we thought it would be.
-    return 0;
+    return LBT_INTERFACE_UNKNOWN;
 }
 
 /*
@@ -71,7 +71,7 @@ int autodetect_blas_interface(void * isamax_addr) {
  * purposefully incorrect `lda` to cause it to store an error code that we can inspect
  * and determine if the internal pointer dereferences were 32-bit or 64-bit.
  */
-int autodetect_lapack_interface(void * dpotrf_addr) {
+int32_t autodetect_lapack_interface(void * dpotrf_addr) {
     // Typecast to function pointer for easier usage below
     void (*dpotrf)(char *, int64_t *, double *, int64_t *, int64_t *) = dpotrf_addr;
 
@@ -86,21 +86,21 @@ int autodetect_lapack_interface(void * dpotrf_addr) {
     if (info == 0xfffffffffffffffc) {
         // If `info` is actually `-4`, it means that `dpotrf` actually stored a 64-bit
         // value into `info`, which means that `lapack_int` internally is 64-bits
-        return 64;
+        return LBT_INTERFACE_ILP64;
     }
     if (info == 0x00000000fffffffc) {
         // This is what it looks like when a library stores a 32-bit value in a 64-bit slot.
-        return 32;
+        return LBT_INTERFACE_LP64;
     }
     // We have no idea what happened; `info` isn't any of the options we thought it would be.
-    return 0;
+    return LBT_INTERFACE_UNKNOWN;
 }
 
 /*
  * Autodetect the interface type of the given library with the given symbol mangling suffix.
  * Returns the values "32", "64" or "0", denoting the bitwidth of the internal index representation.
  */
-int autodetect_interface(void * handle, const char * suffix) {
+int32_t autodetect_interface(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
     // Attempt BLAS `isamax()` test
@@ -118,7 +118,7 @@ int autodetect_interface(void * handle, const char * suffix) {
     }
 
     // Otherwise, this is probably not an LAPACK or BLAS library?!
-    return 0;
+    return LBT_INTERFACE_UNKNOWN;
 }
 
 #ifdef F2C_AUTODETECTION
@@ -146,14 +146,14 @@ int autodetect_f2c(void * handle, const char * suffix) {
     float f2c = sdot_f2c(&n, &A[0], &inca, &B[0], &incb);
 
     if (plain == 0.25) {
-        // "1" means it's normal
-        return 1;
+        // Normal calling convention
+        return LBT_F2C_PLAIN;
     }
     if (f2c == 0.25) {
-        // "2" means it's an f2c style calling convention
-        return 2;
+        // It's an f2c style calling convention
+        return LBT_F2C_REQUIRED;
     }
-    // We have no idea what happened; nothing works
-    return 0;
+    // We have no idea what happened; nothing works and everything is broken
+    return LBT_F2C_UNKNOWN;
 }
 #endif

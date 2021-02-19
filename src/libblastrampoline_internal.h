@@ -43,6 +43,39 @@ extern const char *const exported_func_names[];
 extern const void ** exported_func32_addrs[];
 extern const void ** exported_func64_addrs[];
 
+// The config type you get back from lbt_get_config()
+#define MAX_TRACKED_LIBS        31
+typedef struct {
+    char * libname;
+    void * handle;
+    const char * suffix;
+    int32_t interface;
+    int32_t f2c;
+} lbt_library_info_t;
+
+#define LBT_INTERFACE_LP64              32
+#define LBT_INTERFACE_ILP64             64
+#define LBT_INTERFACE_UNKNOWN           -1
+
+#define LBT_F2C_PLAIN                   0
+#define LBT_F2C_REQUIRED                1
+#define LBT_F2C_UNKNOWN                 -1
+
+typedef struct {
+    lbt_library_info_t ** loaded_libs;
+    uint32_t build_flags;
+} lbt_config_t;
+
+// The various "build_flags" that LBT can report back to the client
+#define LBT_BUILDFLAGS_DEEPBINDLESS     0x01
+#define LBT_BUILDFLAGS_F2C_CAPABLE      0x02
+
+// Functions in `config.c`
+void init_config();
+void clear_loaded_libraries();
+JL_DLLEXPORT const lbt_config_t * lbt_get_config();
+void record_library_load(const char * libname, void * handle, const char * suffix, int interface, int f2c);
+
 // Functions in `win_utils.c`
 int wchar_to_utf8(const wchar_t * wstr, char *str, size_t maxlen);
 int utf8_to_wchar(const char * str, wchar_t * wstr, size_t maxlen);
@@ -53,9 +86,9 @@ void * lookup_symbol(const void * lib_handle, const char * symbol_name);
 
 // Functions in `autodetection.c`
 const char * autodetect_symbol_suffix(void * handle);
-int autodetect_blas_interface(void * isamax_addr);
-int autodetect_lapack_interface(void * dpotrf_addr);
-int autodetect_interface(void * handle, const char * suffix);
+int32_t autodetect_blas_interface(void * isamax_addr);
+int32_t autodetect_lapack_interface(void * dpotrf_addr);
+int32_t autodetect_interface(void * handle, const char * suffix);
 
 #ifdef F2C_AUTODETECTION
 int autodetect_f2c(void * handle, const char * suffix);
