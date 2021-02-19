@@ -212,13 +212,13 @@ extern void (*f2c_zdotu__addr)(double complex *z, const int32_t *n, const double
 double complex f2c_zdotu_(const int32_t* n, const double complex* x, const int32_t* ix, const double complex *y, const int32_t *iy)
 {
 	double complex z;
-	f2c_zdotu__addr(n, x, ix, y, iy, &z);
+	f2c_zdotu__addr(&z, n, x, ix, y, iy);
 	return z;
 }
 extern void (*f2c_zdotu_64__addr)(double complex *z, const int64_t *n, const double complex *x, const int64_t * ix, const double complex *y, const int64_t *iy);
 double complex f2c_zdotu_64_(const int64_t* n, const double complex* x, const int64_t* ix, const double complex *y, const int64_t *iy)
 {
 	double complex z;
-	f2c_zdotu_64__addr(n, x, ix, y, iy, &z);
+	f2c_zdotu_64__addr(&z, n, x, ix, y, iy);
 	return z;
 }
