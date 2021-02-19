@@ -36,6 +36,14 @@ function lbt_get_config(handle)
     return unsafe_load(ccall(dlsym(handle, :lbt_get_config), Ptr{lbt_config_t}, ()))
 end
 
+function lbt_get_num_threads(handle)
+    return ccall(dlsym(handle, :lbt_get_num_threads), Int32, ())
+end
+
+function lbt_set_num_threads(handle, nthreads)
+    return ccall(dlsym(handle, :lbt_set_num_threads), Cvoid, (Int32,), nthreads)
+end
+
 function unpack_loaded_libraries(config::lbt_config_t)
     libs = LBTLibraryInfo[]
     idx = 1
@@ -101,4 +109,27 @@ end
     @test libs[1].suffix == ""
     @test libs[1].interface == LBT_INTERFACE_LP64
     @test libs[1].f2c == LBT_F2C_PLAIN
+
+
+    # get/set threads
+    nthreads = ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_get_num_threads), Cint, ())
+    @test lbt_get_num_threads(lbt_handle) == nthreads
+    nthreads = div(nthreads, 2)
+    lbt_set_num_threads(lbt_handle, nthreads)
+    @test ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_get_num_threads), Cint, ()) == nthreads
+    @test lbt_get_num_threads(lbt_handle) == nthreads
+
+    # If we're on a 64-bit system, load OpenBLAS_jll in and cause a mismatch in the threading
+    if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+        lbt_forward(lbt_handle, OpenBLAS_jll.libopenblas_path)
+
+        lbt_set_num_threads(lbt_handle, 1)
+        @test lbt_get_num_threads(lbt_handle) == 1
+        @test ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_get_num_threads), Cint, ()) == 1
+
+        ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_set_num_threads), Cvoid, (Cint,), 2)
+        @test lbt_get_num_threads(lbt_handle) == 2
+        lbt_set_num_threads(lbt_handle, 1)
+        @test lbt_get_num_threads(lbt_handle) == 1
+    end
 end
