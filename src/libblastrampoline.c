@@ -52,30 +52,33 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     // Next, we need to figure out if it's a 32-bit or 64-bit BLAS library;
     // we'll do that by calling `autodetect_interface()`:
     int interface = autodetect_interface(handle, lib_suffix);
-    if (interface == 0) {
+    if (interface == LBT_INTERFACE_UNKNOWN) {
         fprintf(stderr, "Unable to autodetect interface type of \"%s\"\n", libname);
         return 0;
     }
     if (verbose) {
-        if (interface == 64) {
+        if (interface == LBT_INTERFACE_ILP64) {
             printf(" -> Autodetected interface ILP64 (64-bit)\n");
-        } else {
+        }
+        if (interface == LBT_INTERFACE_LP64) {
             printf(" -> Autodetected interface LP64 (32-bit)\n");
         }
     }
 
+    int f2c = LBT_F2C_PLAIN;
 #ifdef F2C_AUTODETECTION
     // Next, we need to probe to see if this is an f2c-style calling convention library
     // The only major example of this that we know of is Accelerate on macOS
-    int f2c = autodetect_f2c(handle, lib_suffix);
-    if (f2c == 0) {
+    f2c = autodetect_f2c(handle, lib_suffix);
+    if (f2c == LBT_F2C_UNKNOWN) {
         fprintf(stderr, "Unable to autodetect calling convention of \"%s\"\n", libname);
         return 0;
     }
     if (verbose) {
-        if (f2c == 2) {
+        if (f2c == LBT_F2C_REQUIRED) {
             printf(" -> Autodetected f2c-style calling convention\n");
-        } else {
+        }
+        if (f2c == LBT_F2C_PLAIN) {
             printf(" -> Autodetected gfortran calling convention\n");
         }
     }
@@ -116,13 +119,13 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     // we bind to the suffix-"" names, so even if the names of that library
     // internally are suffixed to something else, we ourselves will interfere with
     // a future suffix-"" ILP64 BLAS.
-    if (interface == 32) {
+    if (interface == LBT_INTERFACE_LP64) {
         deepbindless_interfaces_loaded |= DEEPBINDLESS_INTERFACE_LP64_LOADED;
     }
 
     // We only mark a loaded ILP64 BLAS if it is a suffix-"" BLAS, since that is
     // the only case in which it will interfere with our LP64 BLAS symbols.
-    if (lib_suffix[0] == '\0' && interface == 64) {
+    if (lib_suffix[0] == '\0' && interface == LBT_INTERFACE_ILP64) {
         deepbindless_interfaces_loaded |= DEEPBINDLESS_INTERFACE_ILP64_LOADED;
     }
 
@@ -134,6 +137,11 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
         return 0;
     }
 #endif
+
+    // If `clear` is set, drop all information about previously-loaded libraries
+    if (clear) {
+        clear_loaded_libraries();
+    }
 
     // Finally, re-export its symbols:
     int nforwards = 0;
@@ -152,10 +160,10 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
         if (addr != NULL) {
             if (verbose) {
                 char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == 64 ? "64_" : "");
+                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
                 printf(" - [%04d] %s -> %s [%p]\n", symbol_idx, exported_name, symbol_name, addr);
             }
-            if (interface == 32) {
+            if (interface == LBT_INTERFACE_LP64) {
                 (*exported_func32_addrs[symbol_idx]) = addr;
             } else {
                 (*exported_func64_addrs[symbol_idx]) = addr;
@@ -170,12 +178,8 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
         }
     }
 
-    if (verbose) {
-        printf("Processed %d symbols; forwarded %d symbols with %d-bit interface and mangling to a suffix of \"%s\"\n", symbol_idx, nforwards, interface, lib_suffix);
-    }
-
 #ifdef F2C_AUTODETECTION
-    if (f2c == 2) {
+    if (f2c == LBT_F2C_REQUIRED) {
         int f2c_symbol_idx = 0;
         for (f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
             // Jump through the f2c_func_idxs layer of indirection to find the `exported_func*_addrs` offsets
@@ -183,12 +187,12 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
 
             if (verbose) {
                 char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == 64 ? "64_" : "");
+                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
                 printf(" - [%04d] f2c(%s)\n", symbol_idx, exported_name);
             }
 
             // Override these addresses with our f2c wrappers
-            if (interface == 32) {
+            if (interface == LBT_INTERFACE_LP64) {
                 // Save "true" symbol address in `f2c_$(name)_addr`, then set our exported `$(name)` symbol
                 // to call `f2c_$(name)`, which will bounce into the true symbol, but fix the return value.
                 (*f2c_func32_addrs[f2c_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
@@ -201,10 +205,18 @@ JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     }
 #endif
 
+    record_library_load(libname, handle, lib_suffix, interface, f2c);
+    if (verbose) {
+        printf("Processed %d symbols; forwarded %d symbols with %d-bit interface and mangling to a suffix of \"%s\"\n", symbol_idx, nforwards, interface, lib_suffix);
+    }
+
     return nforwards;
 }
 
 __attribute__((constructor)) void init(void) {
+    // Initialize config structures
+    init_config();
+
     // If LBT_VERBOSE == "1", the startup invocation should be verbose
     int verbose = 0;
     const char * verbose_str = getenv("LBT_VERBOSE");
