@@ -83,6 +83,7 @@ int utf8_to_wchar(const char * str, wchar_t * wstr, size_t maxlen);
 // Functions in `dl_utils.c`
 void * load_library(const char * path);
 void * lookup_symbol(const void * lib_handle, const char * symbol_name);
+void close_library(void * handle);
 
 // Functions in `autodetection.c`
 const char * autodetect_symbol_suffix(void * handle);

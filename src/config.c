@@ -27,7 +27,7 @@ void clear_loaded_libraries() {
     for (int idx=0; idx<MAX_TRACKED_LIBS; ++idx) {
         if (lbt_config.loaded_libs[idx] != NULL) {
             free(lbt_config.loaded_libs[idx]->libname);
-            dlclose(lbt_config.loaded_libs[idx]->handle);
+            close_library(lbt_config.loaded_libs[idx]->handle);
             free(lbt_config.loaded_libs[idx]);
             lbt_config.loaded_libs[idx] = NULL;
         }
