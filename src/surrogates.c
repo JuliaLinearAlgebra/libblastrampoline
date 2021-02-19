@@ -1,5 +1,7 @@
 #include "libblastrampoline_internal.h"
 
+#ifdef LBT_DEEPBINDLESS
+
 int find_symbol_idx(const char * name) {
     for (int symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
         if (strcmp(exported_func_names[symbol_idx], "lsame_") == 0) {
@@ -80,3 +82,5 @@ int fake_lsame(char * ca, char * cb) {
     }
     return inta == intb;
 }
+
+#endif // LBT_DEEPBINDLESS

@@ -31,6 +31,10 @@
 #include <limits.h>
 #endif
 
+#if !defined(RTLD_DEEPBIND) && (defined(_OS_LINUX_) || defined(_OS_FREEBSD_))
+#define LBT_DEEPBINDLESS
+#endif
+
 // This is the maximum length of a symbol that we'll allow
 #define MAX_SYMBOL_LEN 64
 
