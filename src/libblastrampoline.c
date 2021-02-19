@@ -26,7 +26,7 @@ uint8_t deepbindless_interfaces_loaded      = 0x00;
  *
  * If `verbose` is set to a non-zero value, it will print out debugging information.
  */
-JL_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
+LBT_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     if (verbose) {
         printf("Generating forwards to %s\n", libname);
     }

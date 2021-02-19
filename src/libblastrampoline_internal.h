@@ -73,7 +73,7 @@ typedef struct {
 // Functions in `config.c`
 void init_config();
 void clear_loaded_libraries();
-JL_DLLEXPORT const lbt_config_t * lbt_get_config();
+LBT_DLLEXPORT const lbt_config_t * lbt_get_config();
 void record_library_load(const char * libname, void * handle, const char * suffix, int interface, int f2c);
 
 // Functions in `win_utils.c`

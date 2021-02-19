@@ -1,6 +1,6 @@
 // We create some holders for f2c functions
-#define XX(name, idx)    JL_HIDDEN const void * f2c_##name##_addr;
-#define XX_64(name, idx) JL_HIDDEN const void * f2c_##name##64__addr;
+#define XX(name, idx)    LBT_HIDDEN const void * f2c_##name##_addr;
+#define XX_64(name, idx) LBT_HIDDEN const void * f2c_##name##64__addr;
 FLOAT32_FUNCS(XX)
 FLOAT32_FUNCS(XX_64)
 COMPLEX64_FUNCS(XX)

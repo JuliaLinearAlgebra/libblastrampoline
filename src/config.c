@@ -8,7 +8,7 @@ void init_config() {
     lbt_config.build_flags = 0x00000000;
 }
 
-JL_DLLEXPORT const lbt_config_t * lbt_get_config() {
+LBT_DLLEXPORT const lbt_config_t * lbt_get_config() {
     // Set build flags (e.g. what we are capable of)
     lbt_config.build_flags = 0x00000000;
 
