@@ -1,6 +1,6 @@
 #include "libblastrampoline_internal.h"
 
-#ifdef LBT_DEEPBINDLESS
+#if defined(LBT_DEEPBINDLESS)
 
 int lsame_idx = -1;
 const void *old_lsame32 = NULL, *old_lsame64 = NULL;

@@ -63,7 +63,7 @@ void close_library(void * handle) {
  * Look up the given symbol within the given library denoted by `handle`.
  */
 void * lookup_symbol(const void * handle, const char * symbol_name) {
-#ifdef _OS_WINDOWS_
+#if defined(_OS_WINDOWS_)
     return GetProcAddress((HMODULE) handle, symbol_name);
 #else
     return dlsym((void *)handle, symbol_name);
