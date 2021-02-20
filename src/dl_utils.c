@@ -17,7 +17,6 @@ void throw_dl_error(const char * path) {
     const char * err = dlerror();
 #endif
     fprintf(stderr, "Message: %s\n", err);
-    exit(1);
 }
 
 
