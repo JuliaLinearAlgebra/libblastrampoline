@@ -4,8 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
-// Load in platform-detection macros
-#include "platform.h"
+// Load in our publicly-defined functions/types
+#include "libblastrampoline.h"
 
 #ifdef _OS_LINUX_
 #include <linux/limits.h>
@@ -45,40 +45,17 @@ extern const void ** exported_func64_addrs[];
 
 // The config type you get back from lbt_get_config()
 #define MAX_TRACKED_LIBS        31
-typedef struct {
-    char * libname;
-    void * handle;
-    const char * suffix;
-    int32_t interface;
-    int32_t f2c;
-} lbt_library_info_t;
-
-#define LBT_INTERFACE_LP64              32
-#define LBT_INTERFACE_ILP64             64
-#define LBT_INTERFACE_UNKNOWN           -1
-
-#define LBT_F2C_PLAIN                   0
-#define LBT_F2C_REQUIRED                1
-#define LBT_F2C_UNKNOWN                 -1
-
-typedef struct {
-    lbt_library_info_t ** loaded_libs;
-    uint32_t build_flags;
-} lbt_config_t;
-
-// The various "build_flags" that LBT can report back to the client
-#define LBT_BUILDFLAGS_DEEPBINDLESS     0x01
-#define LBT_BUILDFLAGS_F2C_CAPABLE      0x02
 
 // Functions in `config.c`
 void init_config();
 void clear_loaded_libraries();
-LBT_DLLEXPORT const lbt_config_t * lbt_get_config();
 void record_library_load(const char * libname, void * handle, const char * suffix, int interface, int f2c);
 
 // Functions in `win_utils.c`
+#ifdef _OS_WINDOWS_
 int wchar_to_utf8(const wchar_t * wstr, char *str, size_t maxlen);
 int utf8_to_wchar(const char * str, wchar_t * wstr, size_t maxlen);
+#endif
 
 // Functions in `dl_utils.c`
 void * load_library(const char * path);

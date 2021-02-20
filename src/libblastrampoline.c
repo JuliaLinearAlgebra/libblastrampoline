@@ -11,20 +11,7 @@
 uint8_t deepbindless_interfaces_loaded      = 0x00;
 
 /*
- * Load the given `libname`, lookup all registered symbols within our `exported_func_names` list,
- * and `dlsym()` the symbol addresses to load the addresses for forwarding into that library.
- *
- * If `clear` is set to a non-zero value, all symbol addresses will be NULL'ed out before they are
- * looked up in `libname`.  If `clear` is set to zero, symbols that do not exist in `libname` will
- * keep their previous value, which allows for loading a base library, then overriding some symbols
- * with a second shim library, integrating separate BLAS and LAPACK libraries, merging an LP64 and
- * ILP64 library into one, or all three use cases at the same time.
- *
- * Note that on certain platforms (currently musl linux and freebsd) you cannot load a non-suffixed
- * ILP64 and an LP64 BLAS at the same time.  Read the note below about lacking RTLD_DEEPBIND
- * support in the system libc for more details.
- *
- * If `verbose` is set to a non-zero value, it will print out debugging information.
+ * Load `libname`, clearing previous mappings if `clear` is set.
  */
 LBT_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     if (verbose) {
