@@ -28,12 +28,34 @@ We note that we have an experimental `Clang.jl`-based symbol extractor that extr
 Because we export both the 32-bit (LP64) and 64-bit (ILP64) interfaces, if clients need header files defining the various BLAS/LAPACK functions, they must include headers defining the appropriate ABI.
 We provide headers broken down by interface (`LP64` vs. `ILP64`) as well as target (e.g. `x86_64-linux-gnu`), so to properly compile your code with headers provided by `libblastrampoline` you must add the appropriate `-I${prefix}/include/${interface}/${target}` flags.
 
-When `libblastrampoline` loads a BLAS/LAPACK library, it will inspect it to determine whether it is a 32-bit (LP64) or 64-bit (ILP64) library, and depending on the result, it will forward from its own 32-bit/64-bit names to the names declared in the library its forwarding to.  This allows automatic usage of multiple libraries with different interfaces but the same symbol names.
+When `libblastrampoline` loads a BLAS/LAPACK library, it will inspect it to determine whether it is a 32-bit (LP64) or 64-bit (ILP64) library, and depending on the result, it will forward from its own 32-bit/64-bit names to the names declared in the library its forwarding to.
+This allows automatic usage of multiple libraries with different interfaces but the same symbol names.
 
-`libblastrampoline` is also cognizant of the f2c calling convention incompatibilities introduced by some libraries such as [Apple's Accelerate](https://developer.apple.com/documentation/accelerate).  It will automatically probe the library to determine its calling convention and employ a return-value conversion routine to fix the `float`/`double` return value differences.  This support is only available on the `x86_64` and `i686` architectures, however these are the only systems on which the incompatibilty exists to our knowledge.
+`libblastrampoline` is also cognizant of the f2c calling convention incompatibilities introduced by some libraries such as [Apple's Accelerate](https://developer.apple.com/documentation/accelerate).
+It will automatically probe the library to determine its calling convention and employ a return-value conversion routine to fix the `float`/`double` return value differences.
+This support is only available on the `x86_64` and `i686` architectures, however these are the only systems on which the incompatibilty exists to our knowledge.
+
+## `libblastrampoline`-specific API
+
+`libblastrampoline` exports a simple configuration API including `lbt_forward()`, `lbt_get_config()`, `lbt_{set,get}_num_threads()`, and more.
+See the [public header file](src/libblastrampoline.h) for the most up-to-date documentation on the `libblastrampoline` API.
+
+**Note**: all `lbt_*` functions should be considered thread-unsafe.
+Do not attempt to load two BLAS libraries one two different threads at the same time.
+
+### Limitations
+
+This library has the ability to work with a mixture of LP64 and ILP64 BLAS libraries, but is slightly hampered on certain platforms that do not have the capability to perform `RTLD_DEEPBIND`-style linking.
+As of the time of this writing, this includes FreeBSD and `musl` Linux.
+The impact of this is that you are unable to load an ILP64 BLAS that exports the typical LP64 names (e.g. `dgemm_`) at the same time as an actual LP64 BLAS (with any naming scheme).
+This is because without `RTLD_DEEPBIND`-style linking semantics, when the ILP64 BLAS tries to call one of its own functions, it will call the function exported by `libblastrampoline` itself, which will result in incorrect values and segfaults.
+To address this, `libblastrampoline` will detect if you attempt to do this and refuse to load a library that would cause this kind of confusion.
+You can always tell if your system is limited in this fashion by calling `lbt_get_config()` and checking the `build_flags` member for the `LBT_BUILDFLAGS_DEEPBINDLESS` flag.
 
 ### Version History
 
-v1.1.0 - Added f2c autodetection for Accelerate.
+v1.2.0 - Added threading getter/setter API, added failure configuration API.
+
+v2.0.0 - Added f2c autodetection for Accelerate, changed public API to `lbt_forward()` from `load_blas_funcs()`.
 
 v1.0.0 - Feburary 2021: Initial release with basic autodetection, LP64/ILP64 mixing and trampoline support.

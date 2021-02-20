@@ -38,6 +38,7 @@ $(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	@mkdir -p $(prefix)/include/libblastrampoline
 	-@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
+	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(prefix)/include/
 	@mkdir -p $(prefix)/$(binlib)
 	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/$(binlib)
 ifeq ($(OS),WINNT)

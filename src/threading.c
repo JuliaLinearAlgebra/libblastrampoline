@@ -74,7 +74,7 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
 /*
  * Sets the given number of threads for all loaded libraries.
  */
-LBT_DLLEXPORT int32_t lbt_set_num_threads(int32_t nthreads) {
+LBT_DLLEXPORT void lbt_set_num_threads(int32_t nthreads) {
     const lbt_config_t * config = lbt_get_config();
     for (int lib_idx=0; config->loaded_libs[lib_idx] != NULL; ++lib_idx) {
         lbt_library_info_t * lib = config->loaded_libs[lib_idx];
