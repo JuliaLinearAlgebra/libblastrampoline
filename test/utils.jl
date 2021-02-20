@@ -69,3 +69,63 @@ function get_blastrampoline_dir()
     global blastrampoline_build_dir = joinpath(dir, "output")
     return blastrampoline_build_dir
 end
+
+
+# Keep these in sync with `src/libblastrampoline_internal.h`
+struct lbt_library_info_t
+    libname::Cstring
+    handle::Ptr{Cvoid}
+    suffix::Cstring
+    interface::Int32
+    f2c::Int32
+end
+struct LBTLibraryInfo
+    libname::String
+    handle::Ptr{Cvoid}
+    suffix::String
+    interface::Int32
+    f2c::Int32
+
+    LBTLibraryInfo(x::lbt_library_info_t) = new(unsafe_string(x.libname), x.handle, unsafe_string(x.suffix), x.interface, x.f2c)
+end
+const LBT_INTERFACE_LP64 = 32
+const LBT_INTERFACE_ILP64 = 64
+const LBT_F2C_PLAIN = 0
+
+struct lbt_config_t
+    loaded_libs::Ptr{Ptr{lbt_library_info_t}}
+    build_flags::UInt32
+end
+const LBT_BUILDFLAGS_F2C_CAPABLE = 0x02
+
+function lbt_forward(handle, path; clear::Bool = false, verbose::Bool = false)
+    ccall(dlsym(handle, :lbt_forward), Int32, (Cstring, Int32, Int32), path, clear ? 1 : 0, verbose ? 1 : 0)
+end
+
+function lbt_get_config(handle)
+    return unsafe_load(ccall(dlsym(handle, :lbt_get_config), Ptr{lbt_config_t}, ()))
+end
+
+function lbt_get_num_threads(handle)
+    return ccall(dlsym(handle, :lbt_get_num_threads), Int32, ())
+end
+
+function lbt_set_num_threads(handle, nthreads)
+    return ccall(dlsym(handle, :lbt_set_num_threads), Cvoid, (Int32,), nthreads)
+end
+
+function lbt_get_forward(handle, symbol_name, interface, f2c = LBT_F2C_PLAIN)
+    return ccall(dlsym(handle, :lbt_get_forward), Ptr{Cvoid}, (Cstring, Int32, Int32), symbol_name, interface, f2c)
+end
+
+function lbt_set_forward(handle, symbol_name, addr, interface, f2c = LBT_F2C_PLAIN; verbose::Bool = false)
+    return ccall(dlsym(handle, :lbt_set_forward), Int32, (Cstring, Ptr{Cvoid}, Int32, Int32, Int32), symbol_name, addr, interface, f2c, verbose ? 1 : 0)
+end
+
+function lbt_set_default_func(handle, addr)
+    return ccall(dlsym(handle, :lbt_set_default_func), Cvoid, (Ptr{Cvoid},), addr)
+end
+
+function lbt_get_default_func(handle)
+    return ccall(dlsym(handle, :lbt_get_default_func), Ptr{Cvoid}, ())
+end

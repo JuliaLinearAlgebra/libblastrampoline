@@ -90,14 +90,14 @@ typedef struct {
  *
  * If `verbose` is set to a non-zero value, it will print out debugging information.
  */
-int lbt_forward(const char * libname, int clear, int verbose);
+LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose);
 
 /*
  * Returns a structure describing the currently-loaded libraries as well as the build configuration
  * of this `libblastrampoline` instance.  See the definition of `lbt_config_t` in this header file
  * for more details.
  */
-const lbt_config_t * lbt_get_config();
+LBT_DLLEXPORT const lbt_config_t * lbt_get_config();
 
 /*
  * Returns the number of threads configured by the underlying BLAS library.  In the event that
@@ -106,7 +106,7 @@ const lbt_config_t * lbt_get_config();
  * for the `lbt_register_thread_interface()` function, although many common functions (such as
  * those for `OpenBLAS`, `MKL` and `BLIS`) are already registered by default.
  */
-int32_t lbt_get_num_threads();
+LBT_DLLEXPORT int32_t lbt_get_num_threads();
 
 /*
  * Sets the number of threads in the underlying BLAS library.  In the event that multiple
@@ -115,7 +115,7 @@ int32_t lbt_get_num_threads();
  * `lbt_register_thread_interface()` function, although many common functions (such as those
  * for `OpenBLAS`, `MKL` and `BLIS`) are already registered by default.
  */
-void lbt_set_num_threads(int32_t num_threads);
+LBT_DLLEXPORT void lbt_set_num_threads(int32_t num_threads);
 
 /*
  * Register a new `get_num_threads()`/`set_num_threads()` pair.  These functions are assumed to be
@@ -130,7 +130,48 @@ void lbt_set_num_threads(int32_t num_threads);
  * name for this functionality, they must register those getter/setter functions here to have them
  * automatically called whenever `lbt_{get,set}_num_threads()` is called.
  */
-void lbt_register_thread_interface(const char * getter, const char * setter);
+LBT_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char * setter);
+
+/*
+ * Function that simply prints out to `stderr` that someone called an uninitialized function.
+ * This is the default default function, see `lbt_set_default_func()` for how to override it.
+ */
+LBT_DLLEXPORT void lbt_default_func_print_error();
+
+/*
+ * Returns the currently-configured default function that gets called if no mapping has been set
+ * for an exported symbol.  Can return `NULL` if it was set as the default function.
+ */
+LBT_DLLEXPORT const void * lbt_get_default_func();
+
+/*
+ * Sets the default function that gets called if no mapping has been set for an exported symbol.
+ * `NULL` is a valid address, if a segfault upon calling an uninitialized function is desirable.
+ * Note that this will not be retroactively applied to already-set pointers, so you should call
+ * this function immediately before calling `lbt_forward()` with `clear` set.
+ */
+LBT_DLLEXPORT void lbt_set_default_func(const void * addr);
+
+/*
+ * Returns the currently-configured forward target for the given `symbol_name`, according to the
+ * requested `interface`.  If `f2c` is set to `LBT_F2C_REQUIRED`, then if there is an f2c
+ * workaround shim in effect for this symbol, this method will thread through that to return the
+ * "true" symbol address.  If `f2c` is set to any other value, then if there is an f2c workaround
+ * shim in effect, the address of the shim will be returned.  (This allows passing this address
+ * to a 3rd party library which does not want to have to deal with f2c conversion, for instance).
+ * If this is not an f2c-capable LBT build, `f2c` is ignored completely.
+ */
+LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t interface, int32_t f2c);
+
+/*
+ * Allows directly setting a symbol to be forwarded to a particular address, for the given
+ * interface.  If `f2c` is set to `LBT_F2C_REQUIRED` and this is an f2c-capable LBT build, an
+ * f2c wrapper function will be interposed between the exported symbol and the targeted address.
+ * If `verbose` is set to a non-zero value, status messages will be printed out to `stdout`.
+ * If `addr` is set to `NULL` it will be set as the default function, see `lbt_set_default_func()`
+ * for how to set the default function pointer.
+ */
+LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * addr, int32_t interface, int32_t f2c, int32_t verbose);
 
 #ifdef __cplusplus
 } // extern "C"

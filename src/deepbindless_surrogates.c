@@ -2,24 +2,18 @@
 
 #ifdef LBT_DEEPBINDLESS
 
-int find_symbol_idx(const char * name) {
-    for (int symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
-        if (strcmp(exported_func_names[symbol_idx], "lsame_") == 0) {
-            return symbol_idx;
-        }
-    }
-
-    // This is fatal as it signifies a configuration error in our trampoline symbol list
-    fprintf(stderr, "Error: Unable to find %s in our symbol list?!\n", name);
-    exit(1);
-}
-
 int lsame_idx = -1;
 const void *old_lsame32 = NULL, *old_lsame64 = NULL;
 void push_fake_lsame() {
     // Find `lsame_` in our symbol list (if we haven't done so before)
-    if (lsame_idx == -1)
+    if (lsame_idx == -1) {
         lsame_idx = find_symbol_idx("lsame_");
+        if (lsame_idx == -1) {
+            // This is fatal as it signifies a configuration error in our trampoline symbol list
+            fprintf(stderr, "Error: Unable to find lsame_ in our symbol list?!\n");
+            exit(1);
+        }
+    }
     
     // Save old values of `lsame_` and `lsame_64_` to our swap location
     old_lsame32 = (*exported_func32_addrs[lsame_idx]);

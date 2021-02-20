@@ -1,48 +1,6 @@
 using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll
+
 include("utils.jl")
-
-function lbt_forward(handle, path; clear::Bool = false, verbose::Bool = false)
-    ccall(dlsym(handle, :lbt_forward), Cint, (Cstring, Cint, Cint), path, clear ? 1 : 0, verbose ? 1 : 0)
-end
-
-# Keep these in sync with `src/libblastrampoline_internal.h`
-struct lbt_library_info_t
-    libname::Cstring
-    handle::Ptr{Cvoid}
-    suffix::Cstring
-    interface::Int32
-    f2c::Int32
-end
-struct LBTLibraryInfo
-    libname::String
-    handle::Ptr{Cvoid}
-    suffix::String
-    interface::Int32
-    f2c::Int32
-
-    LBTLibraryInfo(x::lbt_library_info_t) = new(unsafe_string(x.libname), x.handle, unsafe_string(x.suffix), x.interface, x.f2c)
-end
-const LBT_INTERFACE_LP64 = 32
-const LBT_INTERFACE_ILP64 = 64
-const LBT_F2C_PLAIN = 0
-
-struct lbt_config_t
-    loaded_libs::Ptr{Ptr{lbt_library_info_t}}
-    build_flags::UInt32
-end
-const LBT_BUILDFLAGS_F2C_CAPABLE = 0x02
-
-function lbt_get_config(handle)
-    return unsafe_load(ccall(dlsym(handle, :lbt_get_config), Ptr{lbt_config_t}, ()))
-end
-
-function lbt_get_num_threads(handle)
-    return ccall(dlsym(handle, :lbt_get_num_threads), Int32, ())
-end
-
-function lbt_set_num_threads(handle, nthreads)
-    return ccall(dlsym(handle, :lbt_set_num_threads), Cvoid, (Int32,), nthreads)
-end
 
 function unpack_loaded_libraries(config::lbt_config_t)
     libs = LBTLibraryInfo[]
@@ -57,9 +15,10 @@ function unpack_loaded_libraries(config::lbt_config_t)
     return libs
 end
 
-@testset "Direct usage" begin
-    lbt_prefix = get_blastrampoline_dir()
-    lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/libblastrampoline.$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
+lbt_prefix = get_blastrampoline_dir()
+lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/libblastrampoline.$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
+
+@testset "Config" begin
     @test lbt_handle != C_NULL
 
     # Get immediate config, ensure that nothing is loaded
@@ -110,6 +69,10 @@ end
     @test libs[1].interface == LBT_INTERFACE_LP64
     @test libs[1].f2c == LBT_F2C_PLAIN
 
+end
+
+@testset "get/set threads" begin
+    lbt_forward(lbt_handle, OpenBLAS32_jll.libopenblas_path; clear=true)
 
     # get/set threads
     nthreads = ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_get_num_threads), Cint, ())
@@ -132,4 +95,49 @@ end
         lbt_set_num_threads(lbt_handle, 1)
         @test lbt_get_num_threads(lbt_handle) == 1
     end
+end
+
+slamch_args = []
+function record_slamch_args(str::Cstring)
+    push!(slamch_args, unsafe_string(str))
+    return 13.37f0
+end
+
+# This "default function" will keep track of everyone who tries to call an uninitialized BLAS function
+stacktraces = []
+function default_capture_stacktrace()
+    push!(stacktraces, stacktrace(true))
+    return nothing
+end
+
+@testset "footgun API" begin
+    # Load OpenBLAS32
+    lbt_forward(lbt_handle, OpenBLAS32_jll.libopenblas_path; clear=true)
+
+    # Test that we can get the `dgemm_` symbol address, and that it is what we expect
+    slamch_32 = dlsym(OpenBLAS32_jll.libopenblas_handle, :slamch_)
+    @test slamch_32 != C_NULL
+    @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_LP64) == slamch_32
+
+    # Now, test that we can muck this up
+    my_slamch = @cfunction(record_slamch_args, Float32, (Cstring,))
+    @test lbt_set_forward(lbt_handle, "slamch_", my_slamch, LBT_INTERFACE_LP64) == 0
+    @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_LP64) == my_slamch
+
+    # Ensure that we actually overrode the symbol
+    @test ccall(dlsym(lbt_handle, "slamch_"), Float32, (Cstring,), "test") == 13.37f0
+    @test slamch_args == ["test"]
+
+    # Override the default function to keep track of people who try to call uninitialized BLAS functions
+    @test lbt_get_default_func(lbt_handle) != C_NULL
+    my_default_func = @cfunction(default_capture_stacktrace, Cvoid, ())
+    lbt_set_default_func(lbt_handle, my_default_func)
+    @test lbt_get_default_func(lbt_handle) == my_default_func
+
+    # Now, set `slamch_64_` to it
+    @test lbt_set_forward(lbt_handle, "slamch_", C_NULL, LBT_INTERFACE_ILP64) == 0
+    ccall(dlsym(lbt_handle, "slamch_64_"), Float32, (Cstring,), "this will call the default function")
+    @test length(stacktraces) == 1
+    self_traces = filter(entry -> string(entry.file) == @__FILE__, stacktraces[1])
+    @test length(self_traces) == 3
 end
