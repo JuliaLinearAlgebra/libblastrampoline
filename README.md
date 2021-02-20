@@ -54,7 +54,7 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
-v1.2.0 - Added threading getter/setter API, added failure configuration API.
+v2.1.0 - Added threading getter/setter API, direct setting API and default function API.
 
 v2.0.0 - Added f2c autodetection for Accelerate, changed public API to `lbt_forward()` from `load_blas_funcs()`.
 
