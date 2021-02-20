@@ -3782,7 +3782,6 @@
     XX(dznrm2_) \
     XX(dzsum1_) \
     XX(dzsum_) \
-    XX(goto_set_num_threads) \
     XX(icamax_) \
     XX(icamin_) \
     XX(icmax1_) \
@@ -3819,16 +3818,6 @@
     XX(lapack_make_complex_float) \
     XX(lsame_) \
     XX(lsamen_) \
-    XX(openblas_get_config) \
-    XX(openblas_get_corename) \
-    XX(openblas_get_num_procs) \
-    XX(openblas_get_num_procs_) \
-    XX(openblas_get_num_threads) \
-    XX(openblas_get_num_threads_) \
-    XX(openblas_get_parallel) \
-    XX(openblas_get_parallel_) \
-    XX(openblas_set_num_threads) \
-    XX(openblas_set_num_threads_) \
     XX(qamax_) \
     XX(qamin_) \
     XX(qasum_) \
@@ -4958,33 +4947,27 @@
     XX(zunmtr_) \
     XX(zupgtr_) \
     XX(zupmtr_) \
-    XX(mkl_get_max_threads) \
-    XX(mkl_get_max_threads_) \
-    XX(MKL_Set_Num_Threads) \
-    XX(MKL_Set_Num_Threads_) \
-    XX(MKL_Set_Interface_Layer) \
-    XX(MKL_Set_Interface_Layer_) \
 
 #endif
 
 #ifndef FLOAT32_FUNCS
 #define FLOAT32_FUNCS(XX) \
-    XX(sdot_, 3890) \
-    XX(sdsdot_, 3891) \
-    XX(sasum_, 3867) \
-    XX(scasum_, 3883) \
-    XX(ssum_, 4294) \
-    XX(scsum_, 3888) \
-    XX(samax_, 3865) \
-    XX(scamax_, 3881) \
-    XX(samin_, 3866) \
-    XX(scamin_, 3882) \
-    XX(smax_, 4162) \
-    XX(smin_, 4163) \
-    XX(snrm2_, 4164) \
-    XX(scnrm2_, 3884) \
-    XX(slamch_, 4038) \
-    XX(slamc3_, 4037) \
+    XX(sdot_, 3879) \
+    XX(sdsdot_, 3880) \
+    XX(sasum_, 3856) \
+    XX(scasum_, 3872) \
+    XX(ssum_, 4283) \
+    XX(scsum_, 3877) \
+    XX(samax_, 3854) \
+    XX(scamax_, 3870) \
+    XX(samin_, 3855) \
+    XX(scamin_, 3871) \
+    XX(smax_, 4151) \
+    XX(smin_, 4152) \
+    XX(snrm2_, 4153) \
+    XX(scnrm2_, 3873) \
+    XX(slamch_, 4027) \
+    XX(slamc3_, 4026) \
 
 #endif
 
@@ -4997,7 +4980,7 @@
 
 #ifndef COMPLEX128_FUNCS
 #define COMPLEX128_FUNCS(XX) \
-    XX(zdotu_, 4448) \
-    XX(zdotc_, 4447) \
+    XX(zdotu_, 4437) \
+    XX(zdotc_, 4436) \
 
 #endif
