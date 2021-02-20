@@ -224,7 +224,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
      * attempts to load another one without setting the `clear` flag, we refuse to
      * load it on a deepbindless system, printing out to `stderr` if we're verbose.
      */
-#if LBT_DEEPBINDLESS
+#if defined(LBT_DEEPBINDLESS)
     // If `clear` is set, we clear our tracking
     if (clear) {
         deepbindless_interfaces_loaded = 0x00;
