@@ -46,6 +46,9 @@ extern const void ** exported_func64_addrs[];
 // The config type you get back from lbt_get_config()
 #define MAX_TRACKED_LIBS        31
 
+// Functions in `libblastrampoline.c`
+int32_t find_symbol_idx(const char * name);
+
 // Functions in `config.c`
 void init_config();
 void clear_loaded_libraries();

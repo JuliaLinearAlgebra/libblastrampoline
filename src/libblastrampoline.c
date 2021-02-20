@@ -10,10 +10,138 @@
 #define DEEPBINDLESS_INTERFACE_ILP64_LOADED   0x02
 uint8_t deepbindless_interfaces_loaded      = 0x00;
 
+
+int32_t find_symbol_idx(const char * name) {
+    for (int32_t symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
+        if (strcmp(exported_func_names[symbol_idx], name) == 0) {
+            return symbol_idx;
+        }
+    }
+    return -1;
+}
+
+
+LBT_DLLEXPORT void lbt_default_func_print_error() {
+    fprintf(stderr, "Error: no BLAS/LAPACK library loaded!\n");
+}
+const void * default_func = (const void *)&lbt_default_func_print_error;
+LBT_DLLEXPORT const void * lbt_get_default_func() {
+    return default_func;
+}
+
+LBT_DLLEXPORT void lbt_set_default_func(const void * addr) {
+    default_func = addr;
+}
+
+/*
+ * Force a forward to a particular value.
+ */
+int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t interface, int32_t f2c, int32_t verbose) {
+    // Quit out immediately if this is not a interface setting
+    if (interface != LBT_INTERFACE_LP64 && interface != LBT_INTERFACE_ILP64) {
+        return -1;
+    }
+
+    // NULL is a special value that means our "default address"... which may itself be `NULL`!
+    if (addr == NULL) {
+        addr = default_func;
+    }
+
+    if (interface == LBT_INTERFACE_LP64) {
+        (*exported_func32_addrs[symbol_idx]) = addr;
+    } else {
+        (*exported_func64_addrs[symbol_idx]) = addr;
+
+        // If we're on an RTLD_DEEPBINDless system and our workaround is activated,
+        // we take over our own 32-bit symbols as well.
+        if (deepbindless_interfaces_loaded & DEEPBINDLESS_INTERFACE_ILP64_LOADED) {
+            (*exported_func32_addrs[symbol_idx]) = addr;
+        }
+    }
+
+#ifdef F2C_AUTODETECTION
+    if (f2c == LBT_F2C_REQUIRED) {
+        // Check to see if this symbol is one of the f2c functions
+        int f2c_symbol_idx = 0;
+        for (f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
+            // Jump through the f2c_func_idxs layer of indirection to find the `exported_func*_addrs` offsets
+            // Skip any symbols that aren't ours
+            if (f2c_func_idxs[f2c_symbol_idx] != symbol_idx)
+                continue;
+
+            if (verbose) {
+                char exported_name[MAX_SYMBOL_LEN];
+                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
+                printf(" - [%04d] f2c(%s)\n", symbol_idx, exported_name);
+            }
+
+            // Override these addresses with our f2c wrappers
+            if (interface == LBT_INTERFACE_LP64) {
+                // Save "true" symbol address in `f2c_$(name)_addr`, then set our exported `$(name)` symbol
+                // to call `f2c_$(name)`, which will bounce into the true symbol, but fix the return value.
+                (*f2c_func32_addrs[f2c_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
+                (*exported_func32_addrs[symbol_idx]) = f2c_func32_wrappers[f2c_symbol_idx];
+            } else {
+                (*f2c_func64_addrs[f2c_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
+                (*exported_func64_addrs[symbol_idx]) = f2c_func64_wrappers[f2c_symbol_idx];
+            }
+        }
+    }
+#endif // F2C_AUTODETECTION
+    return 0;
+}
+
+LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t interface, int32_t f2c) {
+    // Search symbol list for `symbol_name`, then sub off to `set_forward_by_index()`
+    int32_t symbol_idx = find_symbol_idx(symbol_name);
+    if (symbol_idx == -1)
+        return (const void *)-1;
+    
+#ifdef F2C_AUTODETECTION
+    if (f2c == LBT_F2C_REQUIRED) {
+        // Check to see if this symbol is one of the f2c functions
+        int f2c_symbol_idx = 0;
+        for (f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
+            // Skip any symbols that aren't ours
+            if (f2c_func_idxs[f2c_symbol_idx] != symbol_idx)
+                continue;
+
+            // If we find it, return the "true" address, but only if the currently-exported
+            // address is actually our f2c wrapper; if it's not then do nothing.
+            if (interface == LBT_INTERFACE_LP64) {
+                if (*exported_func32_addrs[symbol_idx] == f2c_func32_wrappers[f2c_symbol_idx]) {
+                    return (const void *)(*f2c_func32_addrs[f2c_symbol_idx]);
+                }
+            } else {
+                if (*exported_func64_addrs[symbol_idx] == f2c_func64_wrappers[f2c_symbol_idx]) {
+                    return (const void *)(*f2c_func64_addrs[f2c_symbol_idx]);
+                }
+            }
+        }
+    }
+#endif
+
+    // If we're not in f2c-hell, we can just return our interface's address directly.
+    if (interface == LBT_INTERFACE_LP64) {
+        return (const void *)(*exported_func32_addrs[symbol_idx]);
+    } else {
+        return (const void *)(*exported_func64_addrs[symbol_idx]);
+    }
+}
+
+LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * addr, int32_t interface, int32_t f2c, int32_t verbose) {
+    // Search symbol list for `symbol_name`, then sub off to `set_forward_by_index()`
+    int32_t symbol_idx = find_symbol_idx(symbol_name);
+    if (symbol_idx == -1)
+        return -1;
+
+    return set_forward_by_index(symbol_idx, addr, interface, f2c, verbose);
+}
+
 /*
  * Load `libname`, clearing previous mappings if `clear` is set.
  */
-LBT_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
+LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose) {
     if (verbose) {
         printf("Generating forwards to %s\n", libname);
     }
@@ -131,66 +259,24 @@ LBT_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
     }
 
     // Finally, re-export its symbols:
-    int nforwards = 0;
-    int symbol_idx = 0;
+    int32_t nforwards = 0;
+    int32_t symbol_idx = 0;
     char symbol_name[MAX_SYMBOL_LEN];
     for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
         // If `clear` is set, zero out all symbols that may have been set so far
         if (clear) {
-            (*exported_func32_addrs[symbol_idx]) = NULL;
-            (*exported_func64_addrs[symbol_idx]) = NULL;
+            (*exported_func32_addrs[symbol_idx]) = default_func;
+            (*exported_func64_addrs[symbol_idx]) = default_func;
         }
 
         // Look up this symbol in the given library, if it is a valid symbol, set it!
         sprintf(symbol_name, "%s%s", exported_func_names[symbol_idx], lib_suffix);
         void *addr = lookup_symbol(handle, symbol_name);
         if (addr != NULL) {
-            if (verbose) {
-                char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
-                printf(" - [%04d] %s -> %s [%p]\n", symbol_idx, exported_name, symbol_name, addr);
-            }
-            if (interface == LBT_INTERFACE_LP64) {
-                (*exported_func32_addrs[symbol_idx]) = addr;
-            } else {
-                (*exported_func64_addrs[symbol_idx]) = addr;
-
-                // If we're on an RTLD_DEEPBINDless system and our workaround is activated,
-                // we take over our own 32-bit symbols as well.
-                if (deepbindless_interfaces_loaded & DEEPBINDLESS_INTERFACE_ILP64_LOADED) {
-                    (*exported_func32_addrs[symbol_idx]) = addr;
-                }
-            }
+            set_forward_by_index(symbol_idx,  addr, interface, f2c, verbose);
             nforwards++;
         }
     }
-
-#ifdef F2C_AUTODETECTION
-    if (f2c == LBT_F2C_REQUIRED) {
-        int f2c_symbol_idx = 0;
-        for (f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
-            // Jump through the f2c_func_idxs layer of indirection to find the `exported_func*_addrs` offsets
-            symbol_idx = f2c_func_idxs[f2c_symbol_idx];
-
-            if (verbose) {
-                char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
-                printf(" - [%04d] f2c(%s)\n", symbol_idx, exported_name);
-            }
-
-            // Override these addresses with our f2c wrappers
-            if (interface == LBT_INTERFACE_LP64) {
-                // Save "true" symbol address in `f2c_$(name)_addr`, then set our exported `$(name)` symbol
-                // to call `f2c_$(name)`, which will bounce into the true symbol, but fix the return value.
-                (*f2c_func32_addrs[f2c_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
-                (*exported_func32_addrs[symbol_idx]) = f2c_func32_wrappers[f2c_symbol_idx];
-            } else {
-                (*f2c_func64_addrs[f2c_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
-                (*exported_func64_addrs[symbol_idx]) = f2c_func64_wrappers[f2c_symbol_idx];
-            }
-        }
-    }
-#endif
 
     record_library_load(libname, handle, lib_suffix, interface, f2c);
     if (verbose) {
@@ -199,6 +285,7 @@ LBT_DLLEXPORT int lbt_forward(const char * libname, int clear, int verbose) {
 
     return nforwards;
 }
+
 
 __attribute__((constructor)) void init(void) {
     // Initialize config structures
