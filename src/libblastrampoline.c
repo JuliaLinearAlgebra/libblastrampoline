@@ -135,7 +135,13 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
     if (symbol_idx == -1)
         return -1;
 
-    return set_forward_by_index(symbol_idx, addr, interface, f2c, verbose);
+    int32_t ret = set_forward_by_index(symbol_idx, addr, interface, f2c, verbose);
+    if (ret == 0) {
+        // Un-mark this symbol as being provided by any of our libraries;
+        // if you use the footgun API, you can keep track of who is providing what.
+        clear_forwarding_mark(symbol_idx, interface);
+    }
+    return ret;
 }
 
 /*
@@ -262,6 +268,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     int32_t nforwards = 0;
     int32_t symbol_idx = 0;
     char symbol_name[MAX_SYMBOL_LEN];
+    uint8_t forwards[(NUM_EXPORTED_FUNCS/8) + 1] = {0};
     for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
         // If `clear` is set, zero out all symbols that may have been set so far
         if (clear) {
@@ -274,11 +281,12 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         void *addr = lookup_symbol(handle, symbol_name);
         if (addr != NULL) {
             set_forward_by_index(symbol_idx,  addr, interface, f2c, verbose);
+            BITFIELD_SET(forwards, symbol_idx);
             nforwards++;
         }
     }
 
-    record_library_load(libname, handle, lib_suffix, interface, f2c);
+    record_library_load(libname, handle, lib_suffix, &forwards[0], interface, f2c);
     if (verbose) {
         printf("Processed %d symbols; forwarded %d symbols with %d-bit interface and mangling to a suffix of \"%s\"\n", symbol_idx, nforwards, interface, lib_suffix);
     }

@@ -7,12 +7,25 @@ function unpack_loaded_libraries(config::lbt_config_t)
     idx = 1
     lib_ptr = unsafe_load(config.loaded_libs, idx)
     while lib_ptr != C_NULL
-        push!(libs, LBTLibraryInfo(unsafe_load(lib_ptr)))
+        push!(libs, LBTLibraryInfo(unsafe_load(lib_ptr), config.num_exported_symbols))
 
         idx += 1
         lib_ptr = unsafe_load(config.loaded_libs, idx)
     end
     return libs
+end
+
+function find_symbol_offset(config::lbt_config_t, symbol::String)
+    for sym_idx in 1:config.num_exported_symbols
+        if unsafe_string(unsafe_load(config.exported_symbols, sym_idx)) == symbol
+            return UInt32(sym_idx - 1)
+        end
+    end
+    return nothing
+end
+
+function bitfield_get(field::Vector{UInt8}, symbol_idx::UInt32)
+    return field[div(symbol_idx,8)+1] & (UInt8(0x01) << (symbol_idx%8))
 end
 
 lbt_prefix = get_blastrampoline_dir()
@@ -38,6 +51,10 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/libblastrampoline.$(shlib_ext)", RT
         @test (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
     end
 
+    # Check to make sure that `dgemm_` is part of the exported symbols:
+    dgemm_idx = find_symbol_offset(config, "dgemm_")
+    @test dgemm_idx !== nothing
+
     # Walk the libraries and check we have two
     libs = unpack_loaded_libraries(config)
     @test length(libs) == 2
@@ -52,12 +69,21 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/libblastrampoline.$(shlib_ext)", RT
         @test libs[1].interface == LBT_INTERFACE_LP64
     end
     @test libs[1].f2c == LBT_F2C_PLAIN
+    @test bitfield_get(libs[1].active_forwards, dgemm_idx) != 0
 
     # Next check OpenBLAS32_jll which is always LP64
     @test libs[2].libname == OpenBLAS32_jll.libopenblas_path
     @test libs[2].suffix == ""
     @test libs[2].interface == LBT_INTERFACE_LP64
     @test libs[2].f2c == LBT_F2C_PLAIN
+
+    # If OpenBLAS32 and OpenBLAS are the same interface (e.g. i686)
+    # then libs[2].active_forwards should be all zero!
+    if libs[1].interface == libs[2].interface
+        @test bitfield_get(libs[2].active_forwards, dgemm_idx) == 0
+    else
+        @test bitfield_get(libs[2].active_forwards, dgemm_idx) != 0
+    end
 
     # Load OpenBLAS32_jll again, but this time clearing it and ensure the config gets cleared too
     lbt_forward(lbt_handle, OpenBLAS32_jll.libopenblas_path; clear=true)
@@ -68,7 +94,6 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/libblastrampoline.$(shlib_ext)", RT
     @test libs[1].suffix == ""
     @test libs[1].interface == LBT_INTERFACE_LP64
     @test libs[1].f2c == LBT_F2C_PLAIN
-
 end
 
 @testset "get/set threads" begin
@@ -119,10 +144,24 @@ end
     @test slamch_32 != C_NULL
     @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_LP64) == slamch_32
 
+    # Ensure that the libs show that `slamch_` is forwarded by this library:
+    config = lbt_get_config(lbt_handle)
+    libs = unpack_loaded_libraries(config)
+    @test length(libs) == 1
+
+    slamch_idx = find_symbol_offset(config, "slamch_")
+    @test slamch_idx !== nothing
+    @test bitfield_get(libs[1].active_forwards, slamch_idx) != 0
+    orig_forwards = copy(libs[1].active_forwards)
+
     # Now, test that we can muck this up
     my_slamch = @cfunction(record_slamch_args, Float32, (Cstring,))
     @test lbt_set_forward(lbt_handle, "slamch_", my_slamch, LBT_INTERFACE_LP64) == 0
     @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_LP64) == my_slamch
+
+    config = lbt_get_config(lbt_handle)
+    libs = unpack_loaded_libraries(config)
+    @test bitfield_get(libs[1].active_forwards, slamch_idx) == 0
 
     # Ensure that we actually overrode the symbol
     @test ccall(dlsym(lbt_handle, "slamch_"), Float32, (Cstring,), "test") == 13.37f0
