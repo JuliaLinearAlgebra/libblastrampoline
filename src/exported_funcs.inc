@@ -4948,6 +4948,7 @@
     XX(zupgtr_) \
     XX(zupmtr_) \
 
+#define NUM_EXPORTED_FUNCS 4945
 #endif
 
 #ifndef FLOAT32_FUNCS
