@@ -67,6 +67,9 @@ typedef struct {
     // Flags that describe this `libblastrampoline`'s build configuration.
     // See `LBT_BUILDFLAGS_XXX` below.
     uint32_t build_flags;
+    // The names of the symbols that we export.  We do not list both `dgemm_` and `dgemm_64_`, just `dgemm_`.
+    const char ** exported_symbols;
+    uint32_t num_exported_symbols;
 } lbt_config_t;
 
 // Possible values for `build_flags` in `lbt_config_t`

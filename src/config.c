@@ -1,4 +1,5 @@
 #include "libblastrampoline_internal.h"
+#include "exported_funcs.inc"
 
 lbt_config_t lbt_config;
 
@@ -19,6 +20,9 @@ LBT_DLLEXPORT const lbt_config_t * lbt_get_config() {
 #if defined(F2C_AUTODETECTION)
     lbt_config.build_flags |= LBT_BUILDFLAGS_F2C_CAPABLE;
 #endif
+
+    lbt_config.exported_symbols = (const char **)&exported_func_names[0];
+    lbt_config.num_exported_symbols = NUM_EXPORTED_FUNCS;
 
     return &lbt_config;
 }

@@ -95,6 +95,8 @@ const LBT_F2C_PLAIN = 0
 struct lbt_config_t
     loaded_libs::Ptr{Ptr{lbt_library_info_t}}
     build_flags::UInt32
+    exported_symbols::Ptr{Cstring}
+    num_exported_symbols::UInt32
 end
 const LBT_BUILDFLAGS_F2C_CAPABLE = 0x02
 
