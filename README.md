@@ -1,8 +1,12 @@
+[![GitHub Actions CI](https://github.com/staticfloat/libblastrampoline/actions/workflows/ci.yml/badge.svg)](https://github.com/staticfloat/libblastrampoline/actions/workflows/ci.yml)
+[![Drone Build Status](https://cloud.drone.io/api/badges/staticfloat/libblastrampoline/status.svg)](https://cloud.drone.io/staticfloat/libblastrampoline)
+[![Travis Build Status](https://travis-ci.com/staticfloat/libblastrampoline.svg?branch=main)](https://travis-ci.com/staticfloat/libblastrampoline)
+
 # libblastrampoline
 
 > All problems in computer science can be solved by another level of indirection
 
-Using PLT trampolines to provide a BLAS and LAPACK demuxing library.
+Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library.
 
 ## Basic usage
 
@@ -23,7 +27,7 @@ In particular, we export both a 32-bit (LP64) and 64-bit (ILP64) interface, allo
 Applications that wish to use the 64-bit interface must append `_64` to their function calls, e.g. instead of calling `dgemm()` they must call `dgemm_64()`.
 The BLAS/LAPACK symbol list we re-export comes from the `gensymbol` script contained within `OpenBLAS`.
 See [`ext/gensymbol`](ext/gensymbol) for more.
-We note that we have an experimental `Clang.jl`-based symbol extractor that extracts only those symbols that are defined within the headers shipped with OpenBLAS, however as there are hundreds of symbols that `gensymbol` knows about (and are indeed exported from the shared library `libopenblas.so`) that are not included in the public C headers, we take the conservative approach and export the `gensymbol`-sourced symbols.
+We note that we have an experimental [`Clang.jl`](https://github.com/JuliaInterop/Clang.jl)-based symbol extractor that extracts only those symbols that are defined within the headers shipped with OpenBLAS, however as there are hundreds of symbols that `gensymbol` knows about (and are indeed exported from the shared library `libopenblas.so`) that are not included in the public C headers, we take the conservative approach and export the `gensymbol`-sourced symbols.
 
 Because we export both the 32-bit (LP64) and 64-bit (ILP64) interfaces, if clients need header files defining the various BLAS/LAPACK functions, they must include headers defining the appropriate ABI.
 We provide headers broken down by interface (`LP64` vs. `ILP64`) as well as target (e.g. `x86_64-linux-gnu`), so to properly compile your code with headers provided by `libblastrampoline` you must add the appropriate `-I${prefix}/include/${interface}/${target}` flags.
@@ -41,7 +45,7 @@ This support is only available on the `x86_64` and `i686` architectures, however
 See the [public header file](src/libblastrampoline.h) for the most up-to-date documentation on the `libblastrampoline` API.
 
 **Note**: all `lbt_*` functions should be considered thread-unsafe.
-Do not attempt to load two BLAS libraries one two different threads at the same time.
+Do not attempt to load two BLAS libraries on two different threads at the same time.
 
 ### Limitations
 
@@ -55,6 +59,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 ### Version History
 
 v3.0.0 - Added `active_forwards` field to `lbt_libinfo_t` and `exported_symbols` to `lbt_config_t`.
+
+v2.2.0 - Removed useless `exit(1)` in `src/dl_utils.c`.
 
 v2.1.0 - Added threading getter/setter API, direct setting API and default function API.
 
