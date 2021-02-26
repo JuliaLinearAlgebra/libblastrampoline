@@ -34,6 +34,13 @@ extern "C" {
 # define LBT_HIDDEN    __attribute__ ((visibility("hidden")))
 #endif
 
+#define BF_CHUNK(array, idx)           (array[((uint32_t)(idx/8))])
+#define BF_MASK(idx)                   ((uint8_t)(0x1 << (idx % 8)))
+#define BITFIELD_GET(array, idx)      ((BF_CHUNK(array, idx) &  BF_MASK(idx)) >> (idx % 8))
+#define BITFIELD_CLEAR(array, idx)      BF_CHUNK(array, idx) &= ~(BF_MASK(idx))
+#define BITFIELD_SET(array, idx)        BF_CHUNK(array, idx) |=   BF_MASK(idx)
+
+
 // The metadata stored on each loaded library
 typedef struct {
     // The library name as passed to `lbt_forward()`.
@@ -43,6 +50,11 @@ typedef struct {
     // The suffix used within this library as autodetected by `lbt_forward`.
     // Common values are `""` or `"64_"`.
     const char * suffix;
+    // bitfield (in uint8_t form) representing the active forwards for this library.
+    // Use the `BITFIELD_{SET,GET}` macros to look at particular indices within this field.
+    // Note that if you use the footgun API (e.g. "lbt_set_forward()") these values will be
+    // zeroed out and you must track them manually if you need to.
+    uint8_t * active_forwards;
     // The interface type  as autodetected by `lbt_forward`, see `LBT_INTERFACE_XXX` below
     int32_t interface;
     // The `f2c` status  as autodetected by `lbt_forward`, see `LBT_F2C_XXX` below
@@ -67,6 +79,9 @@ typedef struct {
     // Flags that describe this `libblastrampoline`'s build configuration.
     // See `LBT_BUILDFLAGS_XXX` below.
     uint32_t build_flags;
+    // The names of the symbols that we export.  We do not list both `dgemm_` and `dgemm_64_`, just `dgemm_`.
+    const char ** exported_symbols;
+    uint32_t num_exported_symbols;
 } lbt_config_t;
 
 // Possible values for `build_flags` in `lbt_config_t`

@@ -58,6 +58,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v3.0.0 - Added `active_forwards` field to `lbt_libinfo_t` and `exported_symbols` to `lbt_config_t`.
+
 v2.2.0 - Removed useless `exit(1)` in `src/dl_utils.c`.
 
 v2.1.0 - Added threading getter/setter API, direct setting API and default function API.

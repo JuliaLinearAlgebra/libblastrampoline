@@ -52,7 +52,8 @@ int32_t find_symbol_idx(const char * name);
 // Functions in `config.c`
 void init_config();
 void clear_loaded_libraries();
-void record_library_load(const char * libname, void * handle, const char * suffix, int interface, int f2c);
+void clear_forwarding_mark(int32_t symbol_idx, int32_t interface);
+void record_library_load(const char * libname, void * handle, const char * suffix, uint8_t * forwards, int interface, int f2c);
 
 // Functions in `win_utils.c`
 #ifdef _OS_WINDOWS_

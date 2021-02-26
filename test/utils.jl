@@ -76,6 +76,7 @@ struct lbt_library_info_t
     libname::Cstring
     handle::Ptr{Cvoid}
     suffix::Cstring
+    active_forwards::Ptr{UInt8}
     interface::Int32
     f2c::Int32
 end
@@ -83,10 +84,11 @@ struct LBTLibraryInfo
     libname::String
     handle::Ptr{Cvoid}
     suffix::String
+    active_forwards::Vector{UInt8}
     interface::Int32
     f2c::Int32
 
-    LBTLibraryInfo(x::lbt_library_info_t) = new(unsafe_string(x.libname), x.handle, unsafe_string(x.suffix), x.interface, x.f2c)
+    LBTLibraryInfo(x::lbt_library_info_t, num_symbols::UInt32) = new(unsafe_string(x.libname), x.handle, unsafe_string(x.suffix), unsafe_wrap(Vector{UInt8}, x.active_forwards, div(num_symbols,8)+1), x.interface, x.f2c)
 end
 const LBT_INTERFACE_LP64 = 32
 const LBT_INTERFACE_ILP64 = 64
@@ -95,6 +97,8 @@ const LBT_F2C_PLAIN = 0
 struct lbt_config_t
     loaded_libs::Ptr{Ptr{lbt_library_info_t}}
     build_flags::UInt32
+    exported_symbols::Ptr{Cstring}
+    num_exported_symbols::UInt32
 end
 const LBT_BUILDFLAGS_F2C_CAPABLE = 0x02
 

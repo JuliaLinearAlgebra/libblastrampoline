@@ -42,6 +42,7 @@ for s in ${EXPORTED_FUNCS}; do
     [ $((${NUM_EXPORTED} % 100)) == 0 ] && echo -n "."
 done
 echo >> "${OUTPUT_FILE}"
+echo "#define NUM_EXPORTED_FUNCS ${NUM_EXPORTED}" >> "${OUTPUT_FILE}"
 echo "#endif" >> "${OUTPUT_FILE}"
 
 
