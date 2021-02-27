@@ -32,7 +32,7 @@ void clear_loaded_libraries() {
         if (lbt_config.loaded_libs[idx] != NULL) {
             free(lbt_config.loaded_libs[idx]->libname);
             free(lbt_config.loaded_libs[idx]->active_forwards);
-            close_library(lbt_config.loaded_libs[idx]->handle);
+            //close_library(lbt_config.loaded_libs[idx]->handle);
             free(lbt_config.loaded_libs[idx]);
             lbt_config.loaded_libs[idx] = NULL;
         }
