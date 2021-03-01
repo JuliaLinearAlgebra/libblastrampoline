@@ -10,14 +10,14 @@
  */
 static char * getter_names[MAX_THREADING_NAMES] = {
     "openblas_get_num_threads",
-    "mkl_get_max_threads",
+    "MKL_Get_Max_Threads",
     "bli_thread_set_num_threads",
     NULL
 };
 
 static char * setter_names[MAX_THREADING_NAMES] = {
     "openblas_set_num_threads",
-    "mkl_set_num_threads",
+    "MKL_Set_Num_Threads",
     "bli_thread_get_num_threads",
     NULL
 };
