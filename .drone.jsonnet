@@ -10,8 +10,8 @@ local Pipeline(os, arch, version, alpine=false) = {
             name: "Run tests",
             image: "julia:"+version+(if alpine then "-alpine" else ""),
             commands: [
-                "apt-get update -y",
-                "apt-get install -y gcc build-essential",
+                (if alpine then "" else "apt-get update -y"),
+                (if alpine then "apk add build-base linux-headers" else "apt-get install -y gcc build-essential"),
                 "julia --project=test --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'",
                 "julia --project=test --check-bounds=yes --color=yes -e 'using Pkg; Pkg.instantiate()'",
                 "julia --project=test --check-bounds=yes --color=yes test/runtests.jl"
@@ -25,4 +25,5 @@ local Pipeline(os, arch, version, alpine=false) = {
 
 [
     Pipeline("linux", "arm64", "1.6"),
+    Pipeline("linux", "amd64", "1.6", true),
 ]

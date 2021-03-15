@@ -20,4 +20,26 @@ trigger:
   branch:
   - main
 
+---
+kind: pipeline
+name: linux - amd64 - Julia 1.6 (Alpine)
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: Run tests
+  image: julia:1.6-alpine
+  commands:
+  - ""
+  - apk add build-base linux-headers
+  - "julia --project=test --check-bounds=yes --color=yes -e 'using InteractiveUtils; versioninfo(verbose=true)'"
+  - "julia --project=test --check-bounds=yes --color=yes -e 'using Pkg; Pkg.instantiate()'"
+  - julia --project=test --check-bounds=yes --color=yes test/runtests.jl
+
+trigger:
+  branch:
+  - main
+
 ...
