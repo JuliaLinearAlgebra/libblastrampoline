@@ -58,6 +58,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v3.0.3 - Fix armv7l trampolines from copy-paste error causing segfaults.
+
 v3.0.2 - Fix MKL threading interface to use properly-capitalized names to get the C ABI.
 
 v3.0.1 - Don't `dlclose()` libraries; this can cause crashes due to not knowing when resources are truly freed.
