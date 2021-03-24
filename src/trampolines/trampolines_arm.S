@@ -5,7 +5,7 @@
 .global MANGLE(UNDERSCORE(name)); \
 .cfi_startproc; \
 MANGLE(UNDERSCORE(name))##:; \
-    ldr ip, CONCAT(.L,MANGLE(UNDERSCORE(name))); \
+    ldr ip, CONCAT(.L,NAMEADDR(name)); \
 CONCAT(.L,MANGLE(UNDERSCORE(name))): ;\
     add ip, pc, ip; \
     ldr pc, [ip]; \
