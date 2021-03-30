@@ -26,7 +26,7 @@ extern "C" {
 # endif
 # define LBT_HIDDEN
 #else
-# if defined(LIBRARY_EXPORTS) && defined(_OS_LINUX)
+# if defined(LIBRARY_EXPORTS) && defined(_OS_LINUX_)
 #  define LBT_DLLEXPORT __attribute__ ((visibility("protected")))
 # else
 #  define LBT_DLLEXPORT __attribute__ ((visibility("default")))
