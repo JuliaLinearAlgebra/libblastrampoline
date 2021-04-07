@@ -54,6 +54,12 @@ int32_t autodetect_blas_interface(void * isamax_addr) {
     pop_fake_lsame();
 #endif
 
+    // Although we declare that `isamax` returns an `int64_t`, it may not actually do so,
+    // since if it's an LP64 binary it's probably returning an `int32_t`.  Depending on the
+    // register semantics, the high 32-bits may or may not be zeroed.  We don't really care
+    // about them, since we know the two cases we're interested in.
+    max_idx = max_idx & 0xffffffff;
+
     // This means the `isamax()` implementation saw `N < 0`, ergo it's a 64-bit library
     if (max_idx == 0) {
         return LBT_INTERFACE_ILP64;
