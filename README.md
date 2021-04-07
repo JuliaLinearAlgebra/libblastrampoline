@@ -58,6 +58,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v3.0.4 - Fix armv7l interface autodetection.
+
 v3.0.3 - Fix armv7l trampolines from copy-paste error causing segfaults.
 
 v3.0.2 - Fix MKL threading interface to use properly-capitalized names to get the C ABI.
