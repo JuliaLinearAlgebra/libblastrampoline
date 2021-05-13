@@ -1,2 +1,5 @@
 [deps]
-Clang = "40e3b903-d033-50b4-a0cc-940c62c95e31"
+LibClang = "673b39ed-8657-431a-8e65-2365c8cec7d5"
+
+[compat]
+LibClang = "0.60"

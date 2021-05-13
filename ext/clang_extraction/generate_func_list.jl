@@ -1,57 +1,79 @@
-using Clang
-using Clang.LibClang.Clang_jll
+using LibClang
+
+include("utils.jl")
+include("JLLEnvs.jl")
+using .JLLEnvs
 
 const LBT_ROOT = abspath(dirname(dirname(@__DIR__)))
 
 # Steal default include path from `cc`
-function get_default_include_path()
-    io = IOBuffer()
-    run(pipeline(`cc -E -Wp,-v -`, stdout=devnull, stderr=io, stdin=devnull))
-    lines = split(String(take!(io)), "\n")
-    start_idx = findfirst(l -> startswith(l, "#include <") && endswith(l, "search starts here:"), lines)
-    stop_idx = findfirst(l -> startswith(l, "End of search list"), lines[start_idx+1:end])
-    return strip.(lines[start_idx+1:start_idx+stop_idx-1])
-end
+# function get_default_include_path()
+#     io = IOBuffer()
+#     run(pipeline(`cc -E -Wp,-v -`, stdout=devnull, stderr=io, stdin=devnull))
+#     lines = split(String(take!(io)), "\n")
+#     start_idx = findfirst(l -> startswith(l, "#include <") && endswith(l, "search starts here:"), lines)
+#     stop_idx = findfirst(l -> startswith(l, "End of search list"), lines[start_idx+1:end])
+#     return strip.(lines[start_idx+1:start_idx+stop_idx-1])
+# end
 
 function extract_symbol_names(include_dir::String = joinpath(LBT_ROOT, "include", "LP64", "x86_64-linux-gnu"))
     # Collect all headers in that directory (nonrecursive because I'm lazy)
     headers = [joinpath(include_dir, header) for header in readdir(include_dir) if endswith(header, ".h")]
 
+    triple = "x86_64-linux-gnu"  ## FIXME: should be deduced from `include_dir`
     # Build `-I` arguments to all the places we'll need
     clang_args = String[
+        # Get system headers
+        "-nostdinc",  # ignore local system headers
+        ["-isystem"*dir for dir in JLLEnvs.get_system_dirs(triple)]...,
+        "--target=$(JLLEnvs.triple2target(triple))",
+
         # Include standard locations
-        ["-I$(inc)" for inc in get_default_include_path()]...,
-        
+        # ["-I$(inc)" for inc in get_default_include_path()]...,
+
         # Include our own include directory
         "-I$(include_dir)",
     ]
 
     # Parse the headers into a `Clang.jl` context
     @info("Extracting symbols from $(length(headers)) headers in $(include_dir)")
-    ctx = DefaultContext()
-    parse_headers!(ctx, headers, args=clang_args, includes=headers)
-
-    # Collect all symbol names defined within these translation units
+    flags = CXTranslationUnit_DetailedPreprocessingRecord |
+            CXTranslationUnit_SkipFunctionBodies
+    idx = clang_createIndex(false, true)
+    @assert idx != C_NULL "failed to create libclang index."
+    tus = []
     symbol_names = String[]
-    for trans_unit in ctx.trans_units
-        root_cursor = getcursor(trans_unit)
-        push!(ctx.cursor_stack, root_cursor)
-        header = spelling(root_cursor)
-        # loop over all of the child cursors and wrap them, if appropriate.
-        ctx.children = children(root_cursor)
-        for (i, child) in enumerate(ctx.children)
-            # Skip everything except function declarations
-            if !isa(child, CLFunctionDecl)
-                continue
-            end
-            # Skip functions that aren't defined in this header
-            if filename(child) != header
-                continue
-            end
-
-            push!(symbol_names, spelling(child))
+    try
+        for h in headers
+            tu = clang_parseTranslationUnit(idx, h, clang_args, length(clang_args), C_NULL, 0, flags)
+            @assert tu != C_NULL "failed to parse header: $h."
+            push!(tus, tu)
         end
-        empty!(ctx.api_buffer)  # clean up api_buffer for the next header
+
+        # Collect all symbol names defined within these translation units
+        for trans_unit in tus
+            root_cursor = clang_getTranslationUnitCursor(trans_unit)
+            header = normpath(get_translation_unit_spelling(trans_unit))
+            # loop over all of the child cursors and wrap them, if appropriate.
+            for (i, child) in enumerate(children(root_cursor))
+                # Skip everything except function declarations
+                if clang_getCursorKind(child) != CXCursor_FunctionDecl
+                    continue
+                end
+                # Skip functions that aren't defined in this header
+                if normpath(get_cursor_filename(child)) != header
+                    continue
+                end
+
+                push!(symbol_names, get_cursor_spelling(child))
+            end
+        end
+    finally
+        # Release resources
+        for trans_unit in tus
+            clang_disposeTranslationUnit(trans_unit)
+        end
+        clang_disposeIndex(idx)
     end
 
     # Drop duplicate `__`-prefixed functions
