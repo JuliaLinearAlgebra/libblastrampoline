@@ -10,28 +10,28 @@ extern "C" {
 #endif  /* __cplusplus */
 
 /*Set the number of threads on runtime.*/
-void openblas_set_num_threads64_(int num_threads);
+//void openblas_set_num_threads64_(int num_threads);
 void goto_set_num_threads64_(int num_threads);
 
 /*Get the number of threads on runtime.*/
-int openblas_get_num_threads64_(void);
+//int openblas_get_num_threads64_(void);
 
 /*Get the number of physical processors (cores).*/
-int openblas_get_num_procs64_(void);
+//int openblas_get_num_procs64_(void);
 
 /*Get the build configure on runtime.*/
-char* openblas_get_config64_(void);
+//char* openblas_get_config64_(void);
 
 /*Get the CPU corename on runtime.*/
-char* openblas_get_corename64_(void);
+//char* openblas_get_corename64_(void);
 
 #ifdef OPENBLAS_OS_LINUX
-/* Sets thread affinity for OpenBLAS threads. `thread_idx` is in [0, openblas_get_num_threads64_()-1]. */
+///* Sets thread affinity for OpenBLAS threads. `thread_idx` is in [0, openblas_get_num_threads64_()-1]. */
 int openblas_setaffinity64_(int thread_idx, size_t cpusetsize, cpu_set_t* cpu_set);
 #endif
 
 /* Get the parallelization type which is used by OpenBLAS */
-int openblas_get_parallel64_(void);
+//int openblas_get_parallel64_(void);
 /* OpenBLAS is compiled for sequential use  */
 #define OPENBLAS_SEQUENTIAL  0
 /* OpenBLAS is compiled using normal threading model */

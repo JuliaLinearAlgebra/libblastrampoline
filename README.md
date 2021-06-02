@@ -42,6 +42,7 @@ This support is only available on the `x86_64` and `i686` architectures, however
 ## `libblastrampoline`-specific API
 
 `libblastrampoline` exports a simple configuration API including `lbt_forward()`, `lbt_get_config()`, `lbt_{set,get}_num_threads()`, and more.
+Vendor-specific APIs such as `openblas_get_num_threads()` are not included in header files or exported from the library.
 See the [public header file](src/libblastrampoline.h) for the most up-to-date documentation on the `libblastrampoline` API.
 
 **Note**: all `lbt_*` functions should be considered thread-unsafe.
