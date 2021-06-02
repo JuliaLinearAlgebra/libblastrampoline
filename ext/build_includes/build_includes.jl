@@ -8,7 +8,7 @@ version = v"0.3.13"
 for openblas32 in (true, false)
     sources = [
         ArchiveSource("https://github.com/xianyi/OpenBLAS/archive/v$(version).tar.gz",
-                    "79197543b17cc314b7e43f7a33148c308b0807cd6381ee77f77e15acf3e6459e")
+                      "79197543b17cc314b7e43f7a33148c308b0807cd6381ee77f77e15acf3e6459e")
     ]
 
     script = """
@@ -36,6 +36,10 @@ for openblas32 in (true, false)
 
     # Call `make install`, fully expecting this to blow up in our faces.
     make "\${flags[@]}" "PREFIX=\${prefix}" install || true
+
+    # Comment out vendor-specific functions like `openblas_{s,g}et_num_threads`
+    find \${prefix}/include -name \\*.h | xargs sed -i -E 's&(.*openblas_[sg]et_.*)&//\\1&'
+    find \${prefix}/include -name \\*.bak | xargs rm -f
     """
 
     products = [
