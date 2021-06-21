@@ -15,6 +15,8 @@ extern "C" {
 #define _OS_DARWIN_
 #elif defined(__EMSCRIPTEN__)
 #define _OS_EMSCRIPTEN_
+#elif defined(__HAIKU__)
+#define _OS_HAIKU_
 #endif
 
 // Borrow definition from `support/dtypes.h`

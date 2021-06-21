@@ -31,6 +31,12 @@
 #include <limits.h>
 #endif
 
+#ifdef _OS_HAIKU_
+#include <posix/limits.h>
+#include <posix/libgen.h>
+#include <posix/dlfcn.h>
+#endif
+
 #if !defined(RTLD_DEEPBIND) && (defined(_OS_LINUX_) || defined(_OS_FREEBSD_))
 #define LBT_DEEPBINDLESS
 #endif
