@@ -35,13 +35,15 @@ endif
 CFLAGS := -g -O2 -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS_add)
 LDFLAGS := -shared
 
-# On linux, we need to link `libdl` to get `dlopen`
 ifeq ($(OS),Linux)
+# On linux, we need to link `libdl` to get `dlopen`
 LDFLAGS += -ldl
+# We also want `-fvisibility=protected` on Linux, to match other platforms
+CFLAGS += -fvisibility=protected
 endif
 
-# On windows, we need to enable unicode mode
 ifeq ($(OS),WINNT)
+# On windows, we need to enable unicode mode
 CFLAGS += -municode
 endif
 
