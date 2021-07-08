@@ -1,6 +1,20 @@
 #include "libblastrampoline_internal.h"
 
-#if defined(LBT_DEEPBINDLESS)
+/*
+ * Users can force an RTLD_DEEPBIND-capable system to avoid using RTLD_DEEPBIND
+ * by setting `LBT_USE_RTLD_DEEPBIND=0` in their environment.  This function
+ * returns `0x01` if it will use `RTLD_DEEPBIND` when loading a library, and
+ * `0x00` otherwise.
+ */
+#if defined(LBT_DEEPBINDLESS) || !defined(RTLD_DEEPBIND)
+uint8_t use_deepbind = 0x00;
+#else
+uint8_t use_deepbind = 0x01;
+#endif
+LBT_DLLEXPORT const uint8_t lbt_get_use_deepbind() {
+    return use_deepbind;
+}
+
 
 int lsame_idx = -1;
 const void *old_lsame32 = NULL, *old_lsame64 = NULL;
@@ -76,5 +90,3 @@ int fake_lsame(char * ca, char * cb) {
     }
     return inta == intb;
 }
-
-#endif // LBT_DEEPBINDLESS

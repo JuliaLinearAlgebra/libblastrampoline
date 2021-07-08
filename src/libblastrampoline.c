@@ -52,7 +52,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
     } else {
         (*exported_func64_addrs[symbol_idx]) = addr;
 
-        // If we're on an RTLD_DEEPBINDless system and our workaround is activated,
+        // If we're on an RTLD_DEEPBIND-less system and our workaround is activated,
         // we take over our own 32-bit symbols as well.
         if (deepbindless_interfaces_loaded & DEEPBINDLESS_INTERFACE_ILP64_LOADED) {
             (*exported_func32_addrs[symbol_idx]) = addr;
@@ -230,7 +230,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
      * attempts to load another one without setting the `clear` flag, we refuse to
      * load it on a deepbindless system, printing out to `stderr` if we're verbose.
      */
-#if defined(LBT_DEEPBINDLESS)
+
     // If `clear` is set, we clear our tracking
     if (clear) {
         deepbindless_interfaces_loaded = 0x00;
@@ -240,13 +240,13 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     // we bind to the suffix-"" names, so even if the names of that library
     // internally are suffixed to something else, we ourselves will interfere with
     // a future suffix-"" ILP64 BLAS.
-    if (interface == LBT_INTERFACE_LP64) {
+    if ((use_deepbind == 0x00) && (interface == LBT_INTERFACE_LP64)) {
         deepbindless_interfaces_loaded |= DEEPBINDLESS_INTERFACE_LP64_LOADED;
     }
 
     // We only mark a loaded ILP64 BLAS if it is a suffix-"" BLAS, since that is
     // the only case in which it will interfere with our LP64 BLAS symbols.
-    if (lib_suffix[0] == '\0' && interface == LBT_INTERFACE_ILP64) {
+    if ((use_deepbind == 0x00) && (lib_suffix[0] == '\0' && interface == LBT_INTERFACE_ILP64)) {
         deepbindless_interfaces_loaded |= DEEPBINDLESS_INTERFACE_ILP64_LOADED;
     }
 
@@ -257,7 +257,6 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         }
         return 0;
     }
-#endif
 
     // If `clear` is set, drop all information about previously-loaded libraries
     if (clear) {
@@ -306,6 +305,19 @@ __attribute__((constructor)) void init(void) {
         verbose = 1;
         printf("libblastrampoline initializing\n");
     }
+
+#if !defined(LBT_DEEPBINDLESS)
+    // If LBT_USE_RTLD_DEEPBIND == "0", we avoid using RTLD_DEEPBIND on a
+    // deepbind-capable system.  This is mostly useful for sanitizers, which
+    // abhor such library loading shenanigans.
+    const char * deepbindless_str = getenv("LBT_USE_RTLD_DEEPBIND");
+    if (deepbindless_str != NULL && strcmp(deepbindless_str, "0") == 0) {
+        use_deepbind = 0x00;
+        if (verbose) {
+            printf("LBT_USE_RTLD_DEEPBIND=0 detected; avoiding usage of RTLD_DEEPBIND\n");
+        }
+    }
+#endif // !defined(LBT_DEEPBINDLESS)
 
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries
     const char * default_libs = getenv("LBT_DEFAULT_LIBS");
