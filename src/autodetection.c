@@ -46,13 +46,15 @@ int32_t autodetect_blas_interface(void * isamax_addr) {
     int64_t incx = 1;
 
     // Override `lsame_` to point to our `fake_lsame` if we're unable to `RTLD_DEEPBIND`
-#ifdef LBT_DEEPBINDLESS
-    push_fake_lsame();
-#endif
+    if (use_deepbind == 0) {
+        push_fake_lsame();
+    }
+
     int64_t max_idx = isamax(&n, X, &incx);
-#ifdef LBT_DEEPBINDLESS
-    pop_fake_lsame();
-#endif
+
+    if (use_deepbind == 0) {
+        pop_fake_lsame();
+    }
 
     // Although we declare that `isamax` returns an `int64_t`, it may not actually do so,
     // since if it's an LP64 binary it's probably returning an `int32_t`.  Depending on the

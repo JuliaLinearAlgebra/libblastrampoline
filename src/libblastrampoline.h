@@ -162,6 +162,13 @@ LBT_DLLEXPORT void lbt_default_func_print_error();
 LBT_DLLEXPORT const void * lbt_get_default_func();
 
 /*
+ * Users can force an RTLD_DEEPBIND-capable system to avoid using RTLD_DEEPBIND by setting
+ * `LBT_USE_RTLD_DEEPBIND=0` in their environment.  This function returns `0x01` if it will
+ *  use `RTLD_DEEPBIND` when loading a library, and `0x00` otherwise.
+ */
+ LBT_DLLEXPORT const uint8_t lbt_get_use_deepbind();
+
+/*
  * Sets the default function that gets called if no mapping has been set for an exported symbol.
  * `NULL` is a valid address, if a segfault upon calling an uninitialized function is desirable.
  * Note that this will not be retroactively applied to already-set pointers, so you should call

@@ -22,6 +22,7 @@ void throw_dl_error(const char * path) {
 
 /*
  * Load the given `path`, using `RTLD_NOW | RTLD_LOCAL` and `RTLD_DEEPBIND`, if available
+ * If `use_deepbind` is set to `0`, don't use `RTLD_DEEPBIND` even if it's available.
  */
 void * load_library(const char * path) {
     void * new_handle = NULL;
@@ -34,13 +35,21 @@ void * load_library(const char * path) {
     }
     new_handle = (void *)LoadLibraryExW(wpath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
 #else
-    // If we have `RTLD_DEEPBIND`, use it!
+
+    // If `use_deepbind` is set to `0`, we voluntarily avoid using
+    // `RTLD_DEEPBIND` even if it's available.  This is primarily used
+    // in conjunction with sanitizer tools, which abhor the presence of
+    // deepbound libraries.
+    if (use_deepbind == 0) {
+        new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+    }
 #if defined(RTLD_DEEPBIND)
-    new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);
-#else
-    new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+    else {
+        new_handle = dlopen(path, RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);
+    }
 #endif
-#endif
+#endif  // defined(_OS_WINDOWS_)
+
     if (new_handle == NULL) {
         throw_dl_error(path);
     }

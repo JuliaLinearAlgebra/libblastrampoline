@@ -82,9 +82,8 @@ int32_t autodetect_interface(void * handle, const char * suffix);
 int autodetect_f2c(void * handle, const char * suffix);
 #endif
 
-#ifdef LBT_DEEPBINDLESS
 // Functions in deepbindless_surrogates.c
 void push_fake_lsame();
 void pop_fake_lsame();
 int fake_lsame(char * ca, char * cb);
-#endif
+extern uint8_t use_deepbind;
