@@ -52,7 +52,7 @@ platform:
 
 steps:
 - name: Run tests
-  image: julia:1.6-alpine
+  image: julia:1.6-alpine3.13
   commands:
   - ""
   - apk add build-base linux-headers
