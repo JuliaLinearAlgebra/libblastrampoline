@@ -24,15 +24,15 @@ $(builddir) $(builddir)/trampolines:
 	@mkdir -p $@
 
 $(builddir)/%.o: %.c | $(builddir) $(builddir)/trampolines
-	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $^)
+	@$(call PRINT_CC,$(CC) -o $@ $(LBT_CFLAGS) -c $^)
 $(builddir)/trampolines/%.o: trampolines/%.S exported_funcs.inc | $(builddir)/trampolines
-	@$(call PRINT_CC,$(CC) -o $@ $(CFLAGS) -c $<)
+	@$(call PRINT_CC,$(CC) -o $@ $(LBT_CFLAGS) -c $<)
 
 dump-trampolines: trampolines/trampolines_$(ARCH).S
 	$(CC) $< -S | sed -E 's/ ((%%)|;) /\n/g' | sed -E 's/.global/\n.global/g'
 
 $(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
-	@$(call PRINT_CC,$(CC) -o $@ $(call IMPLIB_FLAGS,$@) $(CFLAGS) $^ $(LDFLAGS))
+	@$(call PRINT_CC,$(CC) -o $@ $(call IMPLIB_FLAGS,$@) $(LBT_CFLAGS) $^ $(LBT_LDFLAGS))
 
 # Install both libraries and our headers
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
