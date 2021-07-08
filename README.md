@@ -59,6 +59,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v3.1.0 - Add `LBT_USE_RTLD_DEEPBIND` environment variable override (for santizer usage), and add buildsystem fixes for Haiku.
+
 v3.0.4 - Fix armv7l interface autodetection.
 
 v3.0.3 - Fix armv7l trampolines from copy-paste error causing segfaults.
