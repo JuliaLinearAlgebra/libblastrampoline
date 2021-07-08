@@ -8,7 +8,9 @@ local Pipeline(os, arch, version, alpine=false) = {
     steps: [
         {
             name: "Run tests",
-            image: "julia:"+version+(if alpine then "-alpine" else ""),
+            # Use Alpine 3.13 because 3.14 has some troubles with Docker due to
+            # https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.14.0#faccessat2
+            image: "julia:"+version+(if alpine then "-alpine3.13" else ""),
             commands: [
                 (if alpine then "" else "apt-get update -y"),
                 (if alpine then "apk add build-base linux-headers" else "apt-get install -y gcc build-essential"),

@@ -38,12 +38,6 @@ LDFLAGS := -shared
 ifeq ($(OS),Linux)
 # On linux, we need to link `libdl` to get `dlopen`
 LDFLAGS += -ldl
-# We also want `-fvisibility=protected` on Linux, to match other platforms
-CFLAGS += -fvisibility=protected
-# There are bugs with `-fvisibility=protected` and certain versions of `ld`,
-# see https://sourceware.org/bugzilla/show_bug.cgi?id=26815 for more
-# We work around this by using `gold` on Linux
-LDFLAGS += -fuse-ld=gold
 endif
 
 ifeq ($(OS),WINNT)
