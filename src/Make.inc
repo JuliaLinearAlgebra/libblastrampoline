@@ -35,7 +35,7 @@ else
 endif
 
 LBT_CFLAGS := -g -O2 -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
-LBT_LDFLAGS := -shared $(LDFLAGS)
+LBT_LDFLAGS := $(LDFLAGS)
 
 ifeq ($(OS),Linux)
 # On linux, we need to link `libdl` to get `dlopen`
