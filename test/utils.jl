@@ -64,8 +64,8 @@ function get_blastrampoline_dir()
     cflags_add = needs_m32() ? "-m32" : ""
     dir = mktempdir()
     srcdir = joinpath(dirname(@__DIR__), "src")
-    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS_add=$(cflags_add) ARCH=$(Sys.ARCH) clean`)
-    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS_add=$(cflags_add) ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(dir))/output`)
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS=$(cflags_add) ARCH=$(Sys.ARCH) clean`)
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS=$(cflags_add) ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(dir))/output`)
     global blastrampoline_build_dir = joinpath(dir, "output")
     return blastrampoline_build_dir
 end
