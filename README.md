@@ -8,6 +8,8 @@
 
 Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library.
 
+A detailed JuliaCon talk on libblastrampoline: https://www.youtube.com/watch?v=t6hptekOR7s
+
 ## Basic usage
 
 Build `libblastrampoline.so`, then link your BLAS-using library against it instead of `libblas.so`.
