@@ -10,8 +10,6 @@ Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to
 
 A detailed JuliaCon talk on libblastrampoline: https://www.youtube.com/watch?v=t6hptekOR7s
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/t6hptekOR7s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 ## Basic usage
 
 Build `libblastrampoline.so`, then link your BLAS-using library against it instead of `libblas.so`.
