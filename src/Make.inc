@@ -35,12 +35,11 @@ else
 endif
 
 LBT_CFLAGS := -g -O2 -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
-# Linker doesn't detect automatically executable stack isn't needed
-LBT_LDFLAGS := $(LDFLAGS) -Wl,-z,noexecstack
 
 ifeq ($(OS),Linux)
 # On linux, we need to link `libdl` to get `dlopen`
-LBT_LDFLAGS += -ldl
+# and linker doesn't detect automatically executable stack isn't needed
+LBT_LDFLAGS += -ldl -Wl,-z,noexecstack
 endif
 
 ifeq ($(OS),WINNT)
