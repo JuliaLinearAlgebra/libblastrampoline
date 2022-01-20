@@ -5,7 +5,7 @@
  * We are primarily concerned with the FORTRAN names, so we automatically append
  * an underscore to the end, as is standard.
  */
-const char * autodetect_symbol_suffix(void * handle) {
+const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
     // We auto-detect the symbol suffix of the given library by searching for common
     // BLAS and LAPACK symbols, combined with various suffixes that we know of.
     const char * symbol_names[] = {
@@ -15,14 +15,26 @@ const char * autodetect_symbol_suffix(void * handle) {
         "dpotrf_",
     };
     const char * suffixes[] = {
-        // First, LP64-mangling suffixes: No underscore, single underscore, double underscore
+        // Possibly-NULL suffix that we should search over
+        suffix_hint,
+
+        // Search for ILP64-mangling suffixes first, as in the rare case that we want to
+        // load a library that exports both, we prefer to bind to the namespaced symbols first
+        "64", "64_", "_64__", "__64___",
+
+        // Next, LP64-mangling suffixes
         "", "_", "__",
-        // Next, ILP64-mangling suffixes: the same, but with the suffix prepended as well:
-        "64_", "_64__", "__64___",
     };
+
+    // If the suffix hint is NULL, just skip it when calling `lookup_symbol()`.
+    int suffix_start_idx = 0;
+    if (suffix_hint == NULL) {
+        suffix_start_idx = 1;
+    }
+
     char symbol_name[MAX_SYMBOL_LEN];
     for (int symbol_idx=0; symbol_idx<sizeof(symbol_names)/sizeof(const char *); symbol_idx++) {
-        for (int suffix_idx=0; suffix_idx<sizeof(suffixes)/sizeof(const char *); suffix_idx++) {
+        for (int suffix_idx=suffix_start_idx; suffix_idx<sizeof(suffixes)/sizeof(const char *); suffix_idx++) {
             sprintf(symbol_name, "%s%s", symbol_names[symbol_idx], suffixes[suffix_idx]);
             if (lookup_symbol(handle, symbol_name) != NULL) {
                 return suffixes[suffix_idx];

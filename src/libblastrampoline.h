@@ -106,8 +106,12 @@ typedef struct {
  * support in the system libc for more details.
  *
  * If `verbose` is set to a non-zero value, it will print out debugging information.
+ *
+ * If `suffix_hint` is set to a non-NULL value, it is the first suffix that is used to search for
+ * BLAS/LAPACK symbols within the library.  This is useful in case a library contains within it both
+ * LP64 and ILP64 symbols, and you want to prefer one set of symbols over the other.
  */
-LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose);
+LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose, const char * suffix_hint);
 
 /*
  * Returns a structure describing the currently-loaded libraries as well as the build configuration
