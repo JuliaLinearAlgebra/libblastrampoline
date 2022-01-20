@@ -1,4 +1,4 @@
-using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll
+using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
 
 include("utils.jl")
 
@@ -179,4 +179,44 @@ end
     @test length(stacktraces) == 1
     self_traces = filter(entry -> string(entry.file) == @__FILE__, stacktraces[1])
     @test length(self_traces) == 3
+end
+
+if MKL_jll.is_available() && Sys.WORD_SIZE == 64
+    # Since MKL v2022, we can explicitly link against ILP64-suffixed symbols
+    @testset "MKL v2022 ILP64 loading" begin
+        # Load the ILP64 interface library.  Remember, you must load the `core`
+        # and a `threading` library first, with `RTLD_LAZY` for this to work!
+        lbt_forward(lbt_handle, libmkl_rt; clear=true, suffix_hint = "64")
+
+        # Test that we have only one library loaded
+        config = lbt_get_config(lbt_handle)
+        libs = unpack_loaded_libraries(config)
+        @test length(libs) == 1
+
+        # Test that it's MKL and it's correctly identified
+        @test libs[1].libname == MKL_jll.libmkl_rt_path
+        @test libs[1].interface == LBT_INTERFACE_ILP64
+
+        # Test that `dgemm` forwards to `dgemm_` within the MKL binary
+        mkl_dgemm = dlsym(MKL_jll.libmkl_rt_handle, :dgemm_64)
+        @test lbt_get_forward(lbt_handle, "dgemm_", LBT_INTERFACE_ILP64) == mkl_dgemm
+    end
+
+    @testset "MKL v2022 dual-interface loading" begin
+        # Also test that we can load both ILP64 and LP64 at the same time!
+        lbt_forward(lbt_handle, libmkl_rt; clear=true, suffix_hint = "64")
+        lbt_forward(lbt_handle, libmkl_rt; suffix_hint = "")
+
+        # Test that we have both libraries loaded
+        config = lbt_get_config(lbt_handle)
+        libs = unpack_loaded_libraries(config)
+        @test length(libs) == 2
+
+        # Test that it's MKL and it's correctly identified
+        sort!(libs; by = l -> l.libname)
+        @test libs[1].libname == libmkl_rt
+        @test libs[1].interface == LBT_INTERFACE_ILP64
+        @test libs[2].libname == libmkl_rt
+        @test libs[2].interface == LBT_INTERFACE_LP64
+    end
 end
