@@ -73,7 +73,7 @@ void * lookup_symbol(const void * lib_handle, const char * symbol_name);
 void close_library(void * handle);
 
 // Functions in `autodetection.c`
-const char * autodetect_symbol_suffix(void * handle);
+const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint);
 int32_t autodetect_blas_interface(void * isamax_addr);
 int32_t autodetect_lapack_interface(void * dpotrf_addr);
 int32_t autodetect_interface(void * handle, const char * suffix);

@@ -102,8 +102,8 @@ struct lbt_config_t
 end
 const LBT_BUILDFLAGS_F2C_CAPABLE = 0x02
 
-function lbt_forward(handle, path; clear::Bool = false, verbose::Bool = false)
-    ccall(dlsym(handle, :lbt_forward), Int32, (Cstring, Int32, Int32), path, clear ? 1 : 0, verbose ? 1 : 0)
+function lbt_forward(handle, path; clear::Bool = false, verbose::Bool = false, suffix_hint::Union{Nothing,String} = nothing)
+    ccall(dlsym(handle, :lbt_forward), Int32, (Cstring, Int32, Int32, Cstring), path, clear ? 1 : 0, verbose ? 1 : 0, something(suffix_hint, C_NULL))
 end
 
 function lbt_get_config(handle)

@@ -147,7 +147,7 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
 /*
  * Load `libname`, clearing previous mappings if `clear` is set.
  */
-LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose) {
+LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose, const char * suffix_hint) {
     if (verbose) {
         printf("Generating forwards to %s\n", libname);
     }
@@ -161,7 +161,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
 
     // Once we have the BLAS/LAPACK library loaded, we need to autodetect a few things about it.
     // First, we are going to figure out its name-mangling suffix:
-    const char * lib_suffix = autodetect_symbol_suffix(handle);
+    const char * lib_suffix = autodetect_symbol_suffix(handle, suffix_hint);
     if (lib_suffix == NULL) {
         fprintf(stderr, "Unable to autodetect symbol suffix of \"%s\"\n", libname);
         return 0;
@@ -340,7 +340,7 @@ __attribute__((constructor)) void init(void) {
                 curr_lib_start++;
 
             // Load functions from this library, clearing only the first time.
-            lbt_forward(curr_lib, clear, verbose);
+            lbt_forward(curr_lib, clear, verbose, NULL);
             clear = 0;
         }
     }
