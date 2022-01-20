@@ -77,8 +77,10 @@ void record_library_load(const char * libname, void * handle, const char * suffi
             free_idx = idx;
             break;
         }
-        // If this library has been loaded before, all we do is copy the `forwards` over
-        if (lbt_config.loaded_libs[idx]->handle == handle) {
+        // If this library has been loaded before, and the interface matches, all we do is copy the `forwards` over
+        // We check interface matching because it is possible for a single library to contain both LP64 and ILP64
+        // symbols, and we want to treat both of those as separate.
+        if (lbt_config.loaded_libs[idx]->handle == handle && lbt_config.loaded_libs[idx]->interface == interface) {
             memcpy(lbt_config.loaded_libs[idx]->active_forwards, forwards, sizeof(uint8_t)*(NUM_EXPORTED_FUNCS/8 + 1));
             clear_other_forwards(idx, forwards, interface);
             return;
