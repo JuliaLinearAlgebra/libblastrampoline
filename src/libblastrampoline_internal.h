@@ -71,6 +71,7 @@ int utf8_to_wchar(const char * str, wchar_t * wstr, size_t maxlen);
 void * load_library(const char * path);
 void * lookup_symbol(const void * lib_handle, const char * symbol_name);
 void * lookup_self_symbol(const char * symbol_name);
+const char * lookup_self_path();
 void close_library(void * handle);
 
 // Functions in `autodetection.c`

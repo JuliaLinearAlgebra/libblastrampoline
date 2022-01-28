@@ -1,4 +1,5 @@
 #include "libblastrampoline_internal.h"
+#include <dlfcn.h>
 
 void throw_dl_error(const char * path) {
     fprintf(stderr, "ERROR: Unable to load dependent library %s\n", path);
@@ -88,4 +89,30 @@ void * lookup_self_symbol(const char * symbol_name) {
     self_handle = GetModuleHandle(NULL);
 #endif
     return lookup_symbol(self_handle, symbol_name);
+}
+
+
+
+char self_path[PATH_MAX] = {0};
+const char * lookup_self_path()
+{
+    // Reuse the path if this is not the first call.
+    if (self_path[0] != 0) {
+        return self_path;
+    }
+#if defined(_OS_WINDOWS_)
+    if (!GetModuleFileNameA(GetModuleHandle(NULL), self_path, PATH_MAX)) {
+        fprintf(stderr, "ERROR: GetModuleFileName() failed\n");
+        exit(1);
+    }
+#else
+    // On all other platforms, use dladdr()
+    Dl_info info;
+    if (!dladdr(lookup_self_symbol("lbt_forward"), &info)) {
+        fprintf(stderr, "ERROR: Unable to dladdr(\"lbt_forward\"): %s\n", dlerror());
+        exit(1);
+    }
+    strcpy(self_path, info.dli_fname);
+#endif
+    return self_path;
 }
