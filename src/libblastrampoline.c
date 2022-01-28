@@ -307,7 +307,7 @@ __attribute__((constructor)) void init(void) {
     const char * verbose_str = getenv("LBT_VERBOSE");
     if (verbose_str != NULL && strcmp(verbose_str, "1") == 0) {
         verbose = 1;
-        printf("libblastrampoline initializing\n");
+        printf("libblastrampoline initializing from %s\n", lookup_self_path());
     }
 
 #if !defined(LBT_DEEPBINDLESS)
