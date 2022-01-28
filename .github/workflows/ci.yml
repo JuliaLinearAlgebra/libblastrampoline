@@ -11,9 +11,9 @@ jobs:
   gensymbol:
     name: generate_func_list idempotency
     runs-on: ubuntu-20.04
-  steps:
-    - uses: actions/checkout@v2
-    - name: Check exported symbols up to date
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check exported symbols up to date
         shell: bash
         run: |
           cd ext/gensymbol
