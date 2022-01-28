@@ -77,3 +77,15 @@ void * lookup_symbol(const void * handle, const char * symbol_name) {
     return dlsym((void *)handle, symbol_name);
 #endif
 }
+
+/*
+ * Work around protected symbol visibility and GCC/ld.bfd bug:
+ * https://sourceware.org/bugzilla/show_bug.cgi?id=26815
+ */
+void * lookup_self_symbol(const char * symbol_name) {
+    void * self_handle = NULL;
+#if defined(_OS_WINDOWS_)
+    self_handle = GetModuleHandle(NULL);
+#endif
+    return lookup_symbol(self_handle, symbol_name);
+}

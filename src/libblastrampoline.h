@@ -160,17 +160,16 @@ LBT_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char
 LBT_DLLEXPORT void lbt_default_func_print_error();
 
 /*
+ * Function that prints out to `stderr` that someone called an uninitialized function, and
+ * then calls `exit(1)`.  This is used with `lbt_set_default_func()`.
+ */
+LBT_DLLEXPORT void lbt_default_func_print_error_and_exit();
+
+/*
  * Returns the currently-configured default function that gets called if no mapping has been set
  * for an exported symbol.  Can return `NULL` if it was set as the default function.
  */
 LBT_DLLEXPORT const void * lbt_get_default_func();
-
-/*
- * Users can force an RTLD_DEEPBIND-capable system to avoid using RTLD_DEEPBIND by setting
- * `LBT_USE_RTLD_DEEPBIND=0` in their environment.  This function returns `0x01` if it will
- *  use `RTLD_DEEPBIND` when loading a library, and `0x00` otherwise.
- */
- LBT_DLLEXPORT const uint8_t lbt_get_use_deepbind();
 
 /*
  * Sets the default function that gets called if no mapping has been set for an exported symbol.
@@ -179,6 +178,13 @@ LBT_DLLEXPORT const void * lbt_get_default_func();
  * this function immediately before calling `lbt_forward()` with `clear` set.
  */
 LBT_DLLEXPORT void lbt_set_default_func(const void * addr);
+
+/*
+ * Users can force an RTLD_DEEPBIND-capable system to avoid using RTLD_DEEPBIND by setting
+ * `LBT_USE_RTLD_DEEPBIND=0` in their environment.  This function returns `0x01` if it will
+ *  use `RTLD_DEEPBIND` when loading a library, and `0x00` otherwise.
+ */
+ LBT_DLLEXPORT const uint8_t lbt_get_use_deepbind();
 
 /*
  * Returns the currently-configured forward target for the given `symbol_name`, according to the
