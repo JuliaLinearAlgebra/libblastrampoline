@@ -1,5 +1,4 @@
 #include "libblastrampoline_internal.h"
-#include <dlfcn.h>
 
 void throw_dl_error(const char * path) {
     fprintf(stderr, "ERROR: Unable to load dependent library %s\n", path);
@@ -87,6 +86,10 @@ void * lookup_self_symbol(const char * symbol_name) {
     void * self_handle = NULL;
 #if defined(_OS_WINDOWS_)
     self_handle = GetModuleHandle(NULL);
+#elif defined(_OS_DARWIN_)
+    self_handle = RTLD_SELF;
+#elif defined(RTLD_DEFAULT)
+    self_handle = RTLD_DEFAULT;
 #endif
     return lookup_symbol(self_handle, symbol_name);
 }
