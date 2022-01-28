@@ -28,8 +28,8 @@ function bitfield_get(field::Vector{UInt8}, symbol_idx::UInt32)
     return field[div(symbol_idx,8)+1] & (UInt8(0x01) << (symbol_idx%8))
 end
 
-lbt_prefix = get_blastrampoline_dir()
-lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/libblastrampoline.$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
+lbt_link_name, lbt_prefix = build_libblastrampoline()
+lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
 
 @testset "Config" begin
     @test lbt_handle != C_NULL
