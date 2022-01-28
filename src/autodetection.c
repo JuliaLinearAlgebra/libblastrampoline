@@ -18,12 +18,13 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
         // Possibly-NULL suffix that we should search over
         suffix_hint,
 
-        // Search for ILP64-mangling suffixes first, as in the rare case that we want to
-        // load a library that exports both, we prefer to bind to the namespaced symbols first
-        "64", "64_", "_64__", "__64___",
-
-        // Next, LP64-mangling suffixes
+        // First, search for LP64-mangling suffixes, so that when we are loading MKL from a
+        // CLI environment, (where suffix hints are not easy) we want to give the most stable
+        // configuration by default.
         "", "_", "__",
+
+        // Next, search for ILP64-mangling suffixes
+        "64", "64_", "_64__", "__64___",
     };
 
     // If the suffix hint is NULL, just skip it when calling `lookup_symbol()`.
