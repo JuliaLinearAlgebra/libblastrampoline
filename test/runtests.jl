@@ -4,7 +4,7 @@ using Pkg, Artifacts, Base.BinaryPlatforms, Libdl, Test
 include("utils.jl")
 
 # Compile `dgemm_test.c` and `sgesv_test.c` against the given BLAS/LAPACK
-function run_test((test_name, test_expected_outputs), libblas_name, libdirs, interface, backing_libs)
+function run_test((test_name, test_expected_outputs, test_success), libblas_name, libdirs, interface, backing_libs)
     # We need to configure this C build a bit
     cflags = String[
         "-g",
@@ -43,9 +43,16 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
             # We need to tell it how to find CSL at run-time
             LIBPATH_env => append_libpath(libdirs),
             "LBT_DEFAULT_LIBS" => backing_libs,
+            "LBT_STRICT" => 1,
         )
         cmd = `$(dir)/$(test_name)`
-        output = capture_output(addenv(cmd, env))
+        p, output = capture_output(addenv(cmd, env))
+
+        if test_success
+            @test success(p)
+        else
+            @test !success(p)
+        end
 
         # Test to make sure the test ran properly
         has_expected_output = all(occursin(expected, output) for expected in test_expected_outputs)
@@ -68,9 +75,10 @@ function run_test((test_name, test_expected_outputs), libblas_name, libdirs, int
 end
 
 # our tests
-dgemm = ("dgemm_test", ("||C||^2 is:  24.3384",))
-sgesv = ("sgesv_test", ("||b||^2 is:   3.0000",))
-sdot  = ("sdot_test",  ("C is:   1.9900"))
+dgemm =         ("dgemm_test", ("||C||^2 is:  24.3384",),                  true)
+sgesv =         ("sgesv_test", ("||b||^2 is:   3.0000",),                  true)
+sgesv_failure = ("sgesv_test", ("Error: no BLAS/LAPACK library loaded!",), false)
+sdot  =         ("sdot_test",  ("C is:   1.9900",),                         true)
 
 # Build version that links against vanilla OpenBLAS
 openblas_interface = :LP64
@@ -156,6 +164,8 @@ if blas64 !== nothing
         run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
         run_test(sdot,  "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
         # Can't run `sgesv` here as we don't have LAPACK symbols in `libblas64.so`
+
+        run_test(sgesv_failure, "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
     end
 
     # Check if we have a `liblapack` and if we do, run again, this time including `sgesv`
@@ -171,7 +181,7 @@ end
 
 # Finally the super-crazy test: build a binary that links against BOTH sets of symbols!
 if openblas_interface == :ILP64
-    inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"))
+    inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"), true)
     @testset "LBT -> OpenBLAS 32 + 64 (LP64 + ILP64)" begin
         libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
         run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")

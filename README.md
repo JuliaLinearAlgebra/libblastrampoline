@@ -60,6 +60,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v4.1.0 - Add `LBT_STRICT` environment variable that causes calling missing symbols to kill the process.
+
 v4.0.0 - Add `suffix_hint` parameter to `lbt_forward()` to allow overriding symbol suffix search order for dual-interface libraries, and allow loading the same library with multiple interfaces.
 
 v3.1.0 - Add `LBT_USE_RTLD_DEEPBIND` environment variable override (for santizer usage), and add buildsystem fixes for Haiku.

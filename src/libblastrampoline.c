@@ -24,6 +24,10 @@ int32_t find_symbol_idx(const char * name) {
 LBT_DLLEXPORT void lbt_default_func_print_error() {
     fprintf(stderr, "Error: no BLAS/LAPACK library loaded!\n");
 }
+void lbt_default_func_print_error_and_exit() {
+    lbt_default_func_print_error();
+    exit(1);
+}
 const void * default_func = (const void *)&lbt_default_func_print_error;
 LBT_DLLEXPORT const void * lbt_get_default_func() {
     return default_func;
@@ -318,6 +322,17 @@ __attribute__((constructor)) void init(void) {
         }
     }
 #endif // !defined(LBT_DEEPBINDLESS)
+
+    const char * strict_str = getenv("LBT_STRICT");
+    if (strict_str != NULL && strcmp(strict_str, "1") == 0) {
+        if (verbose) {
+            printf("LBT_STRICT=1 detected; calling missing symbols will print an error, then exit\n");
+        }
+        // We can't directly use the symbol name here, since the protected visibility
+        // on Linux causes a linker error with certain versions of GCC and ld:
+        // https://lists.gnu.org/archive/html/bug-binutils/2016-02/msg00191.html
+        default_func = lookup_self_symbol("lbt_default_func_print_error_and_exit");
+    }
 
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries
     const char * default_libs = getenv("LBT_DEFAULT_LIBS");

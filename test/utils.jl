@@ -32,7 +32,7 @@ function capture_output(cmd::Cmd; verbose::Bool = false)
     close(out_pipe.in)
     output = @async read(out_pipe, String)
     wait(p)
-    return fetch(output)
+    return p, fetch(output)
 end
 
 cc = something(
@@ -51,7 +51,7 @@ else
     make = "make"
 end
 
-needs_m32() = startswith(capture_output(`$(cc) -dumpmachine`), "x86_64") && Sys.WORD_SIZE == 32
+needs_m32() = startswith(last(capture_output(`$(cc) -dumpmachine`)), "x86_64") && Sys.WORD_SIZE == 32
 
 
 # Build blastrampoline into a temporary directory, and return that
