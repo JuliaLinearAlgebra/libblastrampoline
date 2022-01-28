@@ -102,30 +102,31 @@ end
 
 # Next, build a version that links against `libblastrampoline`, and tell
 # the trampoline to forwards calls to `OpenBLAS_jll`
-lbt_dir = joinpath(get_blastrampoline_dir(), binlib)
+lbt_link_name, lbt_dir = build_libblastrampoline()
+lbt_dir = joinpath(lbt_dir, binlib)
 
 @testset "LBT -> OpenBLAS_jll ($(openblas_interface))" begin
     libdirs = unique(vcat(OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
-    run_test(dgemm, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
-    run_test(sgesv, "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
-    run_test(sdot,  "blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    run_test(dgemm, lbt_link_name, libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    run_test(sgesv, lbt_link_name, libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    run_test(sdot,  lbt_link_name, libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
 end
 
 # And again, but this time with OpenBLAS32_jll
 @testset "LBT -> OpenBLAS32_jll (LP64)" begin
     libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
-    run_test(dgemm, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
-    run_test(sgesv, "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
-    run_test(sdot,  "blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+    run_test(dgemm, lbt_link_name, libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+    run_test(sgesv, lbt_link_name, libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+    run_test(sdot,  lbt_link_name, libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
 end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
 if MKL_jll.is_available()
     @testset "LBT -> MKL_jll (LP64)" begin
         libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
-        run_test(dgemm, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
-        run_test(sgesv, "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
-        run_test(sdot,  "blastrampoline", libdirs, :LP64, MKL_jll.libmkl_rt_path)
+        run_test(dgemm, lbt_link_name, libdirs, :LP64, MKL_jll.libmkl_rt_path)
+        run_test(sgesv, lbt_link_name, libdirs, :LP64, MKL_jll.libmkl_rt_path)
+        run_test(sdot,  lbt_link_name, libdirs, :LP64, MKL_jll.libmkl_rt_path)
     end
 
     # Test that we can set MKL's interface via an environment variable to select ILP64, and LBT detects it properly
@@ -133,9 +134,9 @@ if MKL_jll.is_available()
         @testset "LBT -> MKL_jll (ILP64, via env)" begin
             withenv("MKL_INTERFACE_LAYER" => "ILP64") do
                 libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
-                run_test(dgemm, "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
-                run_test(sgesv, "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
-                run_test(sdot,  "blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
+                run_test(dgemm, lbt_link_name, libdirs, :ILP64, MKL_jll.libmkl_rt_path)
+                run_test(sgesv, lbt_link_name, libdirs, :ILP64, MKL_jll.libmkl_rt_path)
+                run_test(sdot,  lbt_link_name, libdirs, :ILP64, MKL_jll.libmkl_rt_path)
             end
         end
     end
@@ -145,15 +146,15 @@ end
 veclib_blas_path = "/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/libBLAS.dylib"
 if isfile(veclib_blas_path)
     @testset "LBT -> vecLib/libBLAS" begin
-        run_test(dgemm, "blastrampoline", [lbt_dir], :LP64, veclib_blas_path)
-        run_test(sdot,  "blastrampoline", [lbt_dir], :LP64, veclib_blas_path)
+        run_test(dgemm, lbt_link_name, [lbt_dir], :LP64, veclib_blas_path)
+        run_test(sdot,  lbt_link_name, [lbt_dir], :LP64, veclib_blas_path)
     end
 
     veclib_lapack_path = "/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/libLAPACK.dylib"
     @testset "LBT -> vecLib/libLAPACK" begin
-        run_test(dgemm, "blastrampoline", [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
-        run_test(sgesv, "blastrampoline", [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
-        run_test(sdot,  "blastrampoline", [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
+        run_test(dgemm, lbt_link_name, [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
+        run_test(sgesv, lbt_link_name, [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
+        run_test(sdot,  lbt_link_name, [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
     end
 end
 
@@ -162,20 +163,20 @@ end
 blas64 = dlopen("libblas64", throw_error=false)
 if blas64 !== nothing
     @testset "LBT -> libblas64 (ILP64, BLAS)" begin
-        run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
-        run_test(sdot,  "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
+        run_test(dgemm, lbt_link_name, [lbt_dir], :ILP64, dlpath(blas64))
+        run_test(sdot,  lbt_link_name, [lbt_dir], :ILP64, dlpath(blas64))
         # Can't run `sgesv` here as we don't have LAPACK symbols in `libblas64.so`
 
-        run_test(sgesv_failure, "blastrampoline", [lbt_dir], :ILP64, dlpath(blas64))
+        run_test(sgesv_failure, lbt_link_name, [lbt_dir], :ILP64, dlpath(blas64))
     end
 
     # Check if we have a `liblapack` and if we do, run again, this time including `sgesv`
     lapack = dlopen("liblapack64", throw_error=false)
     if lapack !== nothing
         @testset "LBT -> libblas64 + liblapack64 (ILP64, BLAS+LAPACK)" begin
-            run_test(dgemm, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
-            run_test(sgesv, "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
-            run_test(sdot,  "blastrampoline", [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
+            run_test(dgemm, lbt_link_name, [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
+            run_test(sgesv, lbt_link_name, [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
+            run_test(sdot,  lbt_link_name, [lbt_dir], :ILP64, "$(dlpath(blas64));$(dlpath(lapack))")
         end
     end
 end
@@ -185,7 +186,7 @@ if openblas_interface == :ILP64
     inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"), true)
     @testset "LBT -> OpenBLAS 32 + 64 (LP64 + ILP64)" begin
         libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
-        run_test(inconsolable, "blastrampoline", libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")
+        run_test(inconsolable, lbt_link_name, libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")
     end
 end
 

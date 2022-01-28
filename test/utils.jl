@@ -56,7 +56,7 @@ needs_m32() = startswith(last(capture_output(`$(cc) -dumpmachine`)), "x86_64") &
 
 # Build blastrampoline into a temporary directory, and return that
 blastrampoline_build_dir = nothing
-function get_blastrampoline_dir()
+function build_libblastrampoline()
     if blastrampoline_build_dir !== nothing
         return blastrampoline_build_dir
     end
@@ -66,8 +66,17 @@ function get_blastrampoline_dir()
     srcdir = joinpath(dirname(@__DIR__), "src")
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS=$(cflags_add) ARCH=$(Sys.ARCH) clean`)
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS=$(cflags_add) ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(dir))/output`)
+
     global blastrampoline_build_dir = joinpath(dir, "output")
-    return blastrampoline_build_dir
+
+    # Give LBT a fake linking name so that we can test from within Julia versions that actually load LBT natively.
+    link_name = "blastramp-dev"
+    cp(
+        joinpath(blastrampoline_build_dir, binlib, "libblastrampoline.$(shlib_ext)"),
+        joinpath(blastrampoline_build_dir, binlib, "lib$(link_name).$(shlib_ext)"),
+    )
+    println("$(blastrampoline_build_dir)/$(binlib)")
+    return link_name, blastrampoline_build_dir
 end
 
 
