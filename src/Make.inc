@@ -40,7 +40,7 @@ else ifeq ($(OS), Darwin)
 
   LIB_FULL_VERSION := libblastrampoline.$(LBT_SOVERSION_MAJOR).$(LBT_SOVERSION_MINOR).$(LBT_SOVERSION_PATCH).dylib
   LIB_MAJOR_VERSION := libblastrampoline.$(LBT_SOVERSION_MAJOR).dylib
-  SONAME_FLAG := -Wl,-install_name=@rpath/$(LIB_MAJOR_VERSION)
+  SONAME_FLAG := -install_name @rpath/$(LIB_MAJOR_VERSION)
 else
   SHLIB_EXT := so
   binlib := lib
