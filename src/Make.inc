@@ -22,16 +22,32 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
   OS := WINNT
 endif
 
+LBT_SOVERSION_MAJOR := 4
+LBT_SOVERSION_MINOR := 1
+LBT_SOVERSION_PATCH := 0
+
 ifeq ($(OS), WINNT)
   SHLIB_EXT := dll
   EXE := .exe
   binlib := bin
+
+  LIB_FULL_VERSION := libblastrampoline-$(LBT_SOVERSION_MAJOR)-$(LBT_SOVERSION_MINOR)-$(LBT_SOVERSION_PATCH).dll
+  LIB_MAJOR_VERSION := libblastrampoline-$(LBT_SOVERSION_MAJOR).dll
+  SONAME_FLAG :=
 else ifeq ($(OS), Darwin)
   SHLIB_EXT := dylib
   binlib := lib
+
+  LIB_FULL_VERSION := libblastrampoline.$(LBT_SOVERSION_MAJOR).$(LBT_SOVERSION_MINOR).$(LBT_SOVERSION_PATCH).dylib
+  LIB_MAJOR_VERSION := libblastrampoline.$(LBT_SOVERSION_MAJOR).dylib
+  SONAME_FLAG := -Wl,-install_name=@rpath/$(LIB_FULL_VERSION)
 else
   SHLIB_EXT := so
   binlib := lib
+
+  LIB_FULL_VERSION := libblastrampoline.so.$(LBT_SOVERSION_MAJOR).$(LBT_SOVERSION_MINOR).$(LBT_SOVERSION_PATCH)
+  LIB_MAJOR_VERSION := libblastrampoline.so.$(LBT_SOVERSION_MAJOR)
+  SONAME_FLAG := -Wl,-soname=$(LIB_FULL_VERSION)
 endif
 
 LBT_CFLAGS := -g -O2 -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
