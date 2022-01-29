@@ -31,8 +31,15 @@ $(builddir)/trampolines/%.o: trampolines/%.S exported_funcs.inc | $(builddir)/tr
 dump-trampolines: trampolines/trampolines_$(ARCH).S
 	$(CC) $< -S | sed -E 's/ ((%%)|;) /\n/g' | sed -E 's/.global/\n.global/g'
 
-$(builddir)/libblastrampoline.$(SHLIB_EXT): $(MAIN_OBJS)
-	@$(call PRINT_CC,$(CC) -o $@ $(call IMPLIB_FLAGS,$@) $(LBT_CFLAGS) $^ -shared $(LBT_LDFLAGS))
+
+$(builddir)/$(LIB_FULL_VERSION): $(MAIN_OBJS)
+	@$(call PRINT_CC,$(CC) -o "$@" $(call IMPLIB_FLAGS,$@) $(LBT_CFLAGS) $^ -shared $(LBT_LDFLAGS))
+
+$(builddir)/$(LIB_MAJOR_VERSION): | $(builddir)/$(LIB_FULL_VERSION)
+	ln -sf "$(LIB_FULL_VERSION)" "$@"
+
+$(builddir)/libblastrampoline.$(SHLIB_EXT): | $(builddir)/$(LIB_MAJOR_VERSION)
+	ln -sf "$(LIB_MAJOR_VERSION)" "$@"
 
 # Install both libraries and our headers
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
@@ -40,10 +47,10 @@ install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	-@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
 	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(prefix)/include/
 	@mkdir -p $(prefix)/$(binlib)
-	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT) $(prefix)/$(binlib)
+	@cp -a $(builddir)/libblastrampoline*$(SHLIB_EXT)* $(prefix)/$(binlib)/
 ifeq ($(OS),WINNT)
 	@mkdir -p $(prefix)/lib
-	@cp -a $(builddir)/libblastrampoline.$(SHLIB_EXT).a $(prefix)/lib
+	@cp -a $(builddir)/$(LIB_FULL_VERSION).a $(prefix)/lib
 endif
 
 clean:
