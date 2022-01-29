@@ -106,7 +106,7 @@ lbt_link_name, lbt_dir = build_libblastrampoline()
 lbt_dir = joinpath(lbt_dir, binlib)
 
 @testset "LBT -> OpenBLAS_jll ($(openblas_interface))" begin
-    libdirs = unique(vcat(OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
+    libdirs = unique(vcat(lbt_dir, OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
     run_test(dgemm, lbt_link_name, libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
     run_test(sgesv, lbt_link_name, libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
     run_test(sdot,  lbt_link_name, libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
@@ -114,7 +114,7 @@ end
 
 # And again, but this time with OpenBLAS32_jll
 @testset "LBT -> OpenBLAS32_jll (LP64)" begin
-    libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
+    libdirs = unique(vcat(lbt_dir, OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
     run_test(dgemm, lbt_link_name, libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
     run_test(sgesv, lbt_link_name, libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
     run_test(sdot,  lbt_link_name, libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
@@ -123,7 +123,7 @@ end
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
 if MKL_jll.is_available()
     @testset "LBT -> MKL_jll (LP64)" begin
-        libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
+        libdirs = unique(vcat(lbt_dir, MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
         run_test(dgemm, lbt_link_name, libdirs, :LP64, MKL_jll.libmkl_rt_path)
         run_test(sgesv, lbt_link_name, libdirs, :LP64, MKL_jll.libmkl_rt_path)
         run_test(sdot,  lbt_link_name, libdirs, :LP64, MKL_jll.libmkl_rt_path)
@@ -133,7 +133,7 @@ if MKL_jll.is_available()
     if Sys.WORD_SIZE == 64
         @testset "LBT -> MKL_jll (ILP64, via env)" begin
             withenv("MKL_INTERFACE_LAYER" => "ILP64") do
-                libdirs = unique(vcat(MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
+                libdirs = unique(vcat(lbt_dir, MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
                 run_test(dgemm, lbt_link_name, libdirs, :ILP64, MKL_jll.libmkl_rt_path)
                 run_test(sgesv, lbt_link_name, libdirs, :ILP64, MKL_jll.libmkl_rt_path)
                 run_test(sdot,  lbt_link_name, libdirs, :ILP64, MKL_jll.libmkl_rt_path)
