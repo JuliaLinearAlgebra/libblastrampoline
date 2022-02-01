@@ -59,19 +59,18 @@ word_idx() {
 }
 
 # Also generate a list of functions that need an f2c wrapper
-
-NUM_F2C=0
-
+NUM_SYMBOLS=0
 function output_func() {
     # Skip floatret functions that don't actually exist in our exported funcs
     widx=$(word_idx "${EXPORTED_FUNCS}" ${1})
     if [[ -n "${widx}" ]]; then
         echo "    XX(${1}, ${widx}) \\" >> "${OUTPUT_FILE}"
-        NUM_F2C=$((${NUM_F2C} + 1))
-        [ $((${NUM_F2C} % 10)) == 0 ] && echo -n "."
+        NUM_SYMBOLS=$((${NUM_SYMBOLS} + 1))
+        [ $((${NUM_SYMBOLS} % 10)) == 0 ] && echo -n "."
     fi
 }
 
+NUM_SYMBOLS=0
 FLOAT32_FUNCS="sdot_ sdsdot_ sasum_ scasum_ ssum_ scsum_ samax_ scamax_ samin_ scamin_ smax_ scmax_ smin_ scmin_ snrm2_ scnrm2_ slamch_ slamc3_ "
 echo >> "${OUTPUT_FILE}"
 echo "#ifndef FLOAT32_FUNCS" >> "${OUTPUT_FILE}"
@@ -81,7 +80,9 @@ for func_name in ${FLOAT32_FUNCS}; do
 done
 echo >> "${OUTPUT_FILE}"
 echo "#endif" >> "${OUTPUT_FILE}"
+NUM_FLOAT32_SYMBOLS="${NUM_SYMBOLS}"
 
+NUM_SYMBOLS=0
 COMPLEX64_FUNCS="cdotu_ cdotc_"
 echo >> "${OUTPUT_FILE}"
 echo "#ifndef COMPLEX64_FUNCS" >> "${OUTPUT_FILE}"
@@ -91,7 +92,9 @@ for func_name in ${COMPLEX64_FUNCS}; do
 done
 echo >> "${OUTPUT_FILE}"
 echo "#endif" >> "${OUTPUT_FILE}"
+NUM_COMPLEX64_SYMBOLS="${NUM_SYMBOLS}"
 
+NUM_SYMBOLS=0
 COMPLEX128_FUNCS="zdotu_ zdotc_"
 echo >> "${OUTPUT_FILE}"
 echo "#ifndef COMPLEX128_FUNCS" >> "${OUTPUT_FILE}"
@@ -101,7 +104,23 @@ for func_name in ${COMPLEX128_FUNCS}; do
 done
 echo >> "${OUTPUT_FILE}"
 echo "#endif" >> "${OUTPUT_FILE}"
+NUM_COMPLEX128_SYMBOLS="${NUM_SYMBOLS}"
+
+NUM_SYMBOLS=0
+CBLAS_SUB_FUNCS="$(grep -e '^cblas_.*_sub' <<< "${EXPORTED_FUNCS}")"
+echo >> "${OUTPUT_FILE}"
+echo "#ifndef CBLAS_SUB_FUNCS" >> "${OUTPUT_FILE}"
+echo "#define CBLAS_SUB_FUNCS(XX) \\" >> "${OUTPUT_FILE}"
+for func_name in ${CBLAS_SUB_FUNCS}; do
+    output_func "${func_name}"
+done
+echo >> "${OUTPUT_FILE}"
+echo "#endif" >> "${OUTPUT_FILE}"
+NUM_CBLAS_SUB_SYMBOLS="${NUM_SYMBOLS}"
 
 # Report to the user and cleanup
-echo "Done, with ${NUM_EXPORTED} symbols generated (${NUM_F2C} f2c functions noted)."
+echo
+NUM_F2C_SYMBOLS="$((NUM_FLOAT32_SYMBOLS + NUM_COMPLEX64_SYMBOLS + NUM_COMPLEX128_SYMBOLS))"
+NUM_CMPLX_SYMBOLS="$((NUM_COMPLEX64_SYMBOLS + NUM_COMPLEX128_SYMBOLS))"
+echo "Done, with ${NUM_EXPORTED} symbols generated (${NUM_F2C_SYMBOLS} f2c, ${NUM_CMPLX_SYMBOLS} complex-returning, ${NUM_CBLAS_SUB_SYMBOLS} cblas-sub functions)."
 rm -f tempsymbols.def
