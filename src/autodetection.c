@@ -142,15 +142,58 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
     return LBT_INTERFACE_UNKNOWN;
 }
 
+int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
+    char symbol_name[MAX_SYMBOL_LEN];
+
+    sprintf(symbol_name, "zdotc_%s", suffix);
+    void * zdotc_addr = lookup_symbol(handle, symbol_name);
+    if (zdotc_addr == NULL) {
+        return LBT_COMPLEX_RETSTYLE_UNKNOWN;
+    }
+
+    // Typecast to function pointer for easier usage below
+    double complex (*zdotc_normal)(                  int64_t *, double complex *, int64_t *, double complex *, int64_t *) = zdotc_addr;
+    void           (*zdotc_retarg)(double complex *, int64_t *, double complex *, int64_t *, double complex *, int64_t *) = zdotc_addr;
+
+    /*
+     * First, check to see if `zdotc` zeros out the first argument if all arguments are zero.
+     * Supposedly, most well-behaved implementations will return `0 + 0*I` if the length of
+     * the inputs is zero; so if it is using a "return argument", that's a good way to find out.
+     * 
+     * We detect this by setting `retval` to an initial value of `0.0 + 1.0*I`.  This has the
+     * added benefit of being interpretable as `0` if looked at as an `int{32,64}_t *`, which
+     * makes this invocation safe across the full normal-return/argument-return vs. lp64/ilp64
+     * compatibility square.
+     */
+    double complex retval = 0.0 + 1.0*I;
+    int64_t zero = 0;
+    double complex zeroc = 0.0 + 0.0*I;
+    zdotc_retarg(&retval, &zero, &zeroc, &zero, &zeroc, &zero);
+
+    if (creal(retval) == 0.0 && cimag(retval) == 0.0) {
+        return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+    }
+
+    // If it was _not_ reset, let's hazard a guess that we're dealing with a normal return style:
+    retval = 0.0 + 1.0*I;
+    retval = zdotc_normal(&zero, &zeroc, &zero, &zeroc, &zero);
+    if (creal(retval) == 0.0 && cimag(retval) == 0.0) {
+        return LBT_COMPLEX_RETSTYLE_NORMAL;
+    }
+
+    // If that was not reset either, we have no idea what's going on.
+    return LBT_COMPLEX_RETSTYLE_UNKNOWN;
+}
+
 #ifdef F2C_AUTODETECTION
-int autodetect_f2c(void * handle, const char * suffix) {
+int32_t autodetect_f2c(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
     // Attempt BLAS `sdot_()` test
     sprintf(symbol_name, "sdot_%s", suffix);
     void * sdot_addr = lookup_symbol(handle, symbol_name);
     if (sdot_addr == NULL) {
-        return 0;
+        return LBT_F2C_UNKNOWN;
     }
 
     // Typecast to function pointer for easier usage below

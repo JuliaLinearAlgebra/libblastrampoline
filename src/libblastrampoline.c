@@ -66,8 +66,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
 #ifdef F2C_AUTODETECTION
     if (f2c == LBT_F2C_REQUIRED) {
         // Check to see if this symbol is one of the f2c functions
-        int f2c_symbol_idx = 0;
-        for (f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
+        for (int f2c_symbol_idx=0; f2c_func_idxs[f2c_symbol_idx] != -1; ++f2c_symbol_idx) {
             // Jump through the f2c_func_idxs layer of indirection to find the `exported_func*_addrs` offsets
             // Skip any symbols that aren't ours
             if (f2c_func_idxs[f2c_symbol_idx] != symbol_idx)
@@ -148,9 +147,7 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
     return ret;
 }
 
-/*
- * Load `libname`, clearing previous mappings if `clear` is set.
- */
+// Load `libname`, clearing previous mappings if `clear` is set.
 LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose, const char * suffix_hint) {
     if (verbose) {
         printf("Generating forwards to %s\n", libname);

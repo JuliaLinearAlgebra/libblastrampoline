@@ -69,6 +69,9 @@ typedef struct {
 #define LBT_INTERFACE_UNKNOWN          -1
 
 // Possible values for `f2c` in `lbt_library_info_t`
+// These describe whether a library uses the gfortran ABI for returning floats, or whether
+// an `f2c` converter was used that messed up the ABI and must be converted, as is the case
+// with Apple's Accelerate.
 #define LBT_F2C_PLAIN                   0
 #define LBT_F2C_REQUIRED                1
 #define LBT_F2C_UNKNOWN                -1
