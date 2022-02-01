@@ -104,7 +104,8 @@ end
 
 # Build version that links against vanilla OpenBLAS32
 @testset "Vanilla OpenBLAS32_jll (LP64)" begin
-    run_all_tests("openblas", OpenBLAS32_jll.LIBPATH_list, :LP64, "")
+    # Reverse OpenBLAS32_jll's LIBPATH_list so that we get the right openblas.so
+    run_all_tests("openblas", reverse(OpenBLAS32_jll.LIBPATH_list), :LP64, "")
 end
 
 # Next, build a version that links against `libblastrampoline`, and tell

@@ -89,6 +89,15 @@ ifneq (,$(filter $(ARCH), x86_64 i686))
   CBLAS_DIVERGENCE_AUTODETECTION := 1
 endif
 
+# If we're on x86_64 (and NOT on windows), we can do complex return style autodetection
+# We don't do this on Windows because Windows actually prefers arugment retstyle
+ifneq ($(OS),WINNT)
+ifneq (,$(filter $(ARCH), x86_64))
+  LBT_CFLAGS += -DCOMPLEX_RETSTYLE_AUTODETECTION
+  COMPLEX_RETSTYLE_AUTODETECTION := 1
+endif
+endif
+
 
 ifeq ($(VERBOSE),0)
 ENDCOLOR := "\033[0m"

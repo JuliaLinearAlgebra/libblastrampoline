@@ -154,6 +154,7 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
     return LBT_INTERFACE_UNKNOWN;
 }
 
+#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
@@ -196,6 +197,7 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
     // If that was not reset either, we have no idea what's going on.
     return LBT_COMPLEX_RETSTYLE_UNKNOWN;
 }
+#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
 #ifdef F2C_AUTODETECTION
 int32_t autodetect_f2c(void * handle, const char * suffix) {
@@ -232,7 +234,7 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
     // We have no idea what happened; nothing works and everything is broken
     return LBT_F2C_UNKNOWN;
 }
-#endif
+#endif // F2C_AUTODETECTION
 
 #ifdef CBLAS_DIVERGENCE_AUTODETECTION
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
@@ -261,4 +263,4 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
     // If we can't even find `zdotc_64`, we don't know what this is.
     return LBT_CBLAS_UNKNOWN;
 }
-#endif
+#endif // CBLAS_DIVERGENCE_AUTODETECTION
