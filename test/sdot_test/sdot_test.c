@@ -14,7 +14,6 @@ extern float MANGLE(sdot_)(blasint *, float *, blasint *, float *, blasint *);
 #define N 3
 int main()
 {
-    blasint pivot[N], ok;
     float A[N], B[N];
 
     // Initialize `A` with known values (transposed into FORTRAN ordering)
@@ -27,18 +26,10 @@ int main()
     B[1] = -0.1;
     B[2] =  1.8;
 
+    // Perform dot product
     blasint len = N;
     blasint inca = 1;
     blasint incb = 1;
-
-    // find solution using LAPACK routine SGESV, all the arguments have to
-    // be pointers and you have to add an underscore to the routine name
-
-    //  parameters in the order as they appear in the function call
-    //  order of matrix A, number of right hand sides (b), matrix A,
-    // leading dimension of A, array that records pivoting,
-    // result vector b on entry, x on exit, leading dimension of b
-    //  return value
     float C = MANGLE(sdot_)(&len, &A[0], &inca, &B[0], &incb);
 
     // Print out C
