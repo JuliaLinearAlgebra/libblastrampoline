@@ -7,7 +7,6 @@ all: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 # Objects we'll build
 MAIN_OBJS := libblastrampoline.o dl_utils.o config.o \
 			 autodetection.o \
-			 complex_return_style_adapters.o \
 			 threading.o deepbindless.o trampolines/trampolines_$(ARCH).o
 
 # Include win_utils.c on windws
@@ -22,6 +21,10 @@ endif
 
 ifeq ($(CBLAS_DIVERGENCE_AUTODETECTION),1)
 MAIN_OBJS += cblas_adapters.o
+endif
+
+ifeq ($(COMPLEX_RETSTYLE_AUTODETECTION),1)
+MAIN_OBJS += complex_return_style_adapters.o
 endif
 
 # Place the `.o` files into `$(builddir)`

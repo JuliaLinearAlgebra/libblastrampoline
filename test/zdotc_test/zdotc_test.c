@@ -10,7 +10,7 @@ typedef int64_t blasint;
 typedef int32_t blasint;
 #endif
 
-extern double complex MANGLE(cblas_zdotc_sub)(blasint, double complex *, blasint, double complex *, blasint, double complex *);
+extern void MANGLE(cblas_zdotc_sub)(blasint, double complex *, blasint, double complex *, blasint, double complex *);
 extern double complex MANGLE(zdotc_)(blasint *, double complex *, blasint *, double complex *, blasint *);
 
 #define N 2

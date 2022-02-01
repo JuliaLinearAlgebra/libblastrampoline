@@ -1,7 +1,9 @@
 #include "libblastrampoline_internal.h"
 #include "libblastrampoline_trampdata.h"
-#include "libblastrampoline_complex_retdata.h"
 
+#ifdef COMPLEX_RETSTYLE_AUTODETECTION
+#include "libblastrampoline_complex_retdata.h"
+#endif
 #ifdef F2C_AUTODETECTION
 #include "libblastrampoline_f2cdata.h"
 #endif
@@ -67,6 +69,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
         }
     }
 
+#ifdef COMPLEX_RETSTYLE_AUTODETECTION
     if (complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT) {
         // Check to see if this symbol is one of the complex-returning functions
         for (int complex_symbol_idx=0; cmplxret_func_idxs[complex_symbol_idx] != -1; ++complex_symbol_idx) {
@@ -90,6 +93,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
             }
         }
     }
+#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
 #ifdef F2C_AUTODETECTION
     if (f2c == LBT_F2C_REQUIRED) {
@@ -216,7 +220,9 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     }
 
     // Next, let's figure out what the complex return style is:
-    int complex_retstyle = autodetect_complex_return_style(handle, lib_suffix);
+    int complex_retstyle = LBT_COMPLEX_RETSTYLE_UNKNOWN;
+#ifdef COMPLEX_RETSTYLE_AUTODETECTION
+    complex_retstyle = autodetect_complex_return_style(handle, lib_suffix);
     if (complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN) {
         fprintf(stderr, "Unable to autodetect complex return style of \"%s\"\n", libname);
         return 0;
@@ -229,6 +235,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             printf(" -> Autodetected argument-passing complex return style\n");
         }
     }
+#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
     int f2c = LBT_F2C_PLAIN;
 #ifdef F2C_AUTODETECTION
@@ -247,7 +254,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             printf(" -> Autodetected gfortran calling convention\n");
         }
     }
-#endif
+#endif // F2C_AUTODETECTION
 
     int cblas = LBT_CBLAS_UNKNOWN;
 #ifdef CBLAS_DIVERGENCE_AUTODETECTION
@@ -273,7 +280,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
         }
     }
-#endif
+#endif // CBLAS_DIVERGENCE_AUTODETECTION
 
     /*
      * Now, if we are opening a 64-bit library with 32-bit names (e.g. suffix == ""),
@@ -378,7 +385,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
         }
     }
-#endif
+#endif // CBLAS_DIVERGENCE_AUTODETECTION
 
     record_library_load(libname, handle, lib_suffix, &forwards[0], interface, complex_retstyle, f2c, cblas);
     if (verbose) {

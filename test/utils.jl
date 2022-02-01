@@ -117,9 +117,9 @@ end
 const LBT_INTERFACE_LP64 = 32
 const LBT_INTERFACE_ILP64 = 64
 const LBT_F2C_PLAIN = 0
-const LBT_COMLPEX_RETSTYLE_NORMAL = 0
-const LBT_COMLPEX_RETSTYLE_ARGUMENT = 1
-const LBT_COMLPEX_RETSTYLE_UNKNOWN = -1
+const LBT_COMPLEX_RETSTYLE_NORMAL = 0
+const LBT_COMPLEX_RETSTYLE_ARGUMENT = 1
+const LBT_COMPLEX_RETSTYLE_UNKNOWN = -1
 const LBT_CBLAS_CONFORMANT = 0
 const LBT_CBLAS_DIVERGENT = 1
 const LBT_CBLAS_UNKNOWN = -1
@@ -152,7 +152,7 @@ function lbt_get_forward(handle, symbol_name, interface, f2c = LBT_F2C_PLAIN)
     return ccall(dlsym(handle, :lbt_get_forward), Ptr{Cvoid}, (Cstring, Int32, Int32), symbol_name, interface, f2c)
 end
 
-function lbt_set_forward(handle, symbol_name, addr, interface, complex_retstyle = LBT_COMLPEX_RETSTYLE_NORMAL, f2c = LBT_F2C_PLAIN; verbose::Bool = false)
+function lbt_set_forward(handle, symbol_name, addr, interface, complex_retstyle = LBT_COMPLEX_RETSTYLE_NORMAL, f2c = LBT_F2C_PLAIN; verbose::Bool = false)
     return ccall(dlsym(handle, :lbt_set_forward), Int32, (Cstring, Ptr{Cvoid}, Int32, Int32, Int32, Int32), symbol_name, addr, interface, complex_retstyle, f2c, verbose ? 1 : 0)
 end
 

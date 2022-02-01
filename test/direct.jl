@@ -71,10 +71,18 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[1].f2c == LBT_F2C_PLAIN
     if Sys.ARCH == :x86_64
         @test libs[1].cblas == LBT_CBLAS_CONFORMANT
+        if Sys.iswindows()
+            # Technically, this should be "argument", but we disable complex return style
+            # autodetection on windows since the default compilers seem to prefer argument
+            # style, so we'd rather just not touch things on that platform.
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
+        else
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL
+        end
     else
         @test libs[1].cblas == LBT_CBLAS_UNKNOWN
+        @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
     end
-    @test libs[1].complex_retstyle == LBT_COMLPEX_RETSTYLE_NORMAL
 
     @test bitfield_get(libs[1].active_forwards, dgemm_idx) != 0
 
@@ -83,7 +91,6 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[2].suffix == ""
     @test libs[2].interface == LBT_INTERFACE_LP64
     @test libs[2].f2c == LBT_F2C_PLAIN
-    @test libs[2].complex_retstyle == LBT_COMLPEX_RETSTYLE_NORMAL
 
     # If OpenBLAS32 and OpenBLAS are the same interface (e.g. i686)
     # then libs[2].active_forwards should be all zero!
@@ -189,7 +196,7 @@ end
     @test length(self_traces) == 3
 end
 
-if MKL_jll.is_available() && Sys.WORD_SIZE == 64
+if MKL_jll.is_available() && Sys.ARCH == :x86_64
     # Since MKL v2022, we can explicitly link against ILP64-suffixed symbols
     @testset "MKL v2022 ILP64 loading" begin
         # Load the ILP64 interface library.  Remember, you must load the `core`
@@ -237,9 +244,13 @@ if MKL_jll.is_available() && Sys.WORD_SIZE == 64
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
         @test libs[1].cblas == LBT_CBLAS_DIVERGENT
-        @test libs[1].complex_retstyle == LBT_COMLPEX_RETSTYLE_ARGUMENT
+        if Sys.iswindows()
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
+        else
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
+        end
 
-        # Call cblas_zdotu_sub, showcasing that it doesn't work
+        # Call cblas_zdotu_sub, asserting that it does not try to call a forwardless-symbol
         empty!(stacktraces)
         A = ComplexF64[3.1 + 1.4im, -1.0 +  1.2im]
         B = ComplexF64[1.3 + 0.3im, -1.1 + -3.4im]
