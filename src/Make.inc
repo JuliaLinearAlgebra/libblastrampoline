@@ -22,8 +22,8 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
   OS := WINNT
 endif
 
-LBT_SOVERSION_MAJOR := 4
-LBT_SOVERSION_MINOR := 1
+LBT_SOVERSION_MAJOR := 5
+LBT_SOVERSION_MINOR := 0
 LBT_SOVERSION_PATCH := 0
 
 ifeq ($(OS), WINNT)
@@ -80,6 +80,13 @@ F2C_AUTODETECTION := 0
 ifneq (,$(filter $(ARCH), x86_64 i686))
   LBT_CFLAGS += -DF2C_AUTODETECTION
   F2C_AUTODETECTION := 1
+endif
+
+# If we're on x86_64 or i686, we may need to autodetect MKL v2022's incomplete ILP64 suffixing.
+CBLAS_DIVERGENCE_AUTODETECTION := 0
+ifneq (,$(filter $(ARCH), x86_64 i686))
+  LBT_CFLAGS += -DCBLAS_DIVERGENCE_AUTODETECTION
+  CBLAS_DIVERGENCE_AUTODETECTION := 1
 endif
 
 

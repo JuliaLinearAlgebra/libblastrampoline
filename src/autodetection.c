@@ -1,4 +1,24 @@
 #include "libblastrampoline_internal.h"
+#include <complex.h>
+
+/*
+ * Search for a symbol that ends in one of the given suffixes.  Returns NULL if not found.
+ */
+const char * symbol_suffix_search(void * handle, const char * symbol_name, const char ** suffixes, const int num_suffixes) {
+    char symbol_name_suffixed[MAX_SYMBOL_LEN];
+    for (int suffix_idx=0; suffix_idx<num_suffixes; suffix_idx++) {
+        // Skip NULL suffixes (the case where we have no `suffix_hint`)
+        if (suffixes[suffix_idx] == NULL) {
+            continue;
+        }
+
+        sprintf(symbol_name_suffixed, "%s%s", symbol_name, suffixes[suffix_idx]);
+        if (lookup_symbol(handle, symbol_name_suffixed) != NULL) {
+            return suffixes[suffix_idx];
+        }
+    }
+    return NULL;
+}
 
 /*
  * Autodetect the name mangling suffix used by the given BLAS/LAPACK library.
@@ -28,18 +48,10 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
     };
 
     // If the suffix hint is NULL, just skip it when calling `lookup_symbol()`.
-    int suffix_start_idx = 0;
-    if (suffix_hint == NULL) {
-        suffix_start_idx = 1;
-    }
-
-    char symbol_name[MAX_SYMBOL_LEN];
     for (int symbol_idx=0; symbol_idx<sizeof(symbol_names)/sizeof(const char *); symbol_idx++) {
-        for (int suffix_idx=suffix_start_idx; suffix_idx<sizeof(suffixes)/sizeof(const char *); suffix_idx++) {
-            sprintf(symbol_name, "%s%s", symbol_names[symbol_idx], suffixes[suffix_idx]);
-            if (lookup_symbol(handle, symbol_name) != NULL) {
-                return suffixes[suffix_idx];
-            }
+        const char * suffix = symbol_suffix_search(handle, symbol_names[symbol_idx], suffixes, sizeof(suffixes)/sizeof(const char *));
+        if (suffix != NULL) {
+            return suffix;
         }
     }
     return NULL;
@@ -219,5 +231,34 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
     }
     // We have no idea what happened; nothing works and everything is broken
     return LBT_F2C_UNKNOWN;
+}
+#endif
+
+#ifdef CBLAS_DIVERGENCE_AUTODETECTION
+int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
+    char symbol_name[MAX_SYMBOL_LEN];
+
+    sprintf(symbol_name, "zdotc_%s", suffix);
+    if (lookup_symbol(handle, symbol_name) != NULL ) {
+        // If we have both `zdotc_64` and `cblas_zdotc_sub64`, it's all good:
+        sprintf(symbol_name, "cblas_zdotc_sub%s", suffix);
+        if (lookup_symbol(handle, symbol_name) != NULL ) {
+            return LBT_CBLAS_CONFORMANT;
+        }
+
+        const char * lp64_suffixes[] = {
+            "", "_", "__",
+        };
+        const char * suffix = symbol_suffix_search(handle, "cblas_zdotc_sub", lp64_suffixes, sizeof(lp64_suffixes)/sizeof(const char *));
+
+        // If we have `zdotc_64`, but we don't have `cblas_zdotc_sub64`, AND we have an
+        // LP64-mangled `cblas_zdotc_sub`, then we know it's a library that has ILP64
+        // FORTRAN symbols, but not CBLAS ones, such as MKL v2022.0.
+        if (suffix != NULL) {
+            return LBT_CBLAS_DIVERGENT;
+        }
+    }
+    // If we can't even find `zdotc_64`, we don't know what this is.
+    return LBT_CBLAS_UNKNOWN;
 }
 #endif

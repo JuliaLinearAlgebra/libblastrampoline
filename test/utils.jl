@@ -87,7 +87,9 @@ struct lbt_library_info_t
     suffix::Cstring
     active_forwards::Ptr{UInt8}
     interface::Int32
+    complex_retstyle::Int32
     f2c::Int32
+    cblas::Int32
 end
 struct LBTLibraryInfo
     libname::String
@@ -95,13 +97,32 @@ struct LBTLibraryInfo
     suffix::String
     active_forwards::Vector{UInt8}
     interface::Int32
+    complex_retstyle::Int32
     f2c::Int32
+    cblas::Int32
 
-    LBTLibraryInfo(x::lbt_library_info_t, num_symbols::UInt32) = new(unsafe_string(x.libname), x.handle, unsafe_string(x.suffix), unsafe_wrap(Vector{UInt8}, x.active_forwards, div(num_symbols,8)+1), x.interface, x.f2c)
+    LBTLibraryInfo(x::lbt_library_info_t, num_symbols::UInt32) = new(
+        unsafe_string(x.libname),
+        x.handle,
+        unsafe_string(x.suffix),
+        unsafe_wrap(Vector{UInt8},
+        x.active_forwards,
+        div(num_symbols,8)+1),
+        x.interface,
+        x.complex_retstyle,
+        x.f2c,
+        x.cblas
+    )
 end
 const LBT_INTERFACE_LP64 = 32
 const LBT_INTERFACE_ILP64 = 64
 const LBT_F2C_PLAIN = 0
+const LBT_COMLPEX_RETSTYLE_NORMAL = 0
+const LBT_COMLPEX_RETSTYLE_ARGUMENT = 1
+const LBT_COMLPEX_RETSTYLE_UNKNOWN = -1
+const LBT_CBLAS_CONFORMANT = 0
+const LBT_CBLAS_DIVERGENT = 1
+const LBT_CBLAS_UNKNOWN = -1
 
 struct lbt_config_t
     loaded_libs::Ptr{Ptr{lbt_library_info_t}}
@@ -131,8 +152,8 @@ function lbt_get_forward(handle, symbol_name, interface, f2c = LBT_F2C_PLAIN)
     return ccall(dlsym(handle, :lbt_get_forward), Ptr{Cvoid}, (Cstring, Int32, Int32), symbol_name, interface, f2c)
 end
 
-function lbt_set_forward(handle, symbol_name, addr, interface, f2c = LBT_F2C_PLAIN; verbose::Bool = false)
-    return ccall(dlsym(handle, :lbt_set_forward), Int32, (Cstring, Ptr{Cvoid}, Int32, Int32, Int32), symbol_name, addr, interface, f2c, verbose ? 1 : 0)
+function lbt_set_forward(handle, symbol_name, addr, interface, complex_retstyle = LBT_COMLPEX_RETSTYLE_NORMAL, f2c = LBT_F2C_PLAIN; verbose::Bool = false)
+    return ccall(dlsym(handle, :lbt_set_forward), Int32, (Cstring, Ptr{Cvoid}, Int32, Int32, Int32, Int32), symbol_name, addr, interface, complex_retstyle, f2c, verbose ? 1 : 0)
 end
 
 function lbt_set_default_func(handle, addr)
