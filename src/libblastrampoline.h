@@ -57,10 +57,14 @@ typedef struct {
     // Note that if you use the footgun API (e.g. "lbt_set_forward()") these values will be
     // zeroed out and you must track them manually if you need to.
     uint8_t * active_forwards;
-    // The interface type  as autodetected by `lbt_forward`, see `LBT_INTERFACE_XXX` below
+    // The interface type as autodetected by `lbt_forward`, see `LBT_INTERFACE_XXX` below
     int32_t interface;
-    // The `f2c` status  as autodetected by `lbt_forward`, see `LBT_F2C_XXX` below
+    // The complex return style as autodetected by `lbt_forward`, see `LBT_COMPLEX_RETSTYLE_XXX` below
+    int32_t complex_retstyle;
+    // The `f2c` status as autodetected by `lbt_forward`, see `LBT_F2C_XXX` below
     int32_t f2c;
+    // The `cblas` status as autodetected by `lbt_forward`, see `LBT_CBLAS_XXX` below
+    int32_t cblas;
 } lbt_library_info_t;
 
 // Possible values for `interface` in `lbt_library_info_t`
@@ -75,6 +79,21 @@ typedef struct {
 #define LBT_F2C_PLAIN                   0
 #define LBT_F2C_REQUIRED                1
 #define LBT_F2C_UNKNOWN                -1
+
+// Possible values for `retstyle` in `lbt_library_info_t`
+// These describe whether a library is using "normal" return value passing (e.g. through
+// the `XMM{0,1}` registers on x86_64, or the `ST{0,1}` floating-point registers on i686)
+#define LBT_COMPLEX_RETSTYLE_NORMAL     0
+#define LBT_COMPLEX_RETSTYLE_ARGUMENT   1
+#define LBT_COMPLEX_RETSTYLE_UNKNOWN   -1
+
+// Possible values for `cblas` in `lbt_library_info_t`
+// These describe whether a library has properly named CBLAS symbols, or as in the case of
+// MKL v2022.0, the CBLAS symbols lack the ILP64 suffixes, and will need to be adapted to
+// forward to the ILP64-suffixed FORTRAN symbols.
+#define LBT_CBLAS_CONFORMANT            0
+#define LBT_CBLAS_DIVERGENT             1
+#define LBT_CBLAS_UNKNOWN              -1
 
 // The config type you get back from `lbt_get_config()`
 typedef struct {
@@ -208,7 +227,7 @@ LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t int
  * If `addr` is set to `NULL` it will be set as the default function, see `lbt_set_default_func()`
  * for how to set the default function pointer.
  */
-LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * addr, int32_t interface, int32_t f2c, int32_t verbose);
+LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * addr, int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t verbose);
 
 #ifdef __cplusplus
 } // extern "C"

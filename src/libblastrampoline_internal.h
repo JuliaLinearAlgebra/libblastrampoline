@@ -59,7 +59,8 @@ int32_t find_symbol_idx(const char * name);
 void init_config();
 void clear_loaded_libraries();
 void clear_forwarding_mark(int32_t symbol_idx, int32_t interface);
-void record_library_load(const char * libname, void * handle, const char * suffix, uint8_t * forwards, int interface, int f2c);
+void record_library_load(const char * libname, void * handle, const char * suffix, uint8_t * forwards,
+                         int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t cblas);
 
 // Functions in `win_utils.c`
 #ifdef _OS_WINDOWS_
@@ -79,9 +80,13 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint);
 int32_t autodetect_blas_interface(void * isamax_addr);
 int32_t autodetect_lapack_interface(void * dpotrf_addr);
 int32_t autodetect_interface(void * handle, const char * suffix);
+int32_t autodetect_complex_return_style(void * handle, const char * suffix);
 
 #ifdef F2C_AUTODETECTION
-int autodetect_f2c(void * handle, const char * suffix);
+int32_t autodetect_f2c(void * handle, const char * suffix);
+#endif
+#ifdef CBLAS_DIVERGENCE_AUTODETECTION
+int32_t autodetect_cblas_divergence(void * handle, const char * suffix);
 #endif
 
 // Functions in deepbindless_surrogates.c

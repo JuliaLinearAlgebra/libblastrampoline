@@ -5,7 +5,10 @@ include $(LBT_ROOT)/src/Make.inc
 all: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 
 # Objects we'll build
-MAIN_OBJS := libblastrampoline.o dl_utils.o config.o autodetection.o threading.o deepbindless.o trampolines/trampolines_$(ARCH).o
+MAIN_OBJS := libblastrampoline.o dl_utils.o config.o \
+			 autodetection.o \
+			 complex_return_style_adapters.o \
+			 threading.o deepbindless.o trampolines/trampolines_$(ARCH).o
 
 # Include win_utils.c on windws
 ifeq ($(OS),WINNT)
@@ -15,6 +18,10 @@ endif
 # If we're on an architecture that supports f2c autodetection, compile that in!
 ifeq ($(F2C_AUTODETECTION),1)
 MAIN_OBJS += f2c_adapters.o
+endif
+
+ifeq ($(CBLAS_DIVERGENCE_AUTODETECTION),1)
+MAIN_OBJS += cblas_adapters.o
 endif
 
 # Place the `.o` files into `$(builddir)`

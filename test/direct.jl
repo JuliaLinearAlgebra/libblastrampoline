@@ -69,6 +69,13 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
         @test libs[1].interface == LBT_INTERFACE_LP64
     end
     @test libs[1].f2c == LBT_F2C_PLAIN
+    if Sys.ARCH == :x86_64
+        @test libs[1].cblas == LBT_CBLAS_CONFORMANT
+    else
+        @test libs[1].cblas == LBT_CBLAS_UNKNOWN
+    end
+    @test libs[1].complex_retstyle == LBT_COMLPEX_RETSTYLE_NORMAL
+
     @test bitfield_get(libs[1].active_forwards, dgemm_idx) != 0
 
     # Next check OpenBLAS32_jll which is always LP64
@@ -76,6 +83,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[2].suffix == ""
     @test libs[2].interface == LBT_INTERFACE_LP64
     @test libs[2].f2c == LBT_F2C_PLAIN
+    @test libs[2].complex_retstyle == LBT_COMLPEX_RETSTYLE_NORMAL
 
     # If OpenBLAS32 and OpenBLAS are the same interface (e.g. i686)
     # then libs[2].active_forwards should be all zero!
@@ -218,5 +226,27 @@ if MKL_jll.is_available() && Sys.WORD_SIZE == 64
         @test libs[1].interface == LBT_INTERFACE_ILP64
         @test libs[2].libname == libmkl_rt
         @test libs[2].interface == LBT_INTERFACE_LP64
+    end
+
+    @testset "MKL v2022 CBLAS workaround" begin
+        # Load ILP64 MKL
+        lbt_forward(lbt_handle, libmkl_rt; clear=true, suffix_hint = "64")
+
+        config = lbt_get_config(lbt_handle)
+        libs = unpack_loaded_libraries(config)
+        @test length(libs) == 1
+        @test libs[1].interface == LBT_INTERFACE_ILP64
+        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].complex_retstyle == LBT_COMLPEX_RETSTYLE_ARGUMENT
+
+        # Call cblas_zdotu_sub, showcasing that it doesn't work
+        empty!(stacktraces)
+        A = ComplexF64[3.1 + 1.4im, -1.0 +  1.2im]
+        B = ComplexF64[1.3 + 0.3im, -1.1 + -3.4im]
+        result = ComplexF64[0]
+        zdotu_fptr = dlsym(lbt_handle, :cblas_zdotc_sub64_)
+        ccall(zdotu_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
+        @test result[1] ≈ ComplexF64(1.47 + 3.83im)
+        @test isempty(stacktraces)
     end
 end

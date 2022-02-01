@@ -69,7 +69,8 @@ void clear_other_forwards(int skip_idx, uint8_t * forwards, int32_t interface) {
     }
 }
 
-void record_library_load(const char * libname, void * handle, const char * suffix, uint8_t * forwards, int interface, int f2c) {
+void record_library_load(const char * libname, void * handle, const char * suffix, uint8_t * forwards,
+                         int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t cblas) {
     // Scan for the an empty slot, and also check to see if this library has been loaded before.
     int free_idx = -1;
     for (int idx=0; idx<MAX_TRACKED_LIBS; ++idx) {
@@ -101,7 +102,9 @@ void record_library_load(const char * libname, void * handle, const char * suffi
     new_libinfo->active_forwards = (uint8_t *)malloc(sizeof(uint8_t)*(NUM_EXPORTED_FUNCS/8 + 1));
     memcpy(new_libinfo->active_forwards, forwards, sizeof(uint8_t)*(NUM_EXPORTED_FUNCS/8 + 1));
     new_libinfo->interface = interface;
+    new_libinfo->complex_retstyle = complex_retstyle;
     new_libinfo->f2c = f2c;
+    new_libinfo->cblas = cblas;
 
     lbt_config.loaded_libs[free_idx] = new_libinfo;
 
