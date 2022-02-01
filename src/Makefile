@@ -40,7 +40,7 @@ dump-trampolines: trampolines/trampolines_$(ARCH).S
 
 
 $(builddir)/$(LIB_FULL_VERSION): $(MAIN_OBJS)
-	@$(call PRINT_CC,$(CC) -o "$@" $(call IMPLIB_FLAGS,$@) $(LBT_CFLAGS) $^ -shared $(LBT_LDFLAGS))
+	@$(call PRINT_CC,$(CC) -o "$@" $(call IMPLIB_FLAGS,$@) $(LBT_CFLAGS) $(SONAME_FLAG) $^ -shared $(LBT_LDFLAGS))
 
 $(builddir)/$(LIB_MAJOR_VERSION): | $(builddir)/$(LIB_FULL_VERSION)
 	ln -sf "$(LIB_FULL_VERSION)" "$@"
