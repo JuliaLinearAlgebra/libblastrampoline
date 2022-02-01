@@ -1,4 +1,4 @@
-// We create some holders for f2c functions
+// These hold the "true" address that the f2c wrapper invokes in turn
 #define XX(name, idx)    LBT_HIDDEN const void * f2c_##name##_addr;
 #define XX_64(name, idx) LBT_HIDDEN const void * f2c_##name##64__addr;
 FLOAT32_FUNCS(XX)

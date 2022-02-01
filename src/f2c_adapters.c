@@ -2,6 +2,23 @@
 #include <stdint.h>
 #include "libblastrampoline_internal.h"
 
+/*
+ * Some BLAS implementations, such as Apple Accelerate, used f2c to convert a FORTRAN
+ * BLAS implementation into C.  This conversion was done without maintaining the
+ * gfortran calling convention that most BLAS libraries follow, therefore we create
+ * adapters to explicitly deal with the ABI mismatch.
+ *
+ * In particular, we:
+ *   - Convert from `double` -> `float` return types for the following BLAS functions:
+ *       - `s{,c,ca}{max,min}`
+ *       - `s{,ds}dot`
+ *       - `s{,a,c,ca}sum`
+ *       - `s{,c}nrm2`
+ *       - `slamc{h,3}`
+ *   - Pass an extra argument to store return value for the following BLAS functions:
+ *       - `{c,z}dot{c,u}`
+ */
+
 // smax
 extern double (*f2c_smax__addr)(const int32_t* n, const float* x, const int32_t* ix);
 LBT_HIDDEN float f2c_smax_(const int32_t* n, const float* x, const int32_t* ix) {
