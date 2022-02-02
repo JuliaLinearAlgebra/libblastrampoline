@@ -60,6 +60,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v5.0.1 - Fix complex return wrapper infinite loop bug.
+
 v5.0.0 - Add complex return value wrappers and CBLAS workaround.  The complex return value wrapper ensures that all symbols maintain a standard ABI for returning complex numbers, and the CBLAS workaround maps CBLAS symbols to FORTRAN symbols when properly-suffixed CBLAS symbols do not exist, as is the case in MKL `v2022.0`.
 
 v4.1.0 - Add `LBT_STRICT` environment variable that causes calling missing symbols to kill the process.
