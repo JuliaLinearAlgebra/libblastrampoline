@@ -35,6 +35,7 @@ ifeq ($(OS), WINNT)
   LIB_MAJOR_VERSION := libblastrampoline-$(LBT_SOVERSION_MAJOR).dll
   SONAME_FLAG :=
 else ifeq ($(OS), Darwin)
+  FPIC := -fPIC
   SHLIB_EXT := dylib
   binlib := lib
 
@@ -42,6 +43,7 @@ else ifeq ($(OS), Darwin)
   LIB_MAJOR_VERSION := libblastrampoline.$(LBT_SOVERSION_MAJOR).dylib
   SONAME_FLAG := -install_name @rpath/$(LIB_MAJOR_VERSION)
 else
+  FPIC := -fPIC
   SHLIB_EXT := so
   binlib := lib
 
@@ -50,7 +52,7 @@ else
   SONAME_FLAG := -Wl,-soname=$(LIB_MAJOR_VERSION)
 endif
 
-LBT_CFLAGS := -g -O2 -Werror -std=c99 -fPIC -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
+LBT_CFLAGS := -g -O2 -Werror -std=c99 $(FPIC) -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
 LBT_LDFLAGS := $(LDFLAGS)
 
 ifeq ($(OS),Linux)
