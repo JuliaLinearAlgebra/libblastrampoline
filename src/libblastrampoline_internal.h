@@ -24,7 +24,7 @@
 #include <dlfcn.h>
 #endif
 
-#ifdef _OS_FREEBSD_
+#if defined(_OS_FREEBSD_) || defined(_OS_OPENBSD_)
 #include <stddef.h>
 #include <sys/sysctl.h>
 #include <dlfcn.h>

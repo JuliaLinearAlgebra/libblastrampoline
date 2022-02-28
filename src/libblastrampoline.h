@@ -7,6 +7,8 @@ extern "C" {
 // This shamelessly stolen from https://github.com/JuliaLang/julia/blob/master/src/support/platform.h
 #if defined(__FreeBSD__)
 #define _OS_FREEBSD_
+#elif defined(__OpenBSD__)
+#define _OS_OPENBSD_
 #elif defined(__linux__)
 #define _OS_LINUX_
 #elif defined(_WIN32) || defined(_WIN64)
