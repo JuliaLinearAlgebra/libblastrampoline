@@ -77,6 +77,7 @@ end
 
 # our tests, written in C, defined in subdirectories in `test/`
 dgemm =         ("dgemm_test", ("||C||^2 is:  24.3384",),                  true)
+dgemm_large =   ("dgemm_large_test", ("All equal to 2000.0000",),            true)
 sgesv =         ("sgesv_test", ("||b||^2 is:   3.0000",),                  true)
 sgesv_failure = ("sgesv_test", ("Error: no BLAS/LAPACK library loaded!",), false)
 sdot  =         ("sdot_test",  ("C is:   1.9900",),                        true)
@@ -86,7 +87,7 @@ zdotc =         ("zdotc_test", (
                 ),      true)
 
 # Helper function to run all the tests with the given arguments
-function run_all_tests(args...; tests = [dgemm, sgesv, sdot, zdotc])
+function run_all_tests(args...; tests = [dgemm, dgemm_large, sgesv, sdot, zdotc])
     for test in tests
         run_test(test, args...)
     end
