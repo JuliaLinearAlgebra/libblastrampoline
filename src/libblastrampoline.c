@@ -432,6 +432,9 @@ __attribute__((constructor)) void init(void) {
         default_func = lookup_self_symbol("lbt_default_func_print_error_and_exit");
     }
 
+    // Allow the user to provide a default suffix hint
+    const char * suffix_hint = getenv("LBT_SUFFIX_HINT");
+
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries
     const char * default_libs = getenv("LBT_DEFAULT_LIBS");
     if (default_libs != NULL) {
@@ -453,7 +456,7 @@ __attribute__((constructor)) void init(void) {
                 curr_lib_start++;
 
             // Load functions from this library, clearing only the first time.
-            lbt_forward(curr_lib, clear, verbose, NULL);
+            lbt_forward(curr_lib, clear, verbose, suffix_hint);
             clear = 0;
         }
     }

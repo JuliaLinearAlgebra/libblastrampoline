@@ -139,6 +139,13 @@ if MKL_jll.is_available()
                 run_all_tests("blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
             end
         end
+
+        @testset "LBT -> MKL_jll (ILP64, via suffix)" begin
+            withenv("LBT_SUFFIX_HINT" => "64", "LBT_VERBOSE" => "true") do
+                libdirs = unique(vcat(lbt_dir, MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
+                run_all_tests("blastrampoline", libdirs, :ILP64, MKL_jll.libmkl_rt_path)
+            end
+        end
     end
 end
 
