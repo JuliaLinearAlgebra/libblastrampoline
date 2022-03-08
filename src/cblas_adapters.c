@@ -105,3 +105,45 @@ void lbt_cblas_cdotu_sub64_(const int64_t N,
 {
    *z = cdotu_64_(&N, X, &incX, Y, &incY);
 }
+
+
+
+extern float sdot_(const int32_t *,
+                   const float *, const int32_t *,
+                   const float *, const int32_t *);
+float lbt_cblas_sdot(const int32_t N,
+                     const float *X, const int32_t incX,
+                     const float *Y, const int32_t incY)
+{
+   return sdot_(&N, X, &incX, Y, &incY);
+}
+
+extern float sdot_64_(const int64_t *,
+                      const float  *, const int64_t *,
+                      const float  *, const int64_t *);
+float lbt_cblas_sdot64_(const int64_t N,
+                        const float  *X, const int64_t incX,
+                        const float  *Y, const int64_t incY)
+{
+   return sdot_64_(&N, X, &incX, Y, &incY);
+}
+
+extern double ddot_(const int32_t *,
+                    const double *, const int32_t *,
+                    const double *, const int32_t *);
+double lbt_cblas_ddot(const int32_t N,
+                      const double *X, const int32_t incX,
+                      const double *Y, const int32_t incY)
+{
+   return ddot_(&N, X, &incX, Y, &incY);
+}
+
+extern double ddot_64_(const int64_t *,
+                       const double  *, const int64_t *,
+                       const double  *, const int64_t *);
+double lbt_cblas_ddot64_(const int64_t N,
+                         const double  *X, const int64_t incX,
+                         const double  *Y, const int64_t incY)
+{
+   return ddot_64_(&N, X, &incX, Y, &incY);
+}

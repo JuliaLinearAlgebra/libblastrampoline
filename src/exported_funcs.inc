@@ -4986,11 +4986,13 @@
 
 #endif
 
-#ifndef CBLAS_SUB_FUNCS
-#define CBLAS_SUB_FUNCS(XX) \
+#ifndef CBLAS_WORKAROUND_FUNCS
+#define CBLAS_WORKAROUND_FUNCS(XX) \
     XX(cblas_cdotc_sub, 2547) \
     XX(cblas_cdotu_sub, 2549) \
     XX(cblas_zdotc_sub, 2695) \
     XX(cblas_zdotu_sub, 2697) \
+    XX(cblas_ddot, 2588) \
+    XX(cblas_sdot, 2655) \
 
 #endif
