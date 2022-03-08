@@ -259,5 +259,14 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         ccall(zdotu_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
         @test result[1] ≈ ComplexF64(1.47 + 3.83im)
         @test isempty(stacktraces)
+
+        # Also call `sdot_`, asserting the same.
+        empty!(stacktraces)
+        A = Float32[3.1, -1.0]
+        B = Float32[1.3, -1.1]
+        sdot_fptr = dlsym(lbt_handle, :cblas_sdot64_)
+        result = ccall(sdot_fptr, Cfloat, (Int64, Ptr{Float32}, Int64, Ptr{Float32}, Int64), 2, A, 1, B, 1)
+        @test result ≈ Float32(5.13)
+        @test isempty(stacktraces)
     end
 end
