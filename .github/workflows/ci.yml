@@ -60,7 +60,7 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-20.04' && matrix.julia-arch == 'x86' }}
         shell: bash
         run: |
-          sudo apt install -y gcc-multilib
+          sudo apt update && sudo apt install -y gcc-multilib
       - name: Install libblas64
         if: ${{ matrix.os == 'ubuntu-20.04' && matrix.julia-arch == 'x64' }}
         shell: bash
