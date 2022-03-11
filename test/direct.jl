@@ -250,13 +250,13 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
         end
 
-        # Call cblas_zdotu_sub, asserting that it does not try to call a forwardless-symbol
+        # Call cblas_zdotc_sub, asserting that it does not try to call a forwardless-symbol
         empty!(stacktraces)
         A = ComplexF64[3.1 + 1.4im, -1.0 +  1.2im]
         B = ComplexF64[1.3 + 0.3im, -1.1 + -3.4im]
         result = ComplexF64[0]
-        zdotu_fptr = dlsym(lbt_handle, :cblas_zdotc_sub64_)
-        ccall(zdotu_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
+        zdotc_fptr = dlsym(lbt_handle, :cblas_zdotc_sub64_)
+        ccall(zdotc_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
         @test result[1] ≈ ComplexF64(1.47 + 3.83im)
         @test isempty(stacktraces)
 
