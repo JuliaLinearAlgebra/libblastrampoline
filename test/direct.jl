@@ -72,10 +72,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     if Sys.ARCH == :x86_64
         @test libs[1].cblas == LBT_CBLAS_CONFORMANT
         if Sys.iswindows()
-            # Technically, this should be "argument", but we disable complex return style
-            # autodetection on windows since the default compilers seem to prefer argument
-            # style, so we'd rather just not touch things on that platform.
-            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
         else
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL
         end
@@ -244,11 +241,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
         @test libs[1].cblas == LBT_CBLAS_DIVERGENT
-        if Sys.iswindows()
-            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
-        else
-            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
-        end
+        @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_zdotc_sub, asserting that it does not try to call a forwardless-symbol
         empty!(stacktraces)
