@@ -262,4 +262,25 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         @test result ≈ Float32(5.13)
         @test isempty(stacktraces)
     end
+
+    @testset "MKL complex retstyle" begin
+        lbt_forward(lbt_handle, libmkl_rt; clear=true, suffix_hint = "64")
+
+        config = lbt_get_config(lbt_handle)
+        libs = unpack_loaded_libraries(config)
+        @test length(libs) == 1
+        @test libs[1].interface == LBT_INTERFACE_ILP64
+        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
+
+        # Call cblas_cdotc_sub64_ to test the full CBLAS workaround -> complex return style handling chain
+        empty!(stacktraces)
+        A = ComplexF32[3.1 + 1.4im, -1.0 +  1.2im]
+        B = ComplexF32[1.3 + 0.3im, -1.1 + -3.4im]
+        result = ComplexF32[0]
+        cdotc_fptr = dlsym(lbt_handle, :cblas_cdotc_sub64_)
+        ccall(cdotc_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
+        @test result[1] ≈ ComplexF32(1.47 + 3.83im)
+        @test isempty(stacktraces)
+    end
 end
