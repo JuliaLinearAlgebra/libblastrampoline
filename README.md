@@ -60,6 +60,8 @@ You can always tell if your system is limited in this fashion by calling `lbt_ge
 
 ### Version History
 
+v5.1.0 - Enable complex return style autodetection on Windows as well.  We had originally limited this to non-Windows platforms, thinking that the gfortran calling convention was different on that platform, but this turned out to not be the case.
+
 v5.0.2 - Add `cblas_sdot` and `cblas_ddot` to CBLAS divergence workaround wrappers.
 
 v5.0.1 - Fix complex return wrapper infinite loop bug.
