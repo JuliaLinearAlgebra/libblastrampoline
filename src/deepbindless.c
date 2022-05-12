@@ -11,7 +11,7 @@ uint8_t use_deepbind = 0x00;
 #else
 uint8_t use_deepbind = 0x01;
 #endif
-LBT_DLLEXPORT const uint8_t lbt_get_use_deepbind() {
+LBT_DLLEXPORT uint8_t lbt_get_use_deepbind() {
     return use_deepbind;
 }
 
