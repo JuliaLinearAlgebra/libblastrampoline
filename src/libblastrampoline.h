@@ -208,7 +208,7 @@ LBT_DLLEXPORT void lbt_set_default_func(const void * addr);
  * `LBT_USE_RTLD_DEEPBIND=0` in their environment.  This function returns `0x01` if it will
  *  use `RTLD_DEEPBIND` when loading a library, and `0x00` otherwise.
  */
- LBT_DLLEXPORT const uint8_t lbt_get_use_deepbind();
+ LBT_DLLEXPORT uint8_t lbt_get_use_deepbind();
 
 /*
  * Returns the currently-configured forward target for the given `symbol_name`, according to the
