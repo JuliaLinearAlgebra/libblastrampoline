@@ -40,10 +40,8 @@ LBT_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char
         idx++;
     }
 
-    getter_names[idx] = (char *) malloc(strlen(getter));
-    strcpy(getter_names[idx], getter);
-    setter_names[idx] = (char *) malloc(strlen(setter));
-    strcpy(setter_names[idx], setter);
+    getter_names[idx] = strdup(getter);
+    setter_names[idx] = strdup(setter);
 }
 
 /*
