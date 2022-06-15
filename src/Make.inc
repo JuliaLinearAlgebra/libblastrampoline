@@ -18,7 +18,7 @@ endif
 
 # Figure out OS and architecture (used to set `shlib_ext`)
 OS := $(shell uname)
-ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(OS)))
+ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(OS))$(findstring mingw,$(CC)))
   OS := WINNT
 endif
 
