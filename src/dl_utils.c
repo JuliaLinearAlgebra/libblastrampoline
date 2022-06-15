@@ -3,7 +3,7 @@
 void throw_dl_error(const char * path) {
     fprintf(stderr, "ERROR: Unable to load dependent library %s\n", path);
 #if defined(_OS_WINDOWS_)
-    LPWSTR wmsg = TEXT("");
+    LPWSTR wmsg = NULL;
     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                     FORMAT_MESSAGE_FROM_SYSTEM |
                     FORMAT_MESSAGE_IGNORE_INSERTS |
