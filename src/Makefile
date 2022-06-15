@@ -53,14 +53,14 @@ $(builddir)/libblastrampoline.$(SHLIB_EXT): | $(builddir)/$(LIB_MAJOR_VERSION)
 
 # Install both libraries and our headers
 install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
-	@mkdir -p $(prefix)/include/libblastrampoline
-	-@cp -Ra $(LBT_ROOT)/include/* $(prefix)/include/libblastrampoline
-	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(prefix)/include/
-	@mkdir -p $(prefix)/$(binlib)
-	@cp -a $(builddir)/libblastrampoline*$(SHLIB_EXT)* $(prefix)/$(binlib)/
+	@mkdir -p $(DESTDIR)$(prefix)/include/libblastrampoline
+	-@cp -Ra $(LBT_ROOT)/include/* $(DESTDIR)$(prefix)/include/libblastrampoline
+	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(DESTDIR)$(prefix)/include/
+	@mkdir -p $(DESTDIR)$(prefix)/$(binlib)
+	@cp -a $(builddir)/libblastrampoline*$(SHLIB_EXT)* $(DESTDIR)$(prefix)/$(binlib)/
 ifeq ($(OS),WINNT)
-	@mkdir -p $(prefix)/lib
-	@cp -a $(builddir)/$(LIB_FULL_VERSION).a $(prefix)/lib
+	@mkdir -p $(DESTDIR)$(prefix)/lib
+	@cp -a $(builddir)/$(LIB_FULL_VERSION).a $(DESTDIR)$(prefix)/lib
 endif
 
 clean:
