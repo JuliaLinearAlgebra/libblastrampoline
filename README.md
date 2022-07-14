@@ -57,37 +57,3 @@ The impact of this is that you are unable to load an ILP64 BLAS that exports the
 This is because without `RTLD_DEEPBIND`-style linking semantics, when the ILP64 BLAS tries to call one of its own functions, it will call the function exported by `libblastrampoline` itself, which will result in incorrect values and segfaults.
 To address this, `libblastrampoline` will detect if you attempt to do this and refuse to load a library that would cause this kind of confusion.
 You can always tell if your system is limited in this fashion by calling `lbt_get_config()` and checking the `build_flags` member for the `LBT_BUILDFLAGS_DEEPBINDLESS` flag.
-
-### Version History
-
-v5.1.0 - Enable complex return style autodetection on Windows as well.  We had originally limited this to non-Windows platforms, thinking that the gfortran calling convention was different on that platform, but this turned out to not be the case.
-
-v5.0.2 - Add `cblas_sdot` and `cblas_ddot` to CBLAS divergence workaround wrappers.
-
-v5.0.1 - Fix complex return wrapper infinite loop bug.
-
-v5.0.0 - Add complex return value wrappers and CBLAS workaround.  The complex return value wrapper ensures that all symbols maintain a standard ABI for returning complex numbers, and the CBLAS workaround maps CBLAS symbols to FORTRAN symbols when properly-suffixed CBLAS symbols do not exist, as is the case in MKL `v2022.0`.
-
-v4.1.0 - Add `LBT_STRICT` environment variable that causes calling missing symbols to kill the process.
-
-v4.0.0 - Add `suffix_hint` parameter to `lbt_forward()` to allow overriding symbol suffix search order for dual-interface libraries, and allow loading the same library with multiple interfaces.
-
-v3.1.0 - Add `LBT_USE_RTLD_DEEPBIND` environment variable override (for santizer usage), and add buildsystem fixes for Haiku.
-
-v3.0.4 - Fix armv7l interface autodetection.
-
-v3.0.3 - Fix armv7l trampolines from copy-paste error causing segfaults.
-
-v3.0.2 - Fix MKL threading interface to use properly-capitalized names to get the C ABI.
-
-v3.0.1 - Don't `dlclose()` libraries; this can cause crashes due to not knowing when resources are truly freed.
-
-v3.0.0 - Added `active_forwards` field to `lbt_libinfo_t` and `exported_symbols` to `lbt_config_t`.
-
-v2.2.0 - Removed useless `exit(1)` in `src/dl_utils.c`.
-
-v2.1.0 - Added threading getter/setter API, direct setting API and default function API.
-
-v2.0.0 - Added f2c autodetection for Accelerate, changed public API to `lbt_forward()` from `load_blas_funcs()`.
-
-v1.0.0 - Feburary 2021: Initial release with basic autodetection, LP64/ILP64 mixing and trampoline support.
