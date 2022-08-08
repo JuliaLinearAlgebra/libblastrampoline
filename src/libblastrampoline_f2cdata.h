@@ -3,10 +3,6 @@
 #define XX_64(name, idx) LBT_HIDDEN const void * f2c_##name##64__addr;
 FLOAT32_FUNCS(XX)
 FLOAT32_FUNCS(XX_64)
-COMPLEX64_FUNCS(XX)
-COMPLEX64_FUNCS(XX_64)
-COMPLEX128_FUNCS(XX)
-COMPLEX128_FUNCS(XX_64)
 #undef XX
 #undef XX_64
 
@@ -14,8 +10,6 @@ COMPLEX128_FUNCS(XX_64)
 #define XX(name, index)    index,
 const int f2c_func_idxs[] = {
     FLOAT32_FUNCS(XX)
-    COMPLEX64_FUNCS(XX)
-    COMPLEX128_FUNCS(XX)
     -1
 };
 #undef XX
@@ -26,10 +20,6 @@ const int f2c_func_idxs[] = {
 #define XX_64(name, index)  extern const void * f2c_##name##64_ ;
 FLOAT32_FUNCS(XX)
 FLOAT32_FUNCS(XX_64)
-COMPLEX64_FUNCS(XX)
-COMPLEX64_FUNCS(XX_64)
-COMPLEX128_FUNCS(XX)
-COMPLEX128_FUNCS(XX_64)
 #undef XX
 #undef XX_64
 
@@ -39,14 +29,10 @@ COMPLEX128_FUNCS(XX_64)
 #define XX_64(name, index) &f2c_##name##64_,
 const void ** f2c_func32_wrappers[] = {
     FLOAT32_FUNCS(XX)
-    COMPLEX64_FUNCS(XX)
-    COMPLEX128_FUNCS(XX)
     NULL
 };
 const void ** f2c_func64_wrappers[] = {
     FLOAT32_FUNCS(XX_64)
-    COMPLEX64_FUNCS(XX_64)
-    COMPLEX128_FUNCS(XX_64)
     NULL
 };
 #undef XX
@@ -57,14 +43,10 @@ const void ** f2c_func64_wrappers[] = {
 #define XX_64(name, index) &f2c_##name##64__addr,
 const void ** f2c_func32_addrs[] = {
     FLOAT32_FUNCS(XX)
-    COMPLEX64_FUNCS(XX)
-    COMPLEX128_FUNCS(XX)
     NULL
 };
 const void ** f2c_func64_addrs[] = {
     FLOAT32_FUNCS(XX_64)
-    COMPLEX64_FUNCS(XX_64)
-    COMPLEX128_FUNCS(XX_64)
     NULL
 };
 #undef XX
