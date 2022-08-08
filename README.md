@@ -9,7 +9,7 @@ Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to
 
 These BLAS libraries are known to work with libblastrampoline (successfully tested in Julia):
 1. OpenBLAS
-2. MKL
+2. Intel MKL
 3. Apple Accelerate
 4. BLIS
 5. Fujitsu BLAS
