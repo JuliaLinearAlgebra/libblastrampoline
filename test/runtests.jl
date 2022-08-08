@@ -142,9 +142,11 @@ if MKL_jll.is_available()
     end
 end
 
-# Do we have Accelerate available?
+# Do we have Accelerate available?  Note that we can't use `isfile()` here, since Apple
+# has Helpfully (TM) sequestered the dynamic libraries away into a database somewhere that
+# just gets fed into `dlopen()` when you ask for that magic path.
 veclib_blas_path = "/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/libBLAS.dylib"
-if isfile(veclib_blas_path)
+if dlopen_e(veclib_blas_path) != C_NULL
     # Test that we can run BLAS-only tests without LAPACK loaded (`sgesv` test requires LAPACK symbols)
     @testset "LBT -> vecLib/libBLAS" begin
         run_all_tests("blastrampoline", [lbt_dir], :LP64, veclib_blas_path; tests=[dgemm, sdot, zdotc])
