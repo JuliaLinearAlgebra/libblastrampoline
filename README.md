@@ -5,9 +5,14 @@
 
 > All problems in computer science can be solved by another level of indirection
 
-Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library.
+Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library. Watch a detailed [JuliaCon 2021 talk on libblastrampoline](https://www.youtube.com/watch?v=t6hptekOR7s).
 
-A detailed JuliaCon talk on libblastrampoline: https://www.youtube.com/watch?v=t6hptekOR7s
+These BLAS libraries are known to work with libblastrampoline (successfully tested in Julia):
+1. OpenBLAS
+2. MKL
+3. Apple Accelerate
+4. BLIS
+5. Fujitsu BLAS
 
 ## Basic usage
 
