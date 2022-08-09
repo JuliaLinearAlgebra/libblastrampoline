@@ -14,6 +14,14 @@ These BLAS libraries are known to work with libblastrampoline (successfully test
 4. BLIS
 5. Fujitsu BLAS
 
+Julia Packages that utilize libblastrampline to provide easy access to BLAS libraries are
+
+* [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)
+* [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl)
+* [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl)
+* [AppleAccelerateLinAlgWrapper.jl](https://github.com/chriselrod/AppleAccelerateLinAlgWrapper.jl)
+* [OpenBLASHighCoreCount.jl](https://github.com/giordano/OpenBLASHighCoreCount.jl)
+
 ## Basic usage
 
 Build `libblastrampoline.so`, then link your BLAS-using library against it instead of `libblas.so`.
