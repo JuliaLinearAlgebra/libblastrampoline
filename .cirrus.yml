@@ -1,0 +1,14 @@
+freebsd_instance:
+  image: freebsd-13-1-release-amd64
+task:
+  name: FreeBSD
+  env:
+    matrix:
+      - JULIA_VERSION: nightly
+  install_script:
+    - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
+    - pkg install -y gmake
+  build_script:
+    - julia --project=test/ -e 'using Pkg; Pkg.instantiate()'
+  test_script:
+    - julia --project=test/ test/runtests.jl
