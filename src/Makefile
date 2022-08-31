@@ -43,7 +43,7 @@ dump-trampolines: trampolines/trampolines_$(ARCH).S
 
 
 $(builddir)/$(LIB_FULL_VERSION): $(MAIN_OBJS)
-	@$(call PRINT_CC,$(CC) -o "$@" $(call IMPLIB_FLAGS,$@) $(LBT_CFLAGS) $(SONAME_FLAG) $^ -shared $(LBT_LDFLAGS))
+	@$(call PRINT_CC,$(CC) -o "$@" $(call IMPLIB_FLAGS,$(builddir)/$(LIB_MAJOR_VERSION)) $(LBT_CFLAGS) $(SONAME_FLAG) $^ -shared $(LBT_LDFLAGS))
 
 $(builddir)/$(LIB_MAJOR_VERSION): | $(builddir)/$(LIB_FULL_VERSION)
 	ln -sf "$(LIB_FULL_VERSION)" "$@"
@@ -60,7 +60,7 @@ install: $(builddir)/libblastrampoline.$(SHLIB_EXT)
 	@cp -a $(builddir)/libblastrampoline*$(SHLIB_EXT)* $(DESTDIR)$(prefix)/$(binlib)/
 ifeq ($(OS),WINNT)
 	@mkdir -p $(DESTDIR)$(prefix)/lib
-	@cp -a $(builddir)/$(LIB_FULL_VERSION).a $(DESTDIR)$(prefix)/lib
+	@cp -a $(builddir)/$(LIB_MAJOR_VERSION).a $(DESTDIR)$(prefix)/lib
 endif
 
 clean:
