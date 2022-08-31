@@ -24,7 +24,7 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
 endif
 
 LBT_SOVERSION_MAJOR := 5
-LBT_SOVERSION_MINOR := 0
+LBT_SOVERSION_MINOR := 1
 LBT_SOVERSION_PATCH := 2
 
 ifeq ($(OS), WINNT)
