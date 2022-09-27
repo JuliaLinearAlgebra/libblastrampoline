@@ -17,10 +17,10 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
    if needs_m32()
        push!(cflags, "-m32")
    end
-    
+
     ldflags = String[
         # Teach it to find that libblas and its dependencies at build time
-        ("-L$(pathesc(libdir))" for libdir in libdirs)...,
+        ("\"-L$(pathesc(libdir))\"" for libdir in libdirs)...,
         "-l$(libblas_name)",
     ]
 
@@ -38,7 +38,7 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
             @error("compilation failed", srcdir, prefix=dir, cflags=join(cflags, " "), ldflags=join(ldflags, " "))
         end
         @test success(p)
-    
+
         env = Dict(
             # We need to tell it how to find CSL at run-time
             LIBPATH_env => append_libpath(libdirs),
