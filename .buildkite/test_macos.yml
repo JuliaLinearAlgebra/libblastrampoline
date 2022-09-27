@@ -1,0 +1,16 @@
+steps:
+  - label: ":julia: :macos: ${ARCH?} Julia ${JULIA_VERSION?}"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "${JULIA_VERSION?}"
+      - staticfloat/metahook#sf/windows_backslashes:
+          pre-command: |
+            echo "This is a test"
+    commands: |
+      julia --project=test -e 'import Pkg; Pkg.instantiate()'
+      echo "+++ run tests"
+      julia --project=test test/runtests.jl
+    agents:
+      queue: "juliaecosystem"
+      os: "macos"
+      arch: "${AGENT_ARCH?}"

@@ -1,0 +1,70 @@
+steps:
+  - label: ":rocket: Launch matrix of options"
+    commands: |
+      # These variables are available for templating in our child pipelines
+      export JULIA_VERSION OS ARCH AGENT_ARCH ROOTFS_URL ROOTFS_HASH DOCKER_IMAGE
+
+      function upload_pipeline() {
+        buildkite-agent pipeline upload .buildkite/test_$${OS}.yml
+      }
+
+      # We'll test on the following julia versions
+      for JULIA_VERSION in 1.8 nightly; do
+        # First, linux
+        OS="linux"
+        
+        ARCH="x86_64"
+        AGENT_ARCH="x86_64"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v5.26/package_linux.x86_64.tar.gz"
+        ROOTFS_HASH="5b0b851aca3c941b900a1301c13922c6cfc7f211"
+        upload_pipeline
+
+        # We still schedule this one on an x86_64 machine, but use an i686 rootfs
+        ARCH="i686"
+        AGENT_ARCH="x86_64"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v5.26/package_linux.i686.tar.gz"
+        ROOTFS_HASH="abe9ca251b93980e444738b3996779d60ea7045d"
+        upload_pipeline
+
+        ARCH="aarch64"
+        AGENT_ARCH="aarch64"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v5.26/package_linux.aarch64.tar.gz"
+        ROOTFS_HASH="dcf39d10ba43bf13c75d5031c3a88f125780033b"
+        upload_pipeline
+
+
+        # Next, windows
+        OS="windows"
+        ARCH="x86_64"
+        AGENT_ARCH="x86_64"
+        DOCKER_IMAGE="juliapackaging/package-windows-x86_64:v5.44"
+        upload_pipeline
+
+        # same as for Linux, we schedule on an x86_64 machine, but use an i686 docker image
+        OS="windows"
+        ARCH="i686"
+        AGENT_ARCH="x86_64"
+        DOCKER_IMAGE="juliapackaging/package-windows-i686:v5.44"
+        upload_pipeline
+        
+
+
+        # Finally, macOS
+        OS="macos"
+        for ARCH in x86_64 aarch64; do
+          AGENT_ARCH="$${ARCH}"
+          upload_pipeline
+        done
+      done
+    agents:
+      queue: "juliaecosystem"
+
+  - label: "func_list idempotency"
+    commands: |
+      cd ext/gensymbol
+      ./generate_func_list.sh
+      git diff --exit-code
+    agents:
+      queue: "juliaecosystem"
+      os: "linux"
+      arch: "x86_64"

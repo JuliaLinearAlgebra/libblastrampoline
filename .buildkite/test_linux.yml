@@ -1,0 +1,28 @@
+steps:
+  - label: ":julia: :linux: ${ARCH?} Julia ${JULIA_VERSION?}"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "${JULIA_VERSION?}"
+      - staticfloat/sandbox#v1:
+          rootfs_url: "${ROOTFS_URL?}"
+          rootfs_treehash: "${ROOTFS_HASH?}"
+          uid: 0
+          gid: 0
+          workspaces:
+            - "/cache:/cache"
+      - staticfloat/metahook#sf/windows_backslashes:
+          pre-command: |
+            # Upgrade our debian package to bullseye (wowza)
+            if [[ $$(uname -m) == "x86_64" ]] || [[ $$(uname -m) == "aarch64" ]]; then
+              echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list
+              apt update && apt install -y libblas64-dev liblapack64-dev
+            fi
+    commands: |
+      julia --project=test -e 'import Pkg; Pkg.instantiate()'
+      echo "+++ run tests"
+      julia --project=test test/runtests.jl
+    agents:
+      queue: "juliaecosystem"
+      os: "linux"
+      sandbox.jl: "true"
+      arch: "${AGENT_ARCH?}"
