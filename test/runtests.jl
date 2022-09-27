@@ -57,6 +57,9 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
             lbt_path = joinpath(libdirs[1], "libblastrampoline.dll")
             println("ldd $(lbt_path)")
             run(ignorestatus(`ldd $(lbt_path)`))
+            println()
+            println("ldd $(dir)/$(test_name).exe")
+            run(ignorestatus(`ldd $(dir)/$(test_name).exe`))
         end
         @test expected_return_value
 
