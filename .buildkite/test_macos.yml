@@ -6,10 +6,7 @@ steps:
       - staticfloat/metahook#sf/windows_backslashes:
           pre-command: |
             echo "This is a test"
-    commands: |
-      julia --project=test -e 'import Pkg; Pkg.instantiate()'
-      echo "+++ run tests"
-      julia --project=test test/runtests.jl
+    command: "bash .buildkite/instantiate_and_test.sh"
     agents:
       queue: "juliaecosystem"
       os: "macos"

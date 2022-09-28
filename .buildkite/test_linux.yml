@@ -13,15 +13,12 @@ steps:
             - "/cache:/cache"
       - staticfloat/metahook#sf/windows_backslashes:
           pre-command: |
-            # Upgrade our debian package to bullseye (wowza)
-            if [[ "${ARCH?}" == "x86_64" ]] || [[ "${ARCH?}" == "aarch64" ]]; then
+            # Upgrade our debian package to bullseye (wowza) and get an ILP64 blas
+            if [[ "${ARCH?}" == *64 ]]; then
               echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list
               apt update && apt install -y libblas64-dev liblapack64-dev
             fi
-    commands: |
-      julia --project=test -e 'import Pkg; Pkg.instantiate()'
-      echo "+++ run tests"
-      julia --project=test test/runtests.jl
+    command: "bash .buildkite/instantiate_and_test.sh"
     agents:
       queue: "juliaecosystem"
       os: "linux"
