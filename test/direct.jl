@@ -47,7 +47,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     config = lbt_get_config(lbt_handle)
 
     # If we're x86_64, ensure LBT thinks it's f2c-adapter capable
-    if Sys.ARCH == :x86_64
+    if Sys.ARCH ∈ (:x86_64, :aarch64)
         @test (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
     end
 
@@ -69,16 +69,20 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
         @test libs[1].interface == LBT_INTERFACE_LP64
     end
     @test libs[1].f2c == LBT_F2C_PLAIN
-    if Sys.ARCH == :x86_64
-        @test libs[1].cblas == LBT_CBLAS_CONFORMANT
+    if Sys.ARCH ∈ (:x86_64, :aarch64)
         if Sys.iswindows()
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
         else
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL
         end
     else
-        @test libs[1].cblas == LBT_CBLAS_UNKNOWN
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
+    end
+
+    if Sys.ARCH == :x86_64
+        @test libs[1].cblas == LBT_CBLAS_CONFORMANT
+    else
+        @test libs[1].cblas == LBT_CBLAS_UNKNOWN
     end
 
     @test bitfield_get(libs[1].active_forwards, dgemm_idx) != 0
