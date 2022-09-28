@@ -3,6 +3,7 @@ steps:
     plugins:
       - JuliaCI/julia#v1:
           version: "${JULIA_VERSION?}"
+          arch: "${ARCH?}"
       - staticfloat/metahook#sf/windows_backslashes:
           # Copy our julia installation to a known location that we can mount with docker
           pre-command: |
