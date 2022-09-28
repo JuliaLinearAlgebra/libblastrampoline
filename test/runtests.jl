@@ -4,7 +4,7 @@ using Pkg, Artifacts, Base.BinaryPlatforms, Libdl, Test
 include("utils.jl")
 
 # Compile `dgemm_test.c` and `sgesv_test.c` against the given BLAS/LAPACK
-function run_test((test_name, test_expected_outputs, test_success), libblas_name, libdirs, interface, backing_libs)
+function run_test((test_name, test_expected_outputs, expect_success), libblas_name, libdirs, interface, backing_libs)
     # We need to configure this C build a bit
     cflags = String[
         "-g",
@@ -54,9 +54,9 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
         cmd = `$(dir)/$(test_name)`
         p, output = capture_output(addenv(cmd, env))
 
-        expected_return_value = success(p) ^ test_success
+        expected_return_value = success(p) ^ expect_success
         if !expected_return_value
-            @error("Test failed", env, p.exitcode)
+            @error("Test failed", env, p.exitcode, p.termsignal, expect_success)
             println(output)
         end
         @test expected_return_value
