@@ -25,6 +25,9 @@
                             .ascii STR(-export:##I(MANGLE(name))); \
                             .ascii " "; \
                             .section .text
+#elif defined(__ELF__)
+#define DEBUGINFO(name)     .type UNDERSCORE(MANGLE(name)),@function
+#define EXPORT(name)        .size UNDERSCORE(MANGLE(name)), . - UNDERSCORE(MANGLE(name))
 #else
 #define DEBUGINFO(name)
 #define EXPORT(name)
