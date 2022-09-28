@@ -29,6 +29,11 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
         append!(ldflags, ("-Wl,-rpath,$(pathesc(libdir))" for libdir in libdirs))
     end
 
+    if Sys.islinux()
+        # Linux needs this for transitive dependencies
+        append!(ldflags, ("-Wl,-rpath-link,$(pathesc(libdir))" for libdir in libdirs))
+    end
+
     mktempdir() do dir
         @info("Compiling `$(test_name)` against $(libblas_name) ($(backing_libs)) in $(dir)")
         srcdir = joinpath(@__DIR__, test_name)
