@@ -6,7 +6,7 @@ We compile these tests first against vanilla OpenBLAS installations (both LP64 a
 If available, we will test against `MKL` and `libblas64` as well.
 If we are on a 64-bit platform, we will build a test case that uses LP64 and ILP64 routines in the same executable.
 
-Running these tests currently requires the latest tip of `master` on Julia, to deal with JLL lib paths properly.
+Note that these tests require Julia v1.7+, especially on aarch64 where we switched from shipping an LP64 to ILP64 OpenBLAS by default.
 
 Run via:
 ```
