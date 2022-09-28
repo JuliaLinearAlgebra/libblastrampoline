@@ -61,7 +61,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
 
     # First check OpenBLAS_jll which may or may not be ILP64
     @test libs[1].libname == OpenBLAS_jll.libopenblas_path
-    if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+    if Sys.WORD_SIZE == 64
         @test libs[1].suffix == "64_"
         @test libs[1].interface == LBT_INTERFACE_ILP64
     else
@@ -120,7 +120,7 @@ end
     @test lbt_get_num_threads(lbt_handle) == nthreads
 
     # If we're on a 64-bit system, load OpenBLAS_jll in and cause a mismatch in the threading
-    if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+    if Sys.WORD_SIZE == 64
         lbt_forward(lbt_handle, OpenBLAS_jll.libopenblas_path)
 
         lbt_set_num_threads(lbt_handle, 1)
