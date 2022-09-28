@@ -6,18 +6,15 @@ steps:
       - staticfloat/metahook#sf/windows_backslashes:
           # Copy our julia installation to a known location that we can mount with docker
           pre-command: |
-            cp $(dirname $(dirname $(which julia))) /c/buildkite-agent
+            cp -r $(dirname $(dirname $(which julia)))/* /c/buildkite-agent
       - docker#v3.13.0:
           image: "${DOCKER_IMAGE?}"
           always-pull: true
           volumes:
             # Abuse the fact that we have a `PATH` mapping for `buildkite-agent`
             # to mount in our build of Julia for use within the container:
-            - "C:\\buildkite-agent\\bin:C:\\buildkite-agent\\bin"
-    commands: |
-      julia --project=test -e 'import Pkg; Pkg.instantiate()'
-      echo "+++ run tests"
-      julia --project=test test/runtests.jl
+            - "C:\\buildkite-agent:C:\\buildkite-agent"
+          command: ["bash", "-c", ".buildkite/instantiate_and_test.sh"]
     agents:
       queue: "juliaecosystem"
       os: "windows"
