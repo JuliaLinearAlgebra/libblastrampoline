@@ -99,7 +99,7 @@ end
 
 # Build version that links against vanilla OpenBLAS
 openblas_interface = :LP64
-if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+if Sys.WORD_SIZE == 64
     openblas_interface = :ILP64
 end
 openblas_jll_libname = splitext(basename(OpenBLAS_jll.libopenblas_path)[4:end])[1]
