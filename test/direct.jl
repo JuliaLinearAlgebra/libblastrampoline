@@ -47,7 +47,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     config = lbt_get_config(lbt_handle)
 
     # If we're x86_64, ensure LBT thinks it's f2c-adapter capable
-    if Sys.ARCH == :x86_64
+    if Sys.ARCH ∈ (:x86_64, :aarch64)
         @test (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
     end
 
@@ -61,7 +61,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
 
     # First check OpenBLAS_jll which may or may not be ILP64
     @test libs[1].libname == OpenBLAS_jll.libopenblas_path
-    if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+    if Sys.WORD_SIZE == 64
         @test libs[1].suffix == "64_"
         @test libs[1].interface == LBT_INTERFACE_ILP64
     else
@@ -69,16 +69,20 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
         @test libs[1].interface == LBT_INTERFACE_LP64
     end
     @test libs[1].f2c == LBT_F2C_PLAIN
-    if Sys.ARCH == :x86_64
-        @test libs[1].cblas == LBT_CBLAS_CONFORMANT
+    if Sys.ARCH ∈ (:x86_64, :aarch64)
         if Sys.iswindows()
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
         else
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL
         end
     else
-        @test libs[1].cblas == LBT_CBLAS_UNKNOWN
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN
+    end
+
+    if Sys.ARCH == :x86_64
+        @test libs[1].cblas == LBT_CBLAS_CONFORMANT
+    else
+        @test libs[1].cblas == LBT_CBLAS_UNKNOWN
     end
 
     @test bitfield_get(libs[1].active_forwards, dgemm_idx) != 0
@@ -120,7 +124,7 @@ end
     @test lbt_get_num_threads(lbt_handle) == nthreads
 
     # If we're on a 64-bit system, load OpenBLAS_jll in and cause a mismatch in the threading
-    if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+    if Sys.WORD_SIZE == 64
         lbt_forward(lbt_handle, OpenBLAS_jll.libopenblas_path)
 
         lbt_set_num_threads(lbt_handle, 1)

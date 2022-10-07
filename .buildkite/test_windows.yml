@@ -1,0 +1,22 @@
+steps:
+  - label: ":julia: :windows: ${ARCH?} Julia ${JULIA_VERSION?}"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "${JULIA_VERSION?}"
+          arch: "${ARCH?}"
+      - staticfloat/metahook#sf/windows_backslashes:
+          # Copy our julia installation to a known location that we can mount with docker
+          pre-command: |
+            cp -r $(dirname $(dirname $(which julia)))/* /c/buildkite-agent
+      - docker#v3.13.0:
+          image: "${DOCKER_IMAGE?}"
+          always-pull: true
+          volumes:
+            # Abuse the fact that we have a `PATH` mapping for `buildkite-agent`
+            # to mount in our build of Julia for use within the container:
+            - "C:\\buildkite-agent:C:\\buildkite-agent"
+          command: ["bash", "-c", ".buildkite/instantiate_and_test.sh"]
+    agents:
+      queue: "juliaecosystem"
+      os: "windows"
+      arch: "${AGENT_ARCH?}"

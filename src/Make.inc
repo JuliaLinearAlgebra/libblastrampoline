@@ -24,8 +24,8 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
 endif
 
 LBT_SOVERSION_MAJOR := 5
-LBT_SOVERSION_MINOR := 0
-LBT_SOVERSION_PATCH := 2
+LBT_SOVERSION_MINOR := 2
+LBT_SOVERSION_PATCH := 0
 
 ifeq ($(OS), WINNT)
   SHLIB_EXT := dll
@@ -80,7 +80,7 @@ endif
 # If we're on x86_64 or i686, we may need to convert back f2c-style bindings (such as Apple's Accelerate)
 # from returning doubles to instead return float's.  We enable automatic F2C detection on those platforms.
 F2C_AUTODETECTION := 0
-ifneq (,$(filter $(ARCH), x86_64 i686))
+ifneq (,$(filter $(ARCH), x86_64 i686 aarch64 arm64))
   LBT_CFLAGS += -DF2C_AUTODETECTION
   F2C_AUTODETECTION := 1
 endif
@@ -93,7 +93,7 @@ ifneq (,$(filter $(ARCH), x86_64 i686))
 endif
 
 # If we're on x86_64, we can do complex return style autodetection
-ifneq (,$(filter $(ARCH), x86_64))
+ifneq (,$(filter $(ARCH), x86_64 aarch64))
   LBT_CFLAGS += -DCOMPLEX_RETSTYLE_AUTODETECTION
   COMPLEX_RETSTYLE_AUTODETECTION := 1
 endif

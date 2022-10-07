@@ -1,0 +1,31 @@
+steps:
+  - label: ":julia: :linux: ${ARCH?} Julia ${JULIA_VERSION?}"
+    plugins:
+      # Install Julia for the agent first, so that we can run `sandbox`
+      - JuliaCI/julia#v1:
+          version: "1"
+          arch: "${AGENT_ARCH?}"
+      - staticfloat/sandbox#v1:
+          rootfs_url: "${ROOTFS_URL?}"
+          rootfs_treehash: "${ROOTFS_HASH?}"
+          uid: 0
+          gid: 0
+          workspaces:
+            - "/cache:/cache"
+      # Then install Julia for the rootfs arch
+      - JuliaCI/julia#v1:
+          version: "${JULIA_VERSION?}"
+          arch: "${ARCH?}"
+      - staticfloat/metahook#sf/windows_backslashes:
+          pre-command: |
+            # Upgrade our debian package to bullseye (wowza) and get an ILP64 blas
+            if [[ "${ARCH?}" == *64 ]]; then
+              echo "deb http://deb.debian.org/debian bullseye main" > /etc/apt/sources.list.d/bullseye.list
+              apt update && apt install -y libblas64-dev liblapack64-dev
+            fi
+    command: "bash .buildkite/instantiate_and_test.sh"
+    agents:
+      queue: "juliaecosystem"
+      os: "linux"
+      sandbox.jl: "true"
+      arch: "${AGENT_ARCH?}"

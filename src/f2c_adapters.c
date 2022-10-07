@@ -15,8 +15,6 @@
  *       - `s{,a,c,ca}sum`
  *       - `s{,c}nrm2`
  *       - `slamc{h,3}`
- *   - Pass an extra argument to store return value for the following BLAS functions:
- *       - `{c,z}dot{c,u}`
  */
 
 // smax
@@ -177,65 +175,4 @@ LBT_HIDDEN float f2c_slamc3_(const float * x, const float * y) {
 extern double (*f2c_slamc3_64__addr)(const float * x, const float * y);
 LBT_HIDDEN float f2c_slamc3_64_(const float * x, const float * y) {
 	return f2c_slamc3_64__addr(x, y);
-}
-
-
-// cdotc
-extern void (*f2c_cdotc__addr)(float complex *z, const int32_t *n, const float complex *x, const int32_t * ix, const float complex *y, const int32_t *iy);
-LBT_HIDDEN float complex f2c_cdotc_(const int32_t *n, const float complex *x, const int32_t * ix, const float complex *y, const int32_t *iy) {
-	float complex z;
-	f2c_cdotc__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-extern void (*f2c_cdotc_64__addr)(float complex *z, const int64_t *n, const float complex *x, const int64_t * ix, const float complex *y, const int64_t *iy);
-LBT_HIDDEN float complex f2c_cdotc_64_(const int64_t *n, const float complex *x, const int64_t * ix, const float complex *y, const int64_t *iy) {
-	float complex z;
-	f2c_cdotc_64__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-
-// cdotu
-extern void (*f2c_cdotu__addr)(float complex *z, const int32_t *n, const float complex *x, const int32_t * ix, const float complex *y, const int32_t *iy);
-float complex f2c_cdotu_(const int32_t* n, const float complex* x, const int32_t* ix, const float complex *y, const int32_t *iy)
-{
-	float complex z;
-	f2c_cdotu__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-extern void (*f2c_cdotu_64__addr)(float complex *z, const int64_t *n, const float complex *x, const int64_t * ix, const float complex *y, const int64_t *iy);
-float complex f2c_cdotu_64_(const int64_t* n, const float complex* x, const int64_t* ix, const float complex *y, const int64_t *iy)
-{
-	float complex z;
-	f2c_cdotu_64__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-
-// zdotc
-extern void (*f2c_zdotc__addr)(double complex *z, const int32_t *n, const double complex *x, const int32_t * ix, const double complex *y, const int32_t *iy);
-LBT_HIDDEN double complex f2c_zdotc_(const int32_t *n, const double complex *x, const int32_t * ix, const double complex *y, const int32_t *iy) {
-	double complex z;
-	f2c_zdotc__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-extern void (*f2c_zdotc_64__addr)(double complex *z, const int64_t *n, const double complex *x, const int64_t * ix, const double complex *y, const int64_t *iy);
-LBT_HIDDEN double complex f2c_zdotc_64_(const int64_t *n, const double complex *x, const int64_t * ix, const double complex *y, const int64_t *iy) {
-	double complex z;
-	f2c_zdotc_64__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-
-// zdotu
-extern void (*f2c_zdotu__addr)(double complex *z, const int32_t *n, const double complex *x, const int32_t * ix, const double complex *y, const int32_t *iy);
-double complex f2c_zdotu_(const int32_t* n, const double complex* x, const int32_t* ix, const double complex *y, const int32_t *iy)
-{
-	double complex z;
-	f2c_zdotu__addr(&z, n, x, ix, y, iy);
-	return z;
-}
-extern void (*f2c_zdotu_64__addr)(double complex *z, const int64_t *n, const double complex *x, const int64_t * ix, const double complex *y, const int64_t *iy);
-double complex f2c_zdotu_64_(const int64_t* n, const double complex* x, const int64_t* ix, const double complex *y, const int64_t *iy)
-{
-	double complex z;
-	f2c_zdotu_64__addr(&z, n, x, ix, y, iy);
-	return z;
 }

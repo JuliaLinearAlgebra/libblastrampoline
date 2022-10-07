@@ -1,0 +1,13 @@
+steps:
+  - label: ":julia: :macos: ${ARCH?} Julia ${JULIA_VERSION?}"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "${JULIA_VERSION?}"
+      - staticfloat/metahook#sf/windows_backslashes:
+          pre-command: |
+            echo "This is a test"
+    command: "bash .buildkite/instantiate_and_test.sh"
+    agents:
+      queue: "juliaecosystem"
+      os: "macos"
+      arch: "${AGENT_ARCH?}"

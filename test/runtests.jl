@@ -4,7 +4,7 @@ using Pkg, Artifacts, Base.BinaryPlatforms, Libdl, Test
 include("utils.jl")
 
 # Compile `dgemm_test.c` and `sgesv_test.c` against the given BLAS/LAPACK
-function run_test((test_name, test_expected_outputs, test_success), libblas_name, libdirs, interface, backing_libs)
+function run_test((test_name, test_expected_outputs, expect_success), libblas_name, libdirs, interface, backing_libs)
     # We need to configure this C build a bit
     cflags = String[
         "-g",
@@ -17,16 +17,21 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
    if needs_m32()
        push!(cflags, "-m32")
    end
-    
+
     ldflags = String[
         # Teach it to find that libblas and its dependencies at build time
-        ("-L$(pathesc(libdir))" for libdir in libdirs)...,
+        ("\"-L$(pathesc(libdir))\"" for libdir in libdirs)...,
         "-l$(libblas_name)",
     ]
 
     if !Sys.iswindows()
         # Teach it to find that libblas and its dependencies at run time
         append!(ldflags, ("-Wl,-rpath,$(pathesc(libdir))" for libdir in libdirs))
+    end
+
+    if Sys.islinux()
+        # Linux needs this for transitive dependencies
+        append!(ldflags, ("-Wl,-rpath-link,$(pathesc(libdir))" for libdir in libdirs))
     end
 
     mktempdir() do dir
@@ -38,7 +43,7 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
             @error("compilation failed", srcdir, prefix=dir, cflags=join(cflags, " "), ldflags=join(ldflags, " "))
         end
         @test success(p)
-    
+
         env = Dict(
             # We need to tell it how to find CSL at run-time
             LIBPATH_env => append_libpath(libdirs),
@@ -49,9 +54,9 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
         cmd = `$(dir)/$(test_name)`
         p, output = capture_output(addenv(cmd, env))
 
-        expected_return_value = success(p) ^ test_success
+        expected_return_value = success(p) ^ expect_success
         if !expected_return_value
-            @error("Test failed", env)
+            @error("Test failed", env, p.exitcode, p.termsignal, expect_success)
             println(output)
         end
         @test expected_return_value
@@ -94,7 +99,7 @@ end
 
 # Build version that links against vanilla OpenBLAS
 openblas_interface = :LP64
-if Sys.WORD_SIZE == 64 && Sys.ARCH != :aarch64
+if Sys.WORD_SIZE == 64
     openblas_interface = :ILP64
 end
 openblas_jll_libname = splitext(basename(OpenBLAS_jll.libopenblas_path)[4:end])[1]
@@ -142,9 +147,11 @@ if MKL_jll.is_available()
     end
 end
 
-# Do we have Accelerate available?
+# Do we have Accelerate available?  Note that we can't use `isfile()` here, since Apple
+# has Helpfully (TM) sequestered the dynamic libraries away into a database somewhere that
+# just gets fed into `dlopen()` when you ask for that magic path.
 veclib_blas_path = "/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/libBLAS.dylib"
-if isfile(veclib_blas_path)
+if dlopen_e(veclib_blas_path) != C_NULL
     # Test that we can run BLAS-only tests without LAPACK loaded (`sgesv` test requires LAPACK symbols)
     @testset "LBT -> vecLib/libBLAS" begin
         run_all_tests("blastrampoline", [lbt_dir], :LP64, veclib_blas_path; tests=[dgemm, sdot, zdotc])
