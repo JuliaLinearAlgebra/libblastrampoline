@@ -8,7 +8,6 @@ function run_test((test_name, test_expected_outputs, test_success), libblas_name
     # We need to configure this C build a bit
     cflags = String[
         "-g",
-        "-Werror",
     ]
     if interface == :ILP64
         push!(cflags, "-DILP64")
