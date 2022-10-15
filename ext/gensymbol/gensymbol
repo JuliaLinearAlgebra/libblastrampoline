@@ -17,14 +17,14 @@
 # removed blas_thread_shutdown_
 #
 @blasobjsc = (
-    caxpy,caxpby,ccopy,cdotc,cdotu,cgbmv,cgemm,cgemv,cgerc,cgeru,
+    caxpy,caxpby,ccopy,cdotc,cdotu,cgbmv,cgemm,cgemmt,cgemv,cgerc,cgeru,
     chbmv,chemm,chemv,cher2,cher2k,cher,cherk,scabs1,scamax,
     chpmv,chpr2,chpr,crotg,cscal,csrot,csscal,cswap,scamin,scasum,scnrm2,
     csymm,csyr2k,csyrk,ctbmv,ctbsv,ctpmv,ctpsv,ctrmm,ctrmv,ctrsm,
     ctrsv,icamax,icamin,cimatcopy,comatcopy,cgeadd,scsum);
     
 @blasobjsd = (
-    damax,damin,dasum,daxpy,daxpby,dcabs1,dcopy,ddot,dgbmv,dgemm,
+    damax,damin,dasum,daxpy,daxpby,dcabs1,dcopy,ddot,dgbmv,dgemm,dgemmt,
     dgemv,dger,dmax,dmin,dnrm2,drot,drotg,drotm,drotmg,dsbmv,
     dscal,dsdot,dspmv,dspr2,dimatcopy,domatcopy,
     dspr,dswap,dsymm,dsymv,dsyr2,dsyr2k,dsyr,dsyrk,dtbmv,dtbsv,
@@ -34,7 +34,7 @@
 @blasobjss = (
     isamax,isamin,ismax,ismin,
     samax,samin,sasum,saxpy, saxpby, 
-    scopy,sdot,sdsdot,sgbmv,sgemm,sgemv,sger,
+    scopy,sdot,sdsdot,sgbmv,sgemm,sgemmt,sgemv,sger,
     smax,smin,snrm2,simatcopy,somatcopy,
     srot,srotg,srotm,srotmg,ssbmv,sscal,sspmv,sspr2,sspr,sswap,
     ssymm,ssymv,ssyr2,ssyr2k,ssyr,ssyrk,stbmv,stbsv,stpmv,stpsv,
@@ -43,7 +43,7 @@
 @blasobjsz = (
     izamax,izamin,,
     zaxpy,zaxpby,zcopy,zdotc,zdotu,zdrot,
-    zdscal,zgbmv,zgemm,zgemv,zgerc,zgeru,
+    zdscal,zgbmv,zgemm,zgemmt,zgemv,zgerc,zgeru,
     zhbmv,zhemm,zhemv,zher2,zher2k,zher,zherk,zhpmv,zhpr2,
     zhpr,zrotg,zscal,zswap,zsymm,zsyr2k,zsyrk,ztbmv,
     ztbsv,ztpmv,ztpsv,ztrmm,ztrmv,ztrsm,ztrsv,
