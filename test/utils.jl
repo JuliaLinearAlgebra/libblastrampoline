@@ -61,7 +61,7 @@ function build_libblastrampoline()
         return blastrampoline_build_dir
     end
 
-    cflags_add = "-Werror" * needs_m32() ? " -m32" : ""
+    cflags_add = "-Werror" * (needs_m32() ? " -m32" : "")
     dir = mktempdir()
     srcdir = joinpath(dirname(@__DIR__), "src")
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) clean`)
