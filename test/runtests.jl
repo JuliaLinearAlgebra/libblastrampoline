@@ -82,6 +82,7 @@ end
 
 # our tests, written in C, defined in subdirectories in `test/`
 dgemm =         ("dgemm_test", ("||C||^2 is:  24.3384",),                  true)
+dgemmt =        ("dgemmt_test", ("||C||^2 is:  24.3384",),                 true)
 sgesv =         ("sgesv_test", ("||b||^2 is:   3.0000",),                  true)
 sgesv_failure = ("sgesv_test", ("Error: no BLAS/LAPACK library loaded!",), false)
 sdot  =         ("sdot_test",  ("C is:   1.9900",),                        true)
@@ -91,7 +92,7 @@ zdotc =         ("zdotc_test", (
                 ),      true)
 
 # Helper function to run all the tests with the given arguments
-function run_all_tests(args...; tests = [dgemm, sgesv, sdot, zdotc])
+function run_all_tests(args...; tests = [dgemm, dgemmt, sgesv, sdot, zdotc])
     for test in tests
         run_test(test, args...)
     end
@@ -104,13 +105,13 @@ if Sys.WORD_SIZE == 64
 end
 openblas_jll_libname = splitext(basename(OpenBLAS_jll.libopenblas_path)[4:end])[1]
 @testset "Vanilla OpenBLAS_jll ($(openblas_interface))" begin
-    run_all_tests(openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "")
+    run_all_tests(openblas_jll_libname, OpenBLAS_jll.LIBPATH_list, openblas_interface, "", tests=[dgemm, sgesv, sdot, zdotc])
 end
 
 # Build version that links against vanilla OpenBLAS32
 @testset "Vanilla OpenBLAS32_jll (LP64)" begin
     # Reverse OpenBLAS32_jll's LIBPATH_list so that we get the right openblas.so
-    run_all_tests("openblas", reverse(OpenBLAS32_jll.LIBPATH_list), :LP64, "")
+    run_all_tests("openblas", reverse(OpenBLAS32_jll.LIBPATH_list), :LP64, "", tests=[dgemm, sgesv, sdot, zdotc])
 end
 
 # Next, build a version that links against `libblastrampoline`, and tell
@@ -120,13 +121,13 @@ lbt_dir = joinpath(lbt_dir, binlib)
 
 @testset "LBT -> OpenBLAS_jll ($(openblas_interface))" begin
     libdirs = unique(vcat(lbt_dir, OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
-    run_all_tests("blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    run_all_tests("blastrampoline", libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path, tests=[dgemm, sgesv, sdot, zdotc])
 end
 
 # And again, but this time with OpenBLAS32_jll
 @testset "LBT -> OpenBLAS32_jll (LP64)" begin
     libdirs = unique(vcat(lbt_dir, OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
-    run_all_tests("blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+    run_all_tests("blastrampoline", libdirs, :LP64, OpenBLAS32_jll.libopenblas_path, tests=[dgemm, sgesv, sdot, zdotc])
 end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
@@ -157,10 +158,10 @@ if dlopen_e(veclib_blas_path) != C_NULL
         run_all_tests("blastrampoline", [lbt_dir], :LP64, veclib_blas_path; tests=[dgemm, sdot, zdotc])
     end
 
-    # With LAPACK as well, run all tests
+    # With LAPACK as well, run all tests except `dgemmt`
     veclib_lapack_path = "/System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/libLAPACK.dylib"
     @testset "LBT -> vecLib/libLAPACK" begin
-        run_all_tests("blastrampoline", [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path))
+        run_all_tests("blastrampoline", [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path), tests=[dgemm, sgesv, sdot, zdotc])
     end
 end
 
