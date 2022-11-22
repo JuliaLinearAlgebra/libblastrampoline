@@ -53,7 +53,7 @@ else
   SONAME_FLAG := -Wl,-soname=$(LIB_MAJOR_VERSION)
 endif
 
-LBT_CFLAGS := -g -O2 -Werror -std=c99 $(FPIC) -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
+LBT_CFLAGS := -g -O2 -std=c99 $(FPIC) -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
 LBT_LDFLAGS := $(LDFLAGS)
 
 ifeq ($(OS),Linux)
