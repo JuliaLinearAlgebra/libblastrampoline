@@ -221,6 +221,10 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         # Test that `dgemm` forwards to `dgemm_` within the MKL binary
         mkl_dgemm = dlsym(MKL_jll.libmkl_rt_handle, :dgemm_64)
         @test lbt_get_forward(lbt_handle, "dgemm_", LBT_INTERFACE_ILP64) == mkl_dgemm
+
+        # Test that `dgemmt` forwards to `dgemmt_` within the MKL binary
+        mkl_dgemmt = dlsym(MKL_jll.libmkl_rt_handle, :dgemmt_64)
+        @test lbt_get_forward(lbt_handle, "dgemmt_", LBT_INTERFACE_ILP64) == mkl_dgemmt
     end
 
     @testset "MKL v2022 dual-interface loading" begin
