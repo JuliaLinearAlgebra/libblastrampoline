@@ -117,8 +117,13 @@ end
 
     # get/set threads
     nthreads = ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_get_num_threads), Cint, ())
+    @test nthreads > 0
     @test lbt_get_num_threads(lbt_handle) == nthreads
-    nthreads = div(nthreads, 2)
+    if nthreads <= 1
+        nthreads = 2
+    else
+        nthreads = div(nthreads, 2)
+    end
     lbt_set_num_threads(lbt_handle, nthreads)
     @test ccall(dlsym(OpenBLAS32_jll.libopenblas_handle, :openblas_get_num_threads), Cint, ()) == nthreads
     @test lbt_get_num_threads(lbt_handle) == nthreads
