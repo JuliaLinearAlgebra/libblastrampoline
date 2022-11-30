@@ -82,7 +82,7 @@ end
 
 # our tests, written in C, defined in subdirectories in `test/`
 dgemm =         ("dgemm_test", ("||C||^2 is:  24.3384",),                  true)
-dgemmt =        ("dgemmt_test", ("||C||^2 is:  24.3384",),                 true)
+dgemmt =        ("dgemmt_test", ("||C||^2 is:  23.2952",),                 true)
 sgesv =         ("sgesv_test", ("||b||^2 is:   3.0000",),                  true)
 sgesv_failure = ("sgesv_test", ("Error: no BLAS/LAPACK library loaded!",), false)
 sdot  =         ("sdot_test",  ("C is:   1.9900",),                        true)
