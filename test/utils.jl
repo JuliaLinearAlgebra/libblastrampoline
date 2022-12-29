@@ -64,15 +64,15 @@ function build_libblastrampoline()
     cflags_add = "-Werror" * (needs_m32() ? " -m32" : "")
     dir = mktempdir()
     srcdir = joinpath(dirname(@__DIR__), "src")
-    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) clean`)
-    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(dir))/output`)
-
     global blastrampoline_build_dir = joinpath(dir, "output")
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) clean`)
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(blastrampoline_build_dir))`)
 
     # Give LBT a fake linking name so that we can test from within Julia versions that actually load LBT natively.
+    lib_name = split(readchomp(`make -sC $(pathesc(srcdir)) print-LIB_MAJOR_VERSION`), "=")[end]
     link_name = "blastramp-dev"
     cp(
-        joinpath(blastrampoline_build_dir, binlib, "libblastrampoline.$(shlib_ext)"),
+        joinpath(blastrampoline_build_dir, binlib, lib_name),
         joinpath(blastrampoline_build_dir, binlib, "lib$(link_name).$(shlib_ext)"),
     )
     println("$(blastrampoline_build_dir)/$(binlib)")
