@@ -15,7 +15,9 @@ task:
       macos_instance:
         image: ghcr.io/cirruslabs/macos-monterey-base:latest
       env:
-        - JULIA_VERSION: 1
+        matrix:
+          - JULIA_VERSION: 1
+          - JULIA_VERSION: nightly
   install_script: |
     URL="https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh"
     set -x
