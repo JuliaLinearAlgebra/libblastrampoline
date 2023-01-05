@@ -34,6 +34,12 @@ task:
     else
         echo "No downloader installed! :( Install one! :)"
     fi
+
+    # Install build tools on Alpine Linux
+    if command -v apk; then
+        apk update
+        apk add build-base linux-headers
+    fi
   build_script:
     - julia --project=test/ -e 'using Pkg; Pkg.instantiate()'
   test_script:
