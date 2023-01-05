@@ -131,7 +131,7 @@ LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t int
     int32_t symbol_idx = find_symbol_idx(symbol_name);
     if (symbol_idx == -1)
         return (const void *)-1;
-    
+
 #ifdef F2C_AUTODETECTION
     if (f2c == LBT_F2C_REQUIRED) {
         // Check to see if this symbol is one of the f2c functions
