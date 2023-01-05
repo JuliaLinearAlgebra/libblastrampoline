@@ -35,10 +35,14 @@ task:
         echo "No downloader installed! :( Install one! :)"
     fi
 
-    # Install build tools on Alpine Linux
     if command -v apk; then
+        # Install build tools on Alpine Linux
         apk update
         apk add build-base linux-headers
+    elif command -v pkg; then
+        # Install GNU Make on FreeBSD
+        pkg update
+        pkg install -y gmake
     fi
   build_script:
     - julia --project=test/ -e 'using Pkg; Pkg.instantiate()'
