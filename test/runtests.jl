@@ -19,6 +19,7 @@ function run_test((test_name, test_expected_outputs, expect_success), libblas_na
    end
 
     ldflags = String[
+        Sys.isbsd() ? "-Wl,-t" : "-Wl,--trace",
         # Teach it to find that libblas and its dependencies at build time
         ("\"-L$(pathesc(libdir))\"" for libdir in libdirs)...,
         "-l$(libblas_name)",
