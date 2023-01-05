@@ -1,13 +1,49 @@
-freebsd_instance:
-  image: freebsd-13-1-release-amd64
 task:
-  name: FreeBSD
-  env:
-    matrix:
-      - JULIA_VERSION: nightly
-  install_script:
-    - sh -c "$(fetch https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh -o -)"
-    - pkg install -y gmake
+  matrix:
+    - name: FreeBSD
+      freebsd_instance:
+        image: freebsd-13-1-release-amd64
+      env:
+        matrix:
+          - JULIA_VERSION: 1
+    - name: musl Linux
+      container:
+        image: alpine:3.14
+      env:
+        - JULIA_VERSION: 1
+    - name: MacOS M1
+      macos_instance:
+        image: ghcr.io/cirruslabs/macos-monterey-base:latest
+      env:
+        matrix:
+          - JULIA_VERSION: 1
+          - JULIA_VERSION: nightly
+  install_script: |
+    URL="https://raw.githubusercontent.com/ararslan/CirrusCI.jl/master/bin/install.sh"
+    set -x
+    if [ "$(uname -s)" = "Linux" ] && command -v apt; then
+        apt update
+        apt install -y curl
+    fi
+    if command -v curl; then
+        sh -c "$(curl ${URL})"
+    elif command -v wget; then
+        sh -c "$(wget ${URL} -O-)"
+    elif command -v fetch; then
+        sh -c "$(fetch ${URL} -o -)"
+    else
+        echo "No downloader installed! :( Install one! :)"
+    fi
+
+    if command -v apk; then
+        # Install build tools on Alpine Linux
+        apk update
+        apk add build-base linux-headers
+    elif command -v pkg; then
+        # Install GNU Make on FreeBSD
+        pkg update
+        pkg install -y gmake
+    fi
   build_script:
     - julia --project=test/ -e 'using Pkg; Pkg.instantiate()'
   test_script:
