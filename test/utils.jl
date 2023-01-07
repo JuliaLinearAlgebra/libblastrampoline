@@ -53,6 +53,19 @@ end
 
 needs_m32() = startswith(last(capture_output(`$(cc) -dumpmachine`)), "x86_64") && Sys.WORD_SIZE == 32
 
+function blastrampoline_major_version()
+    srcdir = joinpath(dirname(@__DIR__), "src")
+    return split(readchomp(`$(make) -sC $(pathesc(srcdir)) print-LIB_MAJOR_VERSION`), "=")[end]
+end
+
+function blastrampoline_link_name()
+    @static if Sys.iswindows()
+        # On Windows we need to link to `-lblastrampoline-<MAJOR_VERSION>`
+        return replace(splitext(blastrampoline_major_version())[begin], r"^lib" => "")
+    end
+    return "blastrampoline"
+end
+
 
 # Build blastrampoline into a temporary directory, and return that
 blastrampoline_build_dir = nothing
@@ -69,10 +82,9 @@ function build_libblastrampoline()
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(blastrampoline_build_dir))`)
 
     # Give LBT a fake linking name so that we can test from within Julia versions that actually load LBT natively.
-    lib_name = split(readchomp(`make -sC $(pathesc(srcdir)) print-LIB_MAJOR_VERSION`), "=")[end]
     link_name = "blastramp-dev"
     cp(
-        joinpath(blastrampoline_build_dir, binlib, lib_name),
+        joinpath(blastrampoline_build_dir, binlib, blastrampoline_major_version()),
         joinpath(blastrampoline_build_dir, binlib, "lib$(link_name).$(shlib_ext)"),
     )
     println("$(blastrampoline_build_dir)/$(binlib)")
