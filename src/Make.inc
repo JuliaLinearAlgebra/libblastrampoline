@@ -24,7 +24,7 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
 endif
 
 LBT_SOVERSION_MAJOR := 5
-LBT_SOVERSION_MINOR := 3
+LBT_SOVERSION_MINOR := 4
 LBT_SOVERSION_PATCH := 0
 
 ifeq ($(OS), WINNT)
@@ -112,3 +112,14 @@ endif
 # Default installation location; we expect you to be overriding this
 prefix ?= prefix
 builddir ?= build
+
+define newline # a literal \n
+
+
+endef
+
+# Makefile debugging trick:
+# call print-VARIABLE to see the runtime value of any variable
+# (hardened against any special characters appearing in the output)
+print-%:
+	@echo '$*=$(subst ','\'',$(subst $(newline),\n,$($*)))'
