@@ -92,7 +92,7 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix);
 #endif
 
 // Functions in deepbindless_surrogates.c
-void push_fake_lsame();
-void pop_fake_lsame();
+uint8_t push_fake_lsame();
+uint8_t pop_fake_lsame();
 int fake_lsame(char * ca, char * cb);
 extern uint8_t use_deepbind;

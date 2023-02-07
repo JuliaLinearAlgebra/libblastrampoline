@@ -18,14 +18,15 @@ LBT_DLLEXPORT uint8_t lbt_get_use_deepbind() {
 
 int lsame_idx = -1;
 const void *old_lsame32 = NULL, *old_lsame64 = NULL;
-void push_fake_lsame() {
+uint8_t push_fake_lsame() {
     // Find `lsame_` in our symbol list (if we haven't done so before)
     if (lsame_idx == -1) {
         lsame_idx = find_symbol_idx("lsame_");
         if (lsame_idx == -1) {
-            // This is fatal as it signifies a configuration error in our trampoline symbol list
-            fprintf(stderr, "Error: Unable to find lsame_ in our symbol list?!\n");
-            exit(1);
+            fprintf(stderr, "Error: Unable to find lsame_ in our symbol list. "
+                            "This signifies a libblastrampoline compilation failure. "
+                            "Aborting interface autodetection.\n");
+            return 0;
         }
     }
     
@@ -36,13 +37,15 @@ void push_fake_lsame() {
     // Insert our "fake" lsame in so that we always have a half-functional copy
     (*exported_func32_addrs[lsame_idx]) = &fake_lsame;
     (*exported_func64_addrs[lsame_idx]) = &fake_lsame;
+    return 1;
 }
 
-void pop_fake_lsame() {
+uint8_t pop_fake_lsame() {
     if (lsame_idx == -1) {
         // Did you call `pop_fake_lsame()` without calling `push_fake_lsame()` first?!
-        fprintf(stderr, "pop_fake_lsame() called with invalid `lsame_idx`!\n");
-        exit(1);
+        fprintf(stderr, "Error: Invalid lsame_ index. This is an internal libblastrampoline error. "
+                        "Aborting interface autodetection.\n");
+        return 0;
     }
 
     (*exported_func32_addrs[lsame_idx]) = old_lsame32;
@@ -50,6 +53,7 @@ void pop_fake_lsame() {
 
     old_lsame32 = NULL;
     old_lsame64 = NULL;
+    return 1;
 }
 
 
