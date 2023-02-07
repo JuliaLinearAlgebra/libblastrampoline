@@ -274,8 +274,8 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
                     printf(" -> CBLAS not found\n");
                     break;
                 default:
-                    printf(" -> ERROR: CBLAS DETECTION FAILED UNEXPECTEDLY\n");
-                    exit(1);
+                    printf(" -> ERROR: Impossible CBLAS detection result: %d\n", cblas);
+                    cblas = LBT_CBLAS_UNKNOWN;
                     break;
             }
         }

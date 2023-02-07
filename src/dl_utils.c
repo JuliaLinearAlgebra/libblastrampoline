@@ -31,7 +31,7 @@ void * load_library(const char * path) {
     wchar_t wpath[2*PATH_MAX + 1] = {0};
     if (!utf8_to_wchar(path, wpath, 2*PATH_MAX)) {
         fprintf(stderr, "ERROR: Unable to convert path %s to wide string!\n", path);
-        exit(1);
+        return NULL;
     }
     new_handle = (void *)LoadLibraryExW(wpath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
 #else
@@ -106,14 +106,16 @@ const char * lookup_self_path()
 #if defined(_OS_WINDOWS_)
     if (!GetModuleFileNameA(GetModuleHandle(NULL), self_path, PATH_MAX)) {
         fprintf(stderr, "ERROR: GetModuleFileName() failed\n");
-        exit(1);
+        strcpy(self_path, "<unknown>");
+        return self_path;
     }
 #else
     // On all other platforms, use dladdr()
     Dl_info info;
     if (!dladdr(lookup_self_symbol("lbt_forward"), &info)) {
         fprintf(stderr, "ERROR: Unable to dladdr(\"lbt_forward\"): %s\n", dlerror());
-        exit(1);
+        strcpy(self_path, "<unknown>");
+        return self_path;
     }
     strcpy(self_path, info.dli_fname);
 #endif
