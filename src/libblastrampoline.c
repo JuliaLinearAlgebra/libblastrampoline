@@ -395,8 +395,19 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     return nforwards;
 }
 
-
+/*
+ * On windows it's surprisingly difficult to get a handle to ourselves,
+ * and that's because they give it to you in `DllMain()`.  ;)
+ */
+#ifdef _OS_WINDOWS_
+void * _win32_self_handle;
+BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD code, void *) {
+    if (code == DLL_PROCESS_ATTACH) {
+        _win32_self_handle = (void *)hModule;
+    }
+#else
 __attribute__((constructor)) void init(void) {
+#endif
     // Initialize config structures
     init_config();
 
@@ -457,4 +468,8 @@ __attribute__((constructor)) void init(void) {
             clear = 0;
         }
     }
+
+#ifdef _OS_WINDOWS_
+    return TRUE;
+#endif
 }
