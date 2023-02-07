@@ -82,10 +82,11 @@ void * lookup_symbol(const void * handle, const char * symbol_name) {
  * Work around protected symbol visibility and GCC/ld.bfd bug:
  * https://sourceware.org/bugzilla/show_bug.cgi?id=26815
  */
+extern void * _win32_self_handle;
 void * lookup_self_symbol(const char * symbol_name) {
     void * self_handle = NULL;
 #if defined(_OS_WINDOWS_)
-    self_handle = GetModuleHandle(NULL);
+    self_handle = _win32_self_handle;
 #elif defined(_OS_DARWIN_)
     self_handle = RTLD_SELF;
 #elif defined(RTLD_DEFAULT)
@@ -104,7 +105,7 @@ const char * lookup_self_path()
         return self_path;
     }
 #if defined(_OS_WINDOWS_)
-    if (!GetModuleFileNameA(GetModuleHandle(NULL), self_path, PATH_MAX)) {
+    if (!GetModuleFileNameA(_win32_self_handle, self_path, PATH_MAX)) {
         fprintf(stderr, "ERROR: GetModuleFileName() failed\n");
         strcpy(self_path, "<unknown>");
         return self_path;

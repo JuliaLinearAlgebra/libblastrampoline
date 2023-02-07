@@ -61,6 +61,13 @@ function run_test((test_name, test_expected_outputs, expect_success), libblas_na
         end
         @test expected_return_value
 
+        # Expect to see the path to `libblastrampoline` within the output,
+        # since we have `LBT_VERBOSE=1` and at startup, it announces its own path:
+        if startswith(libblas_name, "blastrampoline")
+            lbt_libdir = first(libdirs)
+            @test occursin(lbt_libdir, output)
+        end
+
         # Test to make sure the test ran properly
         has_expected_output = all(occursin(expected, output) for expected in test_expected_outputs)
         if !has_expected_output
@@ -187,7 +194,7 @@ end
 if openblas_interface == :ILP64
     inconsolable = ("inconsolable_test", ("||C||^2 is:  24.3384", "||b||^2 is:   3.0000"), true)
     @testset "LBT -> OpenBLAS 32 + 64 (LP64 + ILP64)" begin
-        libdirs = unique(vcat(OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list..., lbt_dir))
+        libdirs = unique(vcat(lbt_dir, OpenBLAS32_jll.LIBPATH_list..., OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
         run_test(inconsolable, lbt_link_name, libdirs, :wild_sobbing, "$(OpenBLAS32_jll.libopenblas_path);$(OpenBLAS_jll.libopenblas_path)")
     end
 end
