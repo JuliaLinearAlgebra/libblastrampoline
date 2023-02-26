@@ -56,10 +56,10 @@ $(builddir)/$(LIB_MAJOR_VERSION): $(MAIN_OBJS)
 ifneq ($(OS),WINNT)
 $(builddir)/$(LIB_FULL_VERSION): | $(builddir)/$(LIB_MAJOR_VERSION)
 	ln -sf "$(LIB_MAJOR_VERSION)" "$@"
+endif
 
 $(builddir)/libblastrampoline.$(SHLIB_EXT): | $(builddir)/$(LIB_MAJOR_VERSION)
 	ln -sf "$(LIB_MAJOR_VERSION)" "$@"
-endif
 
 # Install both libraries and our headers
 install: $(TARGET_LIBRARIES)
