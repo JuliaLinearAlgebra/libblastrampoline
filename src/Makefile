@@ -1,8 +1,14 @@
 LBT_ROOT := $(dir $(abspath $(dir $(lastword $(MAKEFILE_LIST)))))
 include $(LBT_ROOT)/src/Make.inc
 
+ifneq ($(OS),WINNT)
+maintarget=$(builddir)/libblastrampoline.$(SHLIB_EXT)
+else
+maintarget=$(builddir)/$(LIB_MAJOR_VERSION)
+endif
+
 # Default target
-all: $(builddir)/libblastrampoline.$(SHLIB_EXT)
+all: $(maintarget)
 
 # Objects we'll build
 MAIN_OBJS := libblastrampoline.o dl_utils.o config.o \
