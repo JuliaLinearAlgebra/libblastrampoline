@@ -1,11 +1,15 @@
 LBT_ROOT := $(dir $(abspath $(dir $(lastword $(MAKEFILE_LIST)))))
 include $(LBT_ROOT)/src/Make.inc
 
-ifneq ($(OS),WINNT)
-maintarget=$(builddir)/libblastrampoline.$(SHLIB_EXT)
+ifeq ($(OS),WINNT)
+# On Windows only build the library with the major soversion, all other copies
+# are useless and error prone.
+TARGET_LIBRARIES = $(builddir)/$(LIB_MAJOR_VERSION)
 else
-maintarget=$(builddir)/$(LIB_MAJOR_VERSION)
+TARGET_LIBRARIES = $(builddir)/$(LIB_MAJOR_VERSION) $(builddir)/$(LIB_FULL_VERSION) $(builddir)/libblastrampoline.$(SHLIB_EXT)
 endif
+
+maintarget=$(word 1,$(TARGET_LIBRARIES))
 
 # Default target
 all: $(maintarget)
