@@ -445,6 +445,11 @@ __attribute__((constructor)) void init(void) {
 
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries
     const char * default_libs = getenv("LBT_DEFAULT_LIBS");
+#if defined(LBT_FALLBACK_LIBS)
+    if (default_libs == NULL) {
+        default_libs = LBT_FALLBACK_LIBS;
+    }
+#endif
     if (default_libs != NULL) {
         const char * curr_lib_start = default_libs;
         int clear = 1;
