@@ -1,5 +1,4 @@
-[![GitHub Actions CI](https://github.com/staticfloat/libblastrampoline/actions/workflows/ci.yml/badge.svg)](https://github.com/staticfloat/libblastrampoline/actions/workflows/ci.yml)
-[![Drone Build Status](https://cloud.drone.io/api/badges/staticfloat/libblastrampoline/status.svg)](https://cloud.drone.io/staticfloat/libblastrampoline)
+[![Drone Build Status](https://cloud.drone.io/api/badges/JuliaLinearAlgebra/libblastrampoline/status.svg)](https://cloud.drone.io/JuliaLinearAlgebra/libblastrampoline)
 
 # libblastrampoline
 
