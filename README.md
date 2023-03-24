@@ -1,4 +1,4 @@
-[![Drone Build Status](https://cloud.drone.io/api/badges/JuliaLinearAlgebra/libblastrampoline/status.svg)](https://cloud.drone.io/JuliaLinearAlgebra/libblastrampoline)
+[![Drone Build Status](https://cloud.drone.io/api/badges/staticfloat/libblastrampoline/status.svg)](https://cloud.drone.io/staticfloat/libblastrampoline)
 
 # libblastrampoline
 
