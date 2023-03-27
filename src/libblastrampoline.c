@@ -401,7 +401,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
  */
 #ifdef _OS_WINDOWS_
 void * _win32_self_handle;
-BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD code, void *) {
+BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD code, void *reserved) {
     if (code == DLL_PROCESS_ATTACH) {
         _win32_self_handle = (void *)hModule;
     }
