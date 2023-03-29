@@ -2,6 +2,30 @@
 #include <complex.h>
 
 /*
+ * Some vendors (such as Accelerate) decided to trim off the trailing underscore
+ * from the F77 symbol names when adding their ILP64 symbol names.  So the
+ * symbol name `dgemm_` turns into `dgemm$NEWLAPACK$ILP64`.  But of course,
+ * symbol names like `cblas_sdot` turn into `cblas_sdot$NEWLAPACK$ILP64`.
+ *
+ * So we need a way to selectively trim off the trailing underscore.  We do so
+ * by shoving an ASCII "substitute character" onto the start of `$NEWLAPACK`,
+ */
+void build_symbol_name(char * out, const char *symbol_name, const char *suffix) {
+    size_t symbol_len = strlen(symbol_name);
+#if defined(SYMBOL_TRIMMING)
+    if (suffix[0] == '\x1a') {
+        if (symbol_name[symbol_len-1] == '_') {
+            symbol_len -= 1;
+        }
+        suffix += 1;
+    }
+#endif
+
+    strncpy(out, symbol_name, MAX_SYMBOL_LEN);
+    strncpy(out + symbol_len, suffix, MAX_SYMBOL_LEN - symbol_len);
+}
+
+/*
  * Search for a symbol that ends in one of the given suffixes.  Returns NULL if not found.
  */
 const char * symbol_suffix_search(void * handle, const char * symbol_name, const char ** suffixes, const int num_suffixes) {
@@ -12,7 +36,7 @@ const char * symbol_suffix_search(void * handle, const char * symbol_name, const
             continue;
         }
 
-        sprintf(symbol_name_suffixed, "%s%s", symbol_name, suffixes[suffix_idx]);
+        build_symbol_name(symbol_name_suffixed, symbol_name, suffixes[suffix_idx]);
         if (lookup_symbol(handle, symbol_name_suffixed) != NULL) {
             return suffixes[suffix_idx];
         }
@@ -38,13 +62,25 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
         // Possibly-NULL suffix that we should search over
         suffix_hint,
 
-        // First, search for LP64-mangling suffixes, so that when we are loading MKL from a
+        // First, search for LP64-mangling suffixes, so that when we are loading libs from an
         // CLI environment, (where suffix hints are not easy) we want to give the most stable
         // configuration by default.
+#if defined(_OS_DARWIN_) && defined(SYMBOL_TRIMMING)
+        // Apple Accelerate has an updated LAPACK interface, default to that.
+        // Note that we are making use of our symbol trimming support here to eliminate
+        // the F77 trailing underscore by starting the string with `\x1a`.
+        "\x1a$NEWLAPACK",
+#endif
         "", "_", "__",
 
+        // Next, ILP64-mangling suffixes
+#if defined(_OS_DARWIN_) && defined(SYMBOL_TRIMMING)
+        // Once again, search for Accelerate's non-pure-suffixed names
+        "\x1a$NEWLAPACK$ILP64",
+#endif
+
         // Next, search for ILP64-mangling suffixes
-        "64", "64_", "_64__", "__64___",
+        "64", "_64", "64_", "_64_", "_64__", "__64___",
     };
 
     // If the suffix hint is NULL, just skip it when calling `lookup_symbol()`.
@@ -143,14 +179,14 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
     // Attempt BLAS `isamax()` test
-    sprintf(symbol_name, "isamax_%s", suffix);
+    build_symbol_name(symbol_name, "isamax_", suffix);
     void * isamax = lookup_symbol(handle, symbol_name);
     if (isamax != NULL) {
         return autodetect_blas_interface(isamax);
     }
 
     // Attempt LAPACK `dpotrf()` test
-    sprintf(symbol_name, "dpotrf_%s", suffix);
+    build_symbol_name(symbol_name, "dpotrf_", suffix);
     void * dpotrf = lookup_symbol(handle, symbol_name);
     if (dpotrf != NULL) {
         return autodetect_lapack_interface(dpotrf);
@@ -164,7 +200,7 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
 int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
-    sprintf(symbol_name, "zdotc_%s", suffix);
+    build_symbol_name(symbol_name, "zdotc_", suffix);
     void * zdotc_addr = lookup_symbol(handle, symbol_name);
     if (zdotc_addr == NULL) {
         return LBT_COMPLEX_RETSTYLE_UNKNOWN;
@@ -209,8 +245,8 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
 int32_t autodetect_f2c(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
-    // Attempt BLAS `sdot_()` test
-    sprintf(symbol_name, "sdot_%s", suffix);
+    // Attempt BLAS `sdot()` test
+    build_symbol_name(symbol_name, "sdot_", suffix);
     void * sdot_addr = lookup_symbol(handle, symbol_name);
     if (sdot_addr == NULL) {
         return LBT_F2C_UNKNOWN;
@@ -246,10 +282,10 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
 
-    sprintf(symbol_name, "zdotc_%s", suffix);
+    build_symbol_name(symbol_name, "zdotc_", suffix);
     if (lookup_symbol(handle, symbol_name) != NULL ) {
         // If we have both `zdotc_64` and `cblas_zdotc_sub64`, it's all good:
-        sprintf(symbol_name, "cblas_zdotc_sub%s", suffix);
+        build_symbol_name(symbol_name, "cblas_zdotc_sub", suffix);
         if (lookup_symbol(handle, symbol_name) != NULL ) {
             return LBT_CBLAS_CONFORMANT;
         }

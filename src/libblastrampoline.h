@@ -111,8 +111,11 @@ typedef struct {
 } lbt_config_t;
 
 // Possible values for `build_flags` in `lbt_config_t`
-#define LBT_BUILDFLAGS_DEEPBINDLESS     0x01
-#define LBT_BUILDFLAGS_F2C_CAPABLE      0x02
+#define LBT_BUILDFLAGS_DEEPBINDLESS         0x01
+#define LBT_BUILDFLAGS_F2C_CAPABLE          0x02
+#define LBT_BUILDFLAGS_CBLAS_DIVERGENCE     0x04
+#define LBT_BUILDFLAGS_COMPLEX_RETSTYLE     0x08
+#define LBT_BUILDFLAGS_SYMBOL_TRIMMING      0x10
 
 /*
  * Load the given `libname`, lookup all registered symbols within our configured list of exported

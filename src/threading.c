@@ -56,7 +56,7 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
         lbt_library_info_t * lib = config->loaded_libs[lib_idx];
         for (int symbol_idx=0; getter_names[symbol_idx] != NULL; ++symbol_idx) {
             char symbol_name[MAX_SYMBOL_LEN];
-            sprintf(symbol_name, "%s%s", getter_names[symbol_idx], lib->suffix);
+            build_symbol_name(symbol_name, getter_names[symbol_idx], lib->suffix);
             int (*fptr)() = lookup_symbol(lib->handle, symbol_name);
             if (fptr != NULL) {
                 int new_threads = fptr();
@@ -78,7 +78,7 @@ LBT_DLLEXPORT void lbt_set_num_threads(int32_t nthreads) {
         lbt_library_info_t * lib = config->loaded_libs[lib_idx];
         for (int symbol_idx=0; setter_names[symbol_idx] != NULL; ++symbol_idx) {
             char symbol_name[MAX_SYMBOL_LEN];
-            sprintf(symbol_name, "%s%s", setter_names[symbol_idx], lib->suffix);
+            build_symbol_name(symbol_name, setter_names[symbol_idx], lib->suffix);
             void (*fptr)(int) = lookup_symbol(lib->handle, symbol_name);
             if (fptr != NULL) {
                 fptr(nthreads);

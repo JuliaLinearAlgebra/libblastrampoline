@@ -170,6 +170,19 @@ if dlopen_e(veclib_blas_path) != C_NULL
     @testset "LBT -> vecLib/libLAPACK" begin
         run_all_tests(blastrampoline_link_name(), [lbt_dir], :LP64, string(veclib_blas_path, ";", veclib_lapack_path), tests=[dgemm, sgesv, sdot, zdotc])
     end
+
+    veclib_lapack_handle = dlopen(veclib_lapack_path)
+    if dlsym_e(veclib_lapack_handle, "dpotrf\$NEWLAPACK\$ILP64") != C_NULL
+        @testset "LBT -> vecLib/libBLAS (ILP64)" begin
+            veclib_blas_path_ilp64 = "$(veclib_blas_path)!\x1a\$NEWLAPACK\$ILP64"
+            run_all_tests(blastrampoline_link_name(), [lbt_dir], :ILP64, veclib_blas_path_ilp64; tests=[dgemm, sdot, zdotc])
+        end
+
+        @testset "LBT -> vecLib/libLAPACK (ILP64)" begin
+            veclib_lapack_path_ilp64 = "$(veclib_lapack_path)!\x1a\$NEWLAPACK\$ILP64"
+            run_all_tests(blastrampoline_link_name(), [lbt_dir], :ILP64, veclib_lapack_path_ilp64; tests=[dgemm, sgesv, sdot, zdotc])
+        end
+    end
 end
 
 

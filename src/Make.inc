@@ -98,6 +98,11 @@ ifneq (,$(filter $(ARCH), x86_64 aarch64))
   COMPLEX_RETSTYLE_AUTODETECTION := 1
 endif
 
+# If we're on an apple platform, we need to support symbol name trimming
+ifeq ($(OS), Darwin)
+  LBT_CFLAGS += -DSYMBOL_TRIMMING
+  SYMBOL_TRIMMING := 1
+endif
 
 ifeq ($(VERBOSE),0)
 ENDCOLOR := "\033[0m"
