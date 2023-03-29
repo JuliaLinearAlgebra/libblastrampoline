@@ -21,6 +21,18 @@ LBT_DLLEXPORT const lbt_config_t * lbt_get_config() {
     lbt_config.build_flags |= LBT_BUILDFLAGS_F2C_CAPABLE;
 #endif
 
+#if defined(CBLAS_DIVERGENCE_AUTODETECTION)
+    lbt_config.build_flags |= LBT_BUILDFLAGS_CBLAS_DIVERGENCE;
+#endif
+
+#if defined(COMPLEX_RETSTYLE_AUTODETECTION)
+    lbt_config.build_flags |= LBT_BUILDFLAGS_COMPLEX_RETSTYLE;
+#endif
+
+#if defined(SYMBOL_TRIMMING)
+    lbt_config.build_flags |= LBT_BUILDFLAGS_SYMBOL_TRIMMING;
+#endif
+
     lbt_config.exported_symbols = (const char **)&exported_func_names[0];
     lbt_config.num_exported_symbols = NUM_EXPORTED_FUNCS;
 

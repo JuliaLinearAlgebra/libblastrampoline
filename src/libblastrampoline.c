@@ -80,7 +80,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
             // Report to the user that we're cblas-wrapping this one
             if (verbose) {
                 char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
+                build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
                 printf(" - [%04d] complex(%s)\n", symbol_idx, exported_name);
             }
 
@@ -106,7 +106,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
 
             if (verbose) {
                 char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
+                build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
                 printf(" - [%04d] f2c(%s)\n", symbol_idx, exported_name);
             }
 
@@ -182,7 +182,7 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
 // Load `libname`, clearing previous mappings if `clear` is set.
 LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t verbose, const char * suffix_hint) {
     if (verbose) {
-        printf("Generating forwards to %s\n", libname);
+        printf("Generating forwards to %s (clear: %d, verbose: %d, suffix_hint: '%s')\n", libname, clear, verbose, suffix_hint);
     }
 
     // Load the library, throwing an error if we can't actually load it
@@ -353,7 +353,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         }
 
         // Look up this symbol in the given library, if it is a valid symbol, set it!
-        sprintf(symbol_name, "%s%s", exported_func_names[symbol_idx], lib_suffix);
+        build_symbol_name(symbol_name, exported_func_names[symbol_idx], lib_suffix);
         void *addr = lookup_symbol(handle, symbol_name);
         if (addr != NULL) {
             set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
@@ -374,7 +374,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             // Report to the user that we're cblas-wrapping this one
             if (verbose) {
                 char exported_name[MAX_SYMBOL_LEN];
-                sprintf(exported_name, "%s%s", exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
+                build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
                 printf(" - [%04d] cblas(%s)\n", symbol_idx, exported_name);
             }
 
@@ -443,28 +443,50 @@ __attribute__((constructor)) void init(void) {
         default_func = lookup_self_symbol("lbt_default_func_print_error_and_exit");
     }
 
-    // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries
+    // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries.
+    // Each library can have a `!suffix` tacked onto the end of it, providing a library-specific
+    // suffix_hint.  Example:
+    //    export LBT_DEFAULT_LIBS="libopenblas64.so!64_;/tmp/libfoo.so;/tmp/libbar.so!fastmath32"
     const char * default_libs = getenv("LBT_DEFAULT_LIBS");
     if (default_libs != NULL) {
         const char * curr_lib_start = default_libs;
         int clear = 1;
         char curr_lib[PATH_MAX];
+        char suffix_buffer[MAX_SYMBOL_LEN];
         while (curr_lib_start[0] != '\0') {
             // Find the end of this current library name
             const char * end = curr_lib_start;
-            while (*end != ';' && *end != '\0')
+            const char * suffix_sep = NULL;
+            while (*end != ';' && *end != '\0') {
+                if (*end == '!' && suffix_sep == NULL) {
+                    suffix_sep = end;
+                }
                 end++;
+            }
+            const char * curr_lib_end = end;
+            if (suffix_sep != NULL) {
+                curr_lib_end = suffix_sep;
+            }
 
-            // Copy it into a temporary location
-            int len = end - curr_lib_start;
+            // Figure out if there's an embedded suffix_hint:
+            const char * suffix_hint = NULL;
+            if (suffix_sep != NULL) {
+                int len = end - (suffix_sep + 1);
+                memcpy(suffix_buffer, suffix_sep+1, len);
+                suffix_buffer[len] = '\0';
+                suffix_hint = &suffix_buffer[0];
+            }
+
+            int len = curr_lib_end - curr_lib_start;
             memcpy(curr_lib, curr_lib_start, len);
             curr_lib[len] = '\0';
             curr_lib_start = end;
+
             while (curr_lib_start[0] == ';')
                 curr_lib_start++;
 
             // Load functions from this library, clearing only the first time.
-            lbt_forward(curr_lib, clear, verbose, NULL);
+            lbt_forward(curr_lib, clear, verbose, suffix_hint);
             clear = 0;
         }
     }

@@ -22,7 +22,7 @@ function append_libpath(paths::Vector{<:AbstractString})
     return join(vcat(paths..., get(ENV, LIBPATH_env, String[])), pathsep)
 end
 
-function capture_output(cmd::Cmd; verbose::Bool = false)
+function capture_output(cmd::Cmd; verbose::Bool = false, timeout = 10.0)
     out_pipe = Pipe()
     if verbose
         ld_env = filter(e -> startswith(e, "LBT_") || startswith(e, "LD_") || startswith(e, "DYLD_"), something(cmd.env, String[]))
@@ -30,7 +30,23 @@ function capture_output(cmd::Cmd; verbose::Bool = false)
     end
     p = run(pipeline(ignorestatus(cmd), stdout=out_pipe, stderr=out_pipe), wait=false)
     close(out_pipe.in)
-    output = @async read(out_pipe, String)
+    output = @async begin
+        lines = String[]
+        for line in readlines(out_pipe)
+            if verbose
+                println(line)
+            end
+            push!(lines, line)
+        end
+        return join(lines, "\n")
+    end
+    @async begin
+        sleep(timeout)
+        if process_running(p)
+            @warn("$(basename(cmd.exec[1])) timeout exceeded!")
+            kill(p)
+        end
+    end
     wait(p)
     return p, fetch(output)
 end
