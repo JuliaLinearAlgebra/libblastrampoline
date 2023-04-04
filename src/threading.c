@@ -47,9 +47,11 @@ LBT_DLLEXPORT void lbt_register_thread_interface(const char * getter, const char
 /*
  * Returns the number of threads configured in all loaded libraries.
  * In the event of a mismatch, returns the largest value.
+ * If no BLAS libraries with a known threading interface are loaded,
+ * returns `1`.
  */
 LBT_DLLEXPORT int32_t lbt_get_num_threads() {
-    int32_t max_threads = 0;
+    int32_t max_threads = 1;
 
     const lbt_config_t * config = lbt_get_config();
     for (int lib_idx=0; config->loaded_libs[lib_idx] != NULL; ++lib_idx) {
