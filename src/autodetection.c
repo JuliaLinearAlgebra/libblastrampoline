@@ -65,18 +65,16 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
         // First, search for LP64-mangling suffixes, so that when we are loading libs from an
         // CLI environment, (where suffix hints are not easy) we want to give the most stable
         // configuration by default.
-#if defined(_OS_DARWIN_) && defined(SYMBOL_TRIMMING)
-        // Apple Accelerate has an updated LAPACK interface, default to that.
-        // Note that we are making use of our symbol trimming support here to eliminate
-        // the F77 trailing underscore by starting the string with `\x1a`.
-        "\x1a$NEWLAPACK",
-#endif
         "", "_", "__",
 
         // Next, ILP64-mangling suffixes
 #if defined(_OS_DARWIN_) && defined(SYMBOL_TRIMMING)
         // Once again, search for Accelerate's non-pure-suffixed names
         "\x1a$NEWLAPACK$ILP64",
+        // Apple Accelerate has an updated LAPACK interface.
+        // Note that we are making use of our symbol trimming support here to eliminate
+        // the F77 trailing underscore by starting the string with `\x1a`.
+        "\x1a$NEWLAPACK",
 #endif
 
         // Next, search for ILP64-mangling suffixes
