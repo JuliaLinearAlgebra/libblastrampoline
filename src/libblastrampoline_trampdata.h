@@ -33,3 +33,19 @@ const void ** exported_func64_addrs[] = {
 };
 #undef XX
 #undef XX_64
+
+// Generate list of our own function addresses, so that we can filter
+// out libraries that link against us (such as LAPACK_jll) so that we
+// don't accidentally loop back to ourselves.
+#define XX(name)    NULL,
+#define XX_64(name) NULL,
+const void ** exported_func32[] = {
+    EXPORTED_FUNCS(XX)
+    NULL
+};
+const void ** exported_func64[] = {
+    EXPORTED_FUNCS(XX_64)
+    NULL
+};
+#undef XX
+#undef XX_64

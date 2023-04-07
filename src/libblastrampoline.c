@@ -355,7 +355,9 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         // Look up this symbol in the given library, if it is a valid symbol, set it!
         build_symbol_name(symbol_name, exported_func_names[symbol_idx], lib_suffix);
         void *addr = lookup_symbol(handle, symbol_name);
-        if (addr != NULL) {
+        void *self_symbol_addr = interface == LBT_INTERFACE_ILP64 ? exported_func64[symbol_idx] \
+                                                                  : exported_func32[symbol_idx];
+        if (addr != NULL && addr != self_symbol_addr) {
             set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
             BITFIELD_SET(forwards, symbol_idx);
             nforwards++;
@@ -441,6 +443,17 @@ __attribute__((constructor)) void init(void) {
         // on Linux causes a linker error with certain versions of GCC and ld:
         // https://lists.gnu.org/archive/html/bug-binutils/2016-02/msg00191.html
         default_func = lookup_self_symbol("lbt_default_func_print_error_and_exit");
+    }
+
+    // Build our lists of self-symbol addresses
+    int32_t symbol_idx;
+    char symbol_name[MAX_SYMBOL_LEN];
+    for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
+        exported_func32[symbol_idx] = lookup_self_symbol(exported_func_names[symbol_idx]);
+
+        // Look up this symbol in the given library, if it is a valid symbol, set it!
+        build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
+        exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
     }
 
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries.
