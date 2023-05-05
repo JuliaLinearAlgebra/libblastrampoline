@@ -406,6 +406,9 @@ void * _win32_self_handle;
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD code, void *reserved) {
     if (code == DLL_PROCESS_ATTACH) {
         _win32_self_handle = (void *)hModule;
+    } else {
+        // We do not want to run our initialization more than once per process.
+        return TRUE;
     }
 #else
 __attribute__((constructor)) void init(void) {
