@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 
 # Changelog
+# 2023/05/09 viralbshah
+# Add xgelst
+#
 # 2017/09/03 staticfloat
 # Added zsymv and csymv into @lapackobjs2 so they are properly renamed
 #
@@ -22,7 +25,7 @@
     chpmv,chpr2,chpr,crotg,cscal,csrot,csscal,cswap,scamin,scasum,scnrm2,
     csymm,csyr2k,csyrk,ctbmv,ctbsv,ctpmv,ctpsv,ctrmm,ctrmv,ctrsm,
     ctrsv,icamax,icamin,cimatcopy,comatcopy,cgeadd,scsum);
-    
+
 @blasobjsd = (
     damax,damin,dasum,daxpy,daxpby,dcabs1,dcopy,ddot,dgbmv,dgemm,dgemmt,
     dgemv,dger,dmax,dmin,dnrm2,drot,drotg,drotm,drotmg,dsbmv,
@@ -30,16 +33,16 @@
     dspr,dswap,dsymm,dsymv,dsyr2,dsyr2k,dsyr,dsyrk,dtbmv,dtbsv,
     dtpmv,dtpsv,dtrmm,dtrmv,dtrsm,dtrsv,
         idamax,idamin,idmax,idmin,dgeadd,dsum);
-    
+
 @blasobjss = (
     isamax,isamin,ismax,ismin,
-    samax,samin,sasum,saxpy, saxpby, 
+    samax,samin,sasum,saxpy, saxpby,
     scopy,sdot,sdsdot,sgbmv,sgemm,sgemmt,sgemv,sger,
     smax,smin,snrm2,simatcopy,somatcopy,
     srot,srotg,srotm,srotmg,ssbmv,sscal,sspmv,sspr2,sspr,sswap,
     ssymm,ssymv,ssyr2,ssyr2k,ssyr,ssyrk,stbmv,stbsv,stpmv,stpsv,
     strmm,strmv,strsm,strsv, sgeadd,ssum);
-     
+
 @blasobjsz = (
     izamax,izamin,,
     zaxpy,zaxpby,zcopy,zdotc,zdotu,zdrot,
@@ -57,7 +60,7 @@
     cblas_cgerc, cblas_cgeru, cblas_chbmv, cblas_chemm, cblas_chemv, cblas_cher2, cblas_cher2k,
     cblas_cher, cblas_cherk,  cblas_chpmv, cblas_chpr2, cblas_chpr, cblas_cscal, cblas_caxpby,
     cblas_csscal, cblas_cswap, cblas_csymm, cblas_csyr2k, cblas_csyrk, cblas_ctbmv, cblas_cgeadd,
-    cblas_ctbsv, cblas_ctpmv, cblas_ctpsv, cblas_ctrmm, cblas_ctrmv, cblas_ctrsm, cblas_ctrsv, 
+    cblas_ctbsv, cblas_ctpmv, cblas_ctpsv, cblas_ctrmm, cblas_ctrmv, cblas_ctrsm, cblas_ctrsv,
     cblas_scnrm2, cblas_scasum,
     cblas_icamax, cblas_icamin, cblas_icmin, cblas_icmax, cblas_scsum,cblas_cimatcopy,cblas_comatcopy
     );
@@ -70,7 +73,7 @@
     cblas_dtrmm, cblas_dtrmv, cblas_dtrsm, cblas_dtrsv, cblas_daxpby, cblas_dgeadd,
     cblas_idamax, cblas_idamin, cblas_idmin, cblas_idmax, cblas_dsum,cblas_dimatcopy,cblas_domatcopy
     );
-    
+
 @cblasobjss = (
     cblas_sasum, cblas_saxpy, cblas_saxpby,
     cblas_scopy, cblas_sdot, cblas_sdsdot, cblas_sgbmv, cblas_sgemm,
@@ -120,7 +123,7 @@
 @gemm3mobjsc = (
     cgemm3m,
 );
-@gemm3mobjsz = (    
+@gemm3mobjsz = (
     zgemm3m
 );
 
@@ -153,7 +156,7 @@
 
 @lapackobjss = (
     # These routines are provided by OpenBLAS.
-    sgesv, 
+    sgesv,
     sgetf2,
     sgetrf,
     slaswp,
@@ -168,33 +171,33 @@
 );
 
 @lapackobjsd = (
- dgesv,  
- dgetf2, 
- dgetrf, 
- dlaswp, 
- dgetrs, 
- dlauu2, 
- dlauum, 
- dpotf2, 
- dpotrf, 
- dtrti2, 
- dtrtri, 
- dpotri, 
+ dgesv,
+ dgetf2,
+ dgetrf,
+ dlaswp,
+ dgetrs,
+ dlauu2,
+ dlauum,
+ dpotf2,
+ dpotrf,
+ dtrti2,
+ dtrtri,
+ dpotri,
 );
 
 @lapackobjsc = (
-cgesv,  
-cgetf2, 
-cgetrf, 
-claswp, 
-cgetrs, 
-clauu2, 
-clauum, 
-cpotf2, 
-cpotrf, 
-ctrti2, 
-ctrtri, 
-cpotri, 
+cgesv,
+cgetf2,
+cgetrf,
+claswp,
+cgetrs,
+clauu2,
+clauum,
+cpotf2,
+cpotrf,
+ctrti2,
+ctrtri,
+cpotri,
 );
 
 @lapackobjsz = (
@@ -230,7 +233,7 @@ zpotri,
     ilaver, slamch, slamc3,
 );
 
-@lapackobjs2sc = (    
+@lapackobjs2sc = (
     # SCLAUX  -- Auxiliary routines called from both REAL and COMPLEX.
     # excluded: second_$(TIMER)
     sbdsdc,
@@ -279,7 +282,7 @@ zpotri,
     sgbsvx, sgbtf2, sgbtrf, sgbtrs, sgebak, sgebal, sgebd2,
     sgebrd, sgecon, sgeequ, sgees,  sgeesx, sgeev,  sgeevx,
     sgehd2, sgehrd, sgelq2, sgelqf,
-    sgels,  sgelsd, sgelss, sgelsy, sgeql2, sgeqlf,
+    sgels,  sgelsd, sgelss, sgelst, sgelsy, sgeql2, sgeqlf,
     sgeqp3, sgeqr2, sgeqr2p, sgeqrf, sgeqrfp, sgerfs,
     sgerq2, sgerqf, sgesc2, sgesdd, sgesvd, sgesvx,
     sgetc2, sgetri,
@@ -355,7 +358,7 @@ zpotri,
     cgbtf2, cgbtrf, cgbtrs, cgebak, cgebal, cgebd2, cgebrd,
     cgecon, cgeequ, cgees,  cgeesx, cgeev,  cgeevx,
     cgehd2, cgehrd, cgelq2, cgelqf,
-    cgels,  cgelsd, cgelss, cgelsy, cgeql2, cgeqlf, cgeqp3,
+    cgels,  cgelsd, cgelss, cgelst, cgelsy, cgeql2, cgeqlf, cgeqp3,
     cgeqr2, cgeqr2p, cgeqrf, cgeqrfp, cgerfs,
     cgerq2, cgerqf, cgesc2, cgesdd, cgesvd,
     cgesvx, cgetc2, cgetri,
@@ -434,7 +437,7 @@ zpotri,
     dgbsvx, dgbtf2, dgbtrf, dgbtrs, dgebak, dgebal, dgebd2,
     dgebrd, dgecon, dgeequ, dgees,  dgeesx, dgeev,  dgeevx,
     dgehd2, dgehrd, dgelq2, dgelqf,
-    dgels,  dgelsd, dgelss, dgelsy, dgeql2, dgeqlf,
+    dgels,  dgelsd, dgelss, dgelst, dgelsy, dgeql2, dgeqlf,
     dgeqp3, dgeqr2, dgeqr2p, dgeqrf, dgeqrfp, dgerfs,
     dgerq2, dgerqf, dgesc2, dgesdd, dgesvd, dgesvx,
     dgetc2, dgetri,
@@ -501,7 +504,7 @@ zpotri,
     zgbtf2, zgbtrf, zgbtrs, zgebak, zgebal, zgebd2, zgebrd,
     zgecon, zgeequ, zgees,  zgeesx, zgeev,  zgeevx,
     zgehd2, zgehrd, zgelq2, zgelqf,
-    zgels,  zgelsd, zgelss, zgelsy, zgeql2, zgeqlf, zgeqp3,
+    zgels,  zgelsd, zgelss, zgelst, zgelsy, zgeql2, zgeqlf, zgeqp3,
     zgeqr2, zgeqr2p, zgeqrf, zgeqrfp, zgerfs, zgerq2, zgerqf,
     zgesc2, zgesdd, zgesvd, zgesvx, zgetc2,
     zgetri,
@@ -821,10 +824,10 @@ zpotri,
 );
 
 @lapack_deprecated_objsc = (
-    cgegs,   cggsvd,  
-    cgegv,   cggsvp,  
-    cgelsx,  clahrd,  
-    cgeqpf,  clatzm,  
+    cgegs,   cggsvd,
+    cgegv,   cggsvp,
+    cgelsx,  clahrd,
+    cgeqpf,  clatzm,
     ctzrqf,
     );
 @lapack_deprecated_objsd = (
@@ -833,8 +836,8 @@ zpotri,
     dgelsx,  dggsvp,
              dlahrd,
   dlatzm,  dtzrqf);
-  
-@lapack_deprecated_objss = ( 
+
+@lapack_deprecated_objss = (
   sgelsx,
   sgegs,
   sgegv,
@@ -846,7 +849,7 @@ zpotri,
   stzrqf
   );
 
-@lapack_deprecated_objsz = ( 
+@lapack_deprecated_objsz = (
   zgegs,
   zgegv,
   zgelsx,
@@ -865,24 +868,24 @@ zpotri,
     LAPACKE_cggsvd_work,
     LAPACKE_cgeqpf,
     LAPACKE_cgeqpf_work,
-);  
-@lapacke_deprecated_objsd = (    
+);
+@lapacke_deprecated_objsd = (
     LAPACKE_dggsvp,
     LAPACKE_dggsvp_work,
     LAPACKE_dggsvd,
     LAPACKE_dggsvd_work,
     LAPACKE_dgeqpf,
     LAPACKE_dgeqpf_work,
-);    
-@lapacke_deprecated_objss = (    
+);
+@lapacke_deprecated_objss = (
     LAPACKE_sggsvp,
     LAPACKE_sggsvp_work,
     LAPACKE_sggsvd,
     LAPACKE_sggsvd_work,
     LAPACKE_sgeqpf,
     LAPACKE_sgeqpf_work,
-);    
-@lapacke_deprecated_objsz = (    
+);
+@lapacke_deprecated_objsz = (
     LAPACKE_zggsvp,
     LAPACKE_zggsvp_work,
     LAPACKE_zggsvd,
@@ -2771,7 +2774,7 @@ zpotri,
     LAPACKE_sgesvdq,
     LAPACKE_sgesvdq_work,
 );
-@lapackeobjsz = (    
+@lapackeobjsz = (
     LAPACKE_zgb_nancheck,
     LAPACKE_zgb_trans,
     LAPACKE_zge_nancheck,
@@ -3490,7 +3493,7 @@ zpotri,
     LAPACKE_zsytrs_aa_work,
     LAPACKE_zsytrs_3,
     LAPACKE_zsytrs_3_work,
-    
+
     ## new function from lapack-3.8.0
     LAPACKE_zhesv_aa_2stage,
     LAPACKE_zhesv_aa_2stage_work,
@@ -3519,7 +3522,7 @@ zpotri,
 @lapack_embeded_underscore_objs=(
     xerbla_array, chla_transtype,
     );
-@lapack_embeded_underscore_objs_s=(    
+@lapack_embeded_underscore_objs_s=(
      slasyf_rook,
     ssytf2_rook, ssytrf_rook, ssytrs_rook,
     ssytri_rook, ssycon_rook, ssysv_rook,
@@ -3531,12 +3534,12 @@ zpotri,
     ssytrd_sb2st, ssb2st_kernels, ssyevd_2stage,
     ssyev_2stage, ssyevx_2stage, ssyevr_2stage,
     ssbev_2stage, ssbevx_2stage, ssbevd_2stage,
-    ssygv_2stage, 
+    ssygv_2stage,
     ssysv_aa_2stage, ssytrf_aa_2stage,
-    ssytrs_aa_2stage, 
+    ssytrs_aa_2stage,
     slaorhr_col_getrfnp, slaorhr_col_getrfnp2, sorhr_col,
 );
-@lapack_embeded_underscore_objs_c=(    
+@lapack_embeded_underscore_objs_c=(
     chetf2_rook, chetrf_rook, chetri_rook,
     chetrs_rook, checon_rook, chesv_rook,
     clahef_rook, clasyf_rook,
@@ -3561,7 +3564,7 @@ zpotri,
     csytrs_aa_2stage,
     claunhr_col_getrfnp, claunhr_col_getrfnp2, cunhr_col,
 );
-@lapack_embeded_underscore_objs_d=(    
+@lapack_embeded_underscore_objs_d=(
     dlasyf_rook,
     dsytf2_rook, dsytrf_rook, dsytrs_rook,
     dsytri_rook, dsycon_rook, dsysv_rook,
@@ -3573,12 +3576,12 @@ zpotri,
     dsytrd_sy2sb, dsytrd_sb2st, dsb2st_kernels,
     dsyevd_2stage, dsyev_2stage, dsyevx_2stage,
     dsyevr_2stage, dsbev_2stage, dsbevx_2stage,
-    dsbevd_2stage, dsygv_2stage, 
+    dsbevd_2stage, dsygv_2stage,
      dsysv_aa_2stage,
     dsytrf_aa_2stage, dsytrs_aa_2stage,
     dlaorhr_col_getrfnp, dlaorhr_col_getrfnp2, dorhr_col,
 );
-@lapack_embeded_underscore_objs_z=(    
+@lapack_embeded_underscore_objs_z=(
     zhetf2_rook, zhetrf_rook, zhetri_rook,
     zhetrs_rook, zhecon_rook, zhesv_rook,
     zlahef_rook, zlasyf_rook,
@@ -3621,14 +3624,14 @@ if ($ARGV[13] == 1) {
 	@lapackobjs2 = (@lapackobjs2, @lapackobjs2ds);
 	@lapack_deprecated_objs = (@lapack_deprecated_objs, @lapack_deprecated_objss);
 	@lapacke_deprecated_objs = (@lapacke_deprecated_objs, @lapacke_deprecated_objss);
-	@lapack_embeded_underscore_objs = (@lapack_embeded_underscore_objs,  @lapack_embeded_underscore_objs_s); 
+	@lapack_embeded_underscore_objs = (@lapack_embeded_underscore_objs,  @lapack_embeded_underscore_objs_s);
 	@lapackeobjs = (@lapackeobjs, @lapackeobjss);
 }
 if ($ARGV[14] == 1) {
 	@blasobjs = (@blasobjs, @blasobjsd);
 	@cblasobjs = (@cblasobjs, @cblasobjsd);
 	@lapackobjs = (@lapackobjs, @lapackobjsd);
-	if ($ARGV[13] == 0) { 
+	if ($ARGV[13] == 0) {
 		@lapackobjs2 = (@lapackobjs2, @lapackobjs2ds);
 	}
 	@lapackobjs2 = (@lapackobjs2, @lapackobjs2d, @lapackobjs2dz);
@@ -3644,7 +3647,7 @@ if ($ARGV[15] == 1) {
 	@cblasgemm3mobjs = (@cblasgemm3mobjs, @cblasgemm3mobjsc);
 	@lapackobjs = (@lapackobjs, @lapackobjsc);
 	@lapackobjs2 = (@lapackobjs2, @lapackobjs2c, @lapackobjs2zc);
-	if ($ARGV[13] == 0) { 
+	if ($ARGV[13] == 0) {
 		@lapackobjs2 = (@lapackobjs2, @lapackobjs2sc);
 	}
 	@lapack_deprecated_objs = (@lapack_deprecated_objs, @lapack_deprecated_objsc);
@@ -3659,10 +3662,10 @@ if ($ARGV[16] == 1) {
 	@cblasgemm3mobjs = (@cblasgemm3mobjs, @cblasgemm3mobjsz);
 	@lapackobjs = (@lapackobjs, @lapackobjsz);
 	@lapackobjs2 = (@lapackobjs2, @lapackobjs2z);
-	if ($ARGV[15] == 0) { 
+	if ($ARGV[15] == 0) {
 		@lapackobjs2 = (@lapackobjs2, @lapackobjs2zc);
 	}
-	if ($ARGV[14] == 0) { 
+	if ($ARGV[14] == 0) {
 		@lapackobjs2 = (@lapackobjs2, @lapackobjs2dz);
 	}
 	@lapack_deprecated_objs = (@lapack_deprecated_objs, @lapack_deprecated_objsz);

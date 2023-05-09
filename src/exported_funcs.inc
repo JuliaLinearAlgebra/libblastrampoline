@@ -2770,6 +2770,7 @@
     XX(cgels_) \
     XX(cgelsd_) \
     XX(cgelss_) \
+    XX(cgelst_) \
     XX(cgelsy_) \
     XX(cgemlq_) \
     XX(cgemlqt_) \
@@ -3293,6 +3294,7 @@
     XX(dgels_) \
     XX(dgelsd_) \
     XX(dgelss_) \
+    XX(dgelst_) \
     XX(dgelsy_) \
     XX(dgemlq_) \
     XX(dgemlqt_) \
@@ -3920,6 +3922,7 @@
     XX(sgels_) \
     XX(sgelsd_) \
     XX(sgelss_) \
+    XX(sgelst_) \
     XX(sgelsy_) \
     XX(sgemlq_) \
     XX(sgemlqt_) \
@@ -4480,6 +4483,7 @@
     XX(zgels_) \
     XX(zgelsd_) \
     XX(zgelss_) \
+    XX(zgelst_) \
     XX(zgelsy_) \
     XX(zgemlq_) \
     XX(zgemlqt_) \
@@ -4952,27 +4956,27 @@
     XX(zupgtr_) \
     XX(zupmtr_) \
 
-#define NUM_EXPORTED_FUNCS 4949
+#define NUM_EXPORTED_FUNCS 4953
 #endif
 
 #ifndef FLOAT32_FUNCS
 #define FLOAT32_FUNCS(XX) \
-    XX(sdot_, 3881) \
-    XX(sdsdot_, 3882) \
-    XX(sasum_, 3858) \
-    XX(scasum_, 3874) \
-    XX(ssum_, 4286) \
-    XX(scsum_, 3879) \
-    XX(samax_, 3856) \
-    XX(scamax_, 3872) \
-    XX(samin_, 3857) \
-    XX(scamin_, 3873) \
-    XX(smax_, 4154) \
-    XX(smin_, 4155) \
-    XX(snrm2_, 4156) \
-    XX(scnrm2_, 3875) \
-    XX(slamch_, 4030) \
-    XX(slamc3_, 4029) \
+    XX(sdot_, 3883) \
+    XX(sdsdot_, 3884) \
+    XX(sasum_, 3860) \
+    XX(scasum_, 3876) \
+    XX(ssum_, 4289) \
+    XX(scsum_, 3881) \
+    XX(samax_, 3858) \
+    XX(scamax_, 3874) \
+    XX(samin_, 3859) \
+    XX(scamin_, 3875) \
+    XX(smax_, 4157) \
+    XX(smin_, 4158) \
+    XX(snrm2_, 4159) \
+    XX(scnrm2_, 3877) \
+    XX(slamch_, 4033) \
+    XX(slamc3_, 4032) \
 
 #endif
 
@@ -4985,8 +4989,8 @@
 
 #ifndef COMPLEX128_FUNCS
 #define COMPLEX128_FUNCS(XX) \
-    XX(zdotu_, 4440) \
-    XX(zdotc_, 4439) \
+    XX(zdotu_, 4443) \
+    XX(zdotc_, 4442) \
 
 #endif
 
