@@ -7,19 +7,11 @@
 Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library. Watch a detailed [JuliaCon 2021 talk on libblastrampoline](https://www.youtube.com/watch?v=t6hptekOR7s).
 
 These BLAS libraries are known to work with libblastrampoline (successfully tested in Julia):
-1. OpenBLAS
-2. Intel MKL
-3. Apple Accelerate
-4. BLIS
-5. Fujitsu BLAS
-
-Julia Packages that utilize libblastrampline to provide easy access to BLAS libraries are
-
-* [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)
-* [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl)
-* [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl)
-* [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl)
-* [OpenBLASHighCoreCount.jl](https://github.com/giordano/OpenBLASHighCoreCount.jl)
+1. OpenBLAS through [OpenBLASHighCoreCount.jl](https://github.com/giordano/OpenBLASHighCoreCount.jl)
+2. Intel MKL through [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)
+3. Apple Accelerate through [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl)
+4. BLIS through [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl)
+5. Fujitsu BLAS through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl)
 
 ## Basic usage
 
