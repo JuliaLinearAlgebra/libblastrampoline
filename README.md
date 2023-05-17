@@ -18,7 +18,7 @@ Julia Packages that utilize libblastrampline to provide easy access to BLAS libr
 * [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)
 * [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl)
 * [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl)
-* [AppleAccelerateLinAlgWrapper.jl](https://github.com/chriselrod/AppleAccelerateLinAlgWrapper.jl)
+* [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl)
 * [OpenBLASHighCoreCount.jl](https://github.com/giordano/OpenBLASHighCoreCount.jl)
 
 ## Basic usage
