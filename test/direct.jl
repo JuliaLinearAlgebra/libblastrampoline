@@ -331,4 +331,16 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         @test result[1] ≈ ComplexF32(1.47 + 3.83im)
         @test isempty(stacktraces)
     end
+
+    @testset "MKL threading domains" begin
+        nthreads = lbt_get_num_threads(lbt_handle)
+        if nthreads <= 1
+            nthreads = 2
+        else
+            nthreads = div(nthreads, 2)
+        end
+        lbt_set_num_threads(lbt_handle, nthreads)
+        @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 1) == nthreads
+        @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 2) != nthreads
+    end
 end
