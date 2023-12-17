@@ -73,12 +73,12 @@ endif
 
 # Install both libraries and our headers
 install: $(TARGET_LIBRARIES)
-	@mkdir -p $(DESTDIR)/$(includedir)/libblastrampoline
-	-@cp -Ra $(LBT_ROOT)/include/* $(DESTDIR)/$(includedir)/libblastrampoline
-	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(DESTDIR)/$(includedir)/
-	@mkdir -p $(DESTDIR)/$(libdir)
+	@mkdir -p $(DESTDIR)$(includedir)/libblastrampoline
+	-@cp -Ra $(LBT_ROOT)/include/* $(DESTDIR)$(includedir)/libblastrampoline
+	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(DESTDIR)$(includedir)/
+	@mkdir -p $(DESTDIR)$(libdir)
 	@for lib in $(TARGET_LIBRARIES); do \
-		cp -a $${lib} $(DESTDIR)/$(libdir)/; \
+		cp -a $${lib} $(DESTDIR)$(libdir)/; \
 	done
 ifeq ($(OS),WINNT)
 	@mkdir -p $(DESTDIR)$(prefix)/lib
