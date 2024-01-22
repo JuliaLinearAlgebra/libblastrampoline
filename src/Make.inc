@@ -118,6 +118,9 @@ endif
 prefix ?= prefix
 builddir ?= build
 
+libdir := $(prefix)/$(binlib)
+includedir := $(prefix)/include
+
 define newline # a literal \n
 
 
