@@ -2,6 +2,26 @@
 
 #define MAX_THREADING_NAMES     32
 
+/* 
+ * MKL threading function wrappers 
+ */
+#define MKL_DOMAIN_BLAS 1 /* From mkl_types.h */
+extern int MKL_Domain_Get_Max_Threads(int);
+extern int MKL_Domain_Set_Num_Threads(int, int);
+
+int lbt_mkl_get_max_threads()
+{
+  int nt = MKL_Domain_Get_Max_Threads(MKL_DOMAIN_BLAS);
+  printf("mkl_get_max_threads: %d\n", nt);
+  return nt;
+}
+
+int lbt_mkl_set_num_threads(int nthreads)
+{
+  printf("mkl_set_num_threads: %d\n", nthreads);
+  return MKL_Domain_Set_Num_Threads(nthreads, MKL_DOMAIN_BLAS);
+}
+
 /*
  * We provide a flexible thread getter/setter interface here; by calling `lbt_set_num_threads()`
  * libblastrampoline will propagate the call through to its loaded libraries as long as the
@@ -10,14 +30,14 @@
  */
 static char * getter_names[MAX_THREADING_NAMES] = {
     "openblas_get_num_threads",
-    "MKL_Get_Max_Threads",
+    "lbt_mkl_get_max_threads",
     "bli_thread_get_num_threads",
     NULL
 };
 
 static char * setter_names[MAX_THREADING_NAMES] = {
     "openblas_set_num_threads",
-    "MKL_Set_Num_Threads",
+    "lbt_mkl_set_num_threads",
     "bli_thread_set_num_threads",
     NULL
 };
