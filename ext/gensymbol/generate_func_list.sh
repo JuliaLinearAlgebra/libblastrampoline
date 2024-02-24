@@ -20,10 +20,10 @@ BUILD_DOUBLE=1
 BUILD_COMPLEX=1
 BUILD_COMPLEX16=1
 
-perl ./gensymbol ${SYS} ${ARCH} ${BU} ${EXPRECISION} \
-                 ${NO_CBLAS} ${NO_LAPACK} ${NO_LAPACKE} ${NEED2UNDERSCORES} \
-                 ${ONLY_CBLAS} "" "" \
-                 ${BUILD_LAPACK_DEPRECATED} ${BUILD_BFLOAT16} ${BUILD_SINGLE} ${BUILD_DOUBLE} ${BUILD_COMPLEX} ${BUILD_COMPLEX16} | LC_COLLATE=C sort > tempsymbols.def
+./gensymbol ${SYS} ${ARCH} ${BU} ${EXPRECISION} \
+            ${NO_CBLAS} ${NO_LAPACK} ${NO_LAPACKE} ${NEED2UNDERSCORES} \
+            ${ONLY_CBLAS} "" "" \
+            ${BUILD_LAPACK_DEPRECATED} ${BUILD_BFLOAT16} ${BUILD_SINGLE} ${BUILD_DOUBLE} ${BUILD_COMPLEX} ${BUILD_COMPLEX16} | LC_COLLATE=C sort > tempsymbols.def
 
 OUTPUT_FILE="${LBT_DIR}/src/exported_funcs.inc"
 echo -n "Outputting to ${OUTPUT_FILE}....."

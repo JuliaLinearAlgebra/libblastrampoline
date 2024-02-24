@@ -37,6 +37,10 @@
     XX(LAPACKE_cgebrd_work) \
     XX(LAPACKE_cgecon) \
     XX(LAPACKE_cgecon_work) \
+    XX(LAPACKE_cgedmd) \
+    XX(LAPACKE_cgedmd_work) \
+    XX(LAPACKE_cgedmdq) \
+    XX(LAPACKE_cgedmdq_work) \
     XX(LAPACKE_cgeequ) \
     XX(LAPACKE_cgeequ_work) \
     XX(LAPACKE_cgeequb) \
@@ -103,6 +107,8 @@
     XX(LAPACKE_cgesv_work) \
     XX(LAPACKE_cgesvd) \
     XX(LAPACKE_cgesvd_work) \
+    XX(LAPACKE_cgesvdq) \
+    XX(LAPACKE_cgesvdq_work) \
     XX(LAPACKE_cgesvdx) \
     XX(LAPACKE_cgesvdx_work) \
     XX(LAPACKE_cgesvj) \
@@ -121,6 +127,8 @@
     XX(LAPACKE_cgetrs_work) \
     XX(LAPACKE_cgetsls) \
     XX(LAPACKE_cgetsls_work) \
+    XX(LAPACKE_cgetsqrhrt) \
+    XX(LAPACKE_cgetsqrhrt_work) \
     XX(LAPACKE_cgg_nancheck) \
     XX(LAPACKE_cgg_trans) \
     XX(LAPACKE_cggbak) \
@@ -336,6 +344,8 @@
     XX(LAPACKE_claghe_work) \
     XX(LAPACKE_clagsy) \
     XX(LAPACKE_clagsy_work) \
+    XX(LAPACKE_clangb) \
+    XX(LAPACKE_clangb_work) \
     XX(LAPACKE_clange) \
     XX(LAPACKE_clange_work) \
     XX(LAPACKE_clanhe) \
@@ -607,6 +617,8 @@
     XX(LAPACKE_ctrsna) \
     XX(LAPACKE_ctrsna_work) \
     XX(LAPACKE_ctrsyl) \
+    XX(LAPACKE_ctrsyl3) \
+    XX(LAPACKE_ctrsyl3_work) \
     XX(LAPACKE_ctrsyl_work) \
     XX(LAPACKE_ctrtri) \
     XX(LAPACKE_ctrtri_work) \
@@ -616,6 +628,8 @@
     XX(LAPACKE_ctrttf_work) \
     XX(LAPACKE_ctrttp) \
     XX(LAPACKE_ctrttp_work) \
+    XX(LAPACKE_ctz_nancheck) \
+    XX(LAPACKE_ctz_trans) \
     XX(LAPACKE_ctzrzf) \
     XX(LAPACKE_ctzrzf_work) \
     XX(LAPACKE_cunbdb) \
@@ -638,6 +652,10 @@
     XX(LAPACKE_cungrq_work) \
     XX(LAPACKE_cungtr) \
     XX(LAPACKE_cungtr_work) \
+    XX(LAPACKE_cungtsqr_row) \
+    XX(LAPACKE_cungtsqr_row_work) \
+    XX(LAPACKE_cunhr_col) \
+    XX(LAPACKE_cunhr_col_work) \
     XX(LAPACKE_cunmbr) \
     XX(LAPACKE_cunmbr_work) \
     XX(LAPACKE_cunmhr) \
@@ -699,6 +717,10 @@
     XX(LAPACKE_dgebrd_work) \
     XX(LAPACKE_dgecon) \
     XX(LAPACKE_dgecon_work) \
+    XX(LAPACKE_dgedmd) \
+    XX(LAPACKE_dgedmd_work) \
+    XX(LAPACKE_dgedmdq) \
+    XX(LAPACKE_dgedmdq_work) \
     XX(LAPACKE_dgeequ) \
     XX(LAPACKE_dgeequ_work) \
     XX(LAPACKE_dgeequb) \
@@ -785,6 +807,8 @@
     XX(LAPACKE_dgetrs_work) \
     XX(LAPACKE_dgetsls) \
     XX(LAPACKE_dgetsls_work) \
+    XX(LAPACKE_dgetsqrhrt) \
+    XX(LAPACKE_dgetsqrhrt_work) \
     XX(LAPACKE_dgg_nancheck) \
     XX(LAPACKE_dgg_trans) \
     XX(LAPACKE_dggbak) \
@@ -856,6 +880,8 @@
     XX(LAPACKE_dlagsy_work) \
     XX(LAPACKE_dlamch) \
     XX(LAPACKE_dlamch_work) \
+    XX(LAPACKE_dlangb) \
+    XX(LAPACKE_dlangb_work) \
     XX(LAPACKE_dlange) \
     XX(LAPACKE_dlange_work) \
     XX(LAPACKE_dlansy) \
@@ -922,6 +948,10 @@
     XX(LAPACKE_dorgrq_work) \
     XX(LAPACKE_dorgtr) \
     XX(LAPACKE_dorgtr_work) \
+    XX(LAPACKE_dorgtsqr_row) \
+    XX(LAPACKE_dorgtsqr_row_work) \
+    XX(LAPACKE_dorhr_col) \
+    XX(LAPACKE_dorhr_col_work) \
     XX(LAPACKE_dormbr) \
     XX(LAPACKE_dormbr_work) \
     XX(LAPACKE_dormhr) \
@@ -1257,6 +1287,8 @@
     XX(LAPACKE_dtrsna) \
     XX(LAPACKE_dtrsna_work) \
     XX(LAPACKE_dtrsyl) \
+    XX(LAPACKE_dtrsyl3) \
+    XX(LAPACKE_dtrsyl3_work) \
     XX(LAPACKE_dtrsyl_work) \
     XX(LAPACKE_dtrtri) \
     XX(LAPACKE_dtrtri_work) \
@@ -1266,6 +1298,8 @@
     XX(LAPACKE_dtrttf_work) \
     XX(LAPACKE_dtrttp) \
     XX(LAPACKE_dtrttp_work) \
+    XX(LAPACKE_dtz_nancheck) \
+    XX(LAPACKE_dtz_trans) \
     XX(LAPACKE_dtzrzf) \
     XX(LAPACKE_dtzrzf_work) \
     XX(LAPACKE_get_nancheck) \
@@ -1313,6 +1347,10 @@
     XX(LAPACKE_sgebrd_work) \
     XX(LAPACKE_sgecon) \
     XX(LAPACKE_sgecon_work) \
+    XX(LAPACKE_sgedmd) \
+    XX(LAPACKE_sgedmd_work) \
+    XX(LAPACKE_sgedmdq) \
+    XX(LAPACKE_sgedmdq_work) \
     XX(LAPACKE_sgeequ) \
     XX(LAPACKE_sgeequ_work) \
     XX(LAPACKE_sgeequb) \
@@ -1399,6 +1437,8 @@
     XX(LAPACKE_sgetrs_work) \
     XX(LAPACKE_sgetsls) \
     XX(LAPACKE_sgetsls_work) \
+    XX(LAPACKE_sgetsqrhrt) \
+    XX(LAPACKE_sgetsqrhrt_work) \
     XX(LAPACKE_sgg_nancheck) \
     XX(LAPACKE_sgg_trans) \
     XX(LAPACKE_sggbak) \
@@ -1470,6 +1510,8 @@
     XX(LAPACKE_slagsy_work) \
     XX(LAPACKE_slamch) \
     XX(LAPACKE_slamch_work) \
+    XX(LAPACKE_slangb) \
+    XX(LAPACKE_slangb_work) \
     XX(LAPACKE_slange) \
     XX(LAPACKE_slange_work) \
     XX(LAPACKE_slansy) \
@@ -1536,6 +1578,10 @@
     XX(LAPACKE_sorgrq_work) \
     XX(LAPACKE_sorgtr) \
     XX(LAPACKE_sorgtr_work) \
+    XX(LAPACKE_sorgtsqr_row) \
+    XX(LAPACKE_sorgtsqr_row_work) \
+    XX(LAPACKE_sorhr_col) \
+    XX(LAPACKE_sorhr_col_work) \
     XX(LAPACKE_sormbr) \
     XX(LAPACKE_sormbr_work) \
     XX(LAPACKE_sormhr) \
@@ -1867,6 +1913,8 @@
     XX(LAPACKE_strsna) \
     XX(LAPACKE_strsna_work) \
     XX(LAPACKE_strsyl) \
+    XX(LAPACKE_strsyl3) \
+    XX(LAPACKE_strsyl3_work) \
     XX(LAPACKE_strsyl_work) \
     XX(LAPACKE_strtri) \
     XX(LAPACKE_strtri_work) \
@@ -1876,6 +1924,8 @@
     XX(LAPACKE_strttf_work) \
     XX(LAPACKE_strttp) \
     XX(LAPACKE_strttp_work) \
+    XX(LAPACKE_stz_nancheck) \
+    XX(LAPACKE_stz_trans) \
     XX(LAPACKE_stzrzf) \
     XX(LAPACKE_stzrzf_work) \
     XX(LAPACKE_xerbla) \
@@ -1918,6 +1968,10 @@
     XX(LAPACKE_zgebrd_work) \
     XX(LAPACKE_zgecon) \
     XX(LAPACKE_zgecon_work) \
+    XX(LAPACKE_zgedmd) \
+    XX(LAPACKE_zgedmd_work) \
+    XX(LAPACKE_zgedmdq) \
+    XX(LAPACKE_zgedmdq_work) \
     XX(LAPACKE_zgeequ) \
     XX(LAPACKE_zgeequ_work) \
     XX(LAPACKE_zgeequb) \
@@ -2004,6 +2058,8 @@
     XX(LAPACKE_zgetrs_work) \
     XX(LAPACKE_zgetsls) \
     XX(LAPACKE_zgetsls_work) \
+    XX(LAPACKE_zgetsqrhrt) \
+    XX(LAPACKE_zgetsqrhrt_work) \
     XX(LAPACKE_zgg_nancheck) \
     XX(LAPACKE_zgg_trans) \
     XX(LAPACKE_zggbak) \
@@ -2219,6 +2275,8 @@
     XX(LAPACKE_zlaghe_work) \
     XX(LAPACKE_zlagsy) \
     XX(LAPACKE_zlagsy_work) \
+    XX(LAPACKE_zlangb) \
+    XX(LAPACKE_zlangb_work) \
     XX(LAPACKE_zlange) \
     XX(LAPACKE_zlange_work) \
     XX(LAPACKE_zlanhe) \
@@ -2490,6 +2548,8 @@
     XX(LAPACKE_ztrsna) \
     XX(LAPACKE_ztrsna_work) \
     XX(LAPACKE_ztrsyl) \
+    XX(LAPACKE_ztrsyl3) \
+    XX(LAPACKE_ztrsyl3_work) \
     XX(LAPACKE_ztrsyl_work) \
     XX(LAPACKE_ztrtri) \
     XX(LAPACKE_ztrtri_work) \
@@ -2499,6 +2559,8 @@
     XX(LAPACKE_ztrttf_work) \
     XX(LAPACKE_ztrttp) \
     XX(LAPACKE_ztrttp_work) \
+    XX(LAPACKE_ztz_nancheck) \
+    XX(LAPACKE_ztz_trans) \
     XX(LAPACKE_ztzrzf) \
     XX(LAPACKE_ztzrzf_work) \
     XX(LAPACKE_zunbdb) \
@@ -2521,6 +2583,10 @@
     XX(LAPACKE_zungrq_work) \
     XX(LAPACKE_zungtr) \
     XX(LAPACKE_zungtr_work) \
+    XX(LAPACKE_zungtsqr_row) \
+    XX(LAPACKE_zungtsqr_row_work) \
+    XX(LAPACKE_zunhr_col) \
+    XX(LAPACKE_zunhr_col_work) \
     XX(LAPACKE_zunmbr) \
     XX(LAPACKE_zunmbr_work) \
     XX(LAPACKE_zunmhr) \
@@ -2543,10 +2609,9 @@
     XX(LAPACKE_zupmtr_work) \
     XX(caxpby_) \
     XX(caxpy_) \
-    XX(cbbcsd_) \
-    XX(cbdsqr_) \
     XX(cblas_caxpby) \
     XX(cblas_caxpy) \
+    XX(cblas_caxpyc) \
     XX(cblas_ccopy) \
     XX(cblas_cdotc) \
     XX(cblas_cdotc_sub) \
@@ -2556,6 +2621,7 @@
     XX(cblas_cgeadd) \
     XX(cblas_cgemm) \
     XX(cblas_cgemm3m) \
+    XX(cblas_cgemmt) \
     XX(cblas_cgemv) \
     XX(cblas_cgerc) \
     XX(cblas_cgeru) \
@@ -2571,7 +2637,9 @@
     XX(cblas_chpr2) \
     XX(cblas_cimatcopy) \
     XX(cblas_comatcopy) \
+    XX(cblas_crotg) \
     XX(cblas_cscal) \
+    XX(cblas_csrot) \
     XX(cblas_csscal) \
     XX(cblas_cswap) \
     XX(cblas_csymm) \
@@ -2585,6 +2653,8 @@
     XX(cblas_ctrmv) \
     XX(cblas_ctrsm) \
     XX(cblas_ctrsv) \
+    XX(cblas_damax) \
+    XX(cblas_damin) \
     XX(cblas_dasum) \
     XX(cblas_daxpby) \
     XX(cblas_daxpy) \
@@ -2594,6 +2664,7 @@
     XX(cblas_dgbmv) \
     XX(cblas_dgeadd) \
     XX(cblas_dgemm) \
+    XX(cblas_dgemmt) \
     XX(cblas_dgemv) \
     XX(cblas_dger) \
     XX(cblas_dimatcopy) \
@@ -2625,6 +2696,8 @@
     XX(cblas_dtrmv) \
     XX(cblas_dtrsm) \
     XX(cblas_dtrsv) \
+    XX(cblas_dzamax) \
+    XX(cblas_dzamin) \
     XX(cblas_dzasum) \
     XX(cblas_dznrm2) \
     XX(cblas_dzsum) \
@@ -2644,6 +2717,8 @@
     XX(cblas_izamin) \
     XX(cblas_izmax) \
     XX(cblas_izmin) \
+    XX(cblas_samax) \
+    XX(cblas_samin) \
     XX(cblas_sasum) \
     XX(cblas_saxpby) \
     XX(cblas_saxpy) \
@@ -2653,6 +2728,8 @@
     XX(cblas_sbgemm) \
     XX(cblas_sbgemv) \
     XX(cblas_sbstobf16) \
+    XX(cblas_scamax) \
+    XX(cblas_scamin) \
     XX(cblas_scasum) \
     XX(cblas_scnrm2) \
     XX(cblas_scopy) \
@@ -2662,6 +2739,7 @@
     XX(cblas_sgbmv) \
     XX(cblas_sgeadd) \
     XX(cblas_sgemm) \
+    XX(cblas_sgemmt) \
     XX(cblas_sgemv) \
     XX(cblas_sger) \
     XX(cblas_simatcopy) \
@@ -2695,16 +2773,19 @@
     XX(cblas_xerbla) \
     XX(cblas_zaxpby) \
     XX(cblas_zaxpy) \
+    XX(cblas_zaxpyc) \
     XX(cblas_zcopy) \
     XX(cblas_zdotc) \
     XX(cblas_zdotc_sub) \
     XX(cblas_zdotu) \
     XX(cblas_zdotu_sub) \
+    XX(cblas_zdrot) \
     XX(cblas_zdscal) \
     XX(cblas_zgbmv) \
     XX(cblas_zgeadd) \
     XX(cblas_zgemm) \
     XX(cblas_zgemm3m) \
+    XX(cblas_zgemmt) \
     XX(cblas_zgemv) \
     XX(cblas_zgerc) \
     XX(cblas_zgeru) \
@@ -2720,6 +2801,7 @@
     XX(cblas_zhpr2) \
     XX(cblas_zimatcopy) \
     XX(cblas_zomatcopy) \
+    XX(cblas_zrotg) \
     XX(cblas_zscal) \
     XX(cblas_zswap) \
     XX(cblas_zsymm) \
@@ -2736,1090 +2818,134 @@
     XX(ccopy_) \
     XX(cdotc_) \
     XX(cdotu_) \
-    XX(cgbbrd_) \
-    XX(cgbcon_) \
-    XX(cgbequ_) \
-    XX(cgbequb_) \
     XX(cgbmv_) \
-    XX(cgbrfs_) \
-    XX(cgbsv_) \
-    XX(cgbsvx_) \
-    XX(cgbtf2_) \
-    XX(cgbtrf_) \
-    XX(cgbtrs_) \
     XX(cgeadd_) \
-    XX(cgebak_) \
-    XX(cgebal_) \
-    XX(cgebd2_) \
-    XX(cgebrd_) \
-    XX(cgecon_) \
-    XX(cgeequ_) \
-    XX(cgeequb_) \
-    XX(cgees_) \
-    XX(cgeesx_) \
-    XX(cgeev_) \
-    XX(cgeevx_) \
-    XX(cgehd2_) \
-    XX(cgehrd_) \
-    XX(cgejsv_) \
-    XX(cgelq2_) \
-    XX(cgelq_) \
-    XX(cgelqf_) \
-    XX(cgelqt3_) \
-    XX(cgelqt_) \
-    XX(cgels_) \
-    XX(cgelsd_) \
-    XX(cgelss_) \
-    XX(cgelsy_) \
-    XX(cgemlq_) \
-    XX(cgemlqt_) \
     XX(cgemm3m_) \
     XX(cgemm_) \
     XX(cgemmt_) \
-    XX(cgemqr_) \
-    XX(cgemqrt_) \
     XX(cgemv_) \
-    XX(cgeql2_) \
-    XX(cgeqlf_) \
-    XX(cgeqp3_) \
-    XX(cgeqr2_) \
-    XX(cgeqr2p_) \
-    XX(cgeqr_) \
-    XX(cgeqrf_) \
-    XX(cgeqrfp_) \
-    XX(cgeqrt2_) \
-    XX(cgeqrt3_) \
-    XX(cgeqrt_) \
     XX(cgerc_) \
-    XX(cgerfs_) \
-    XX(cgerq2_) \
-    XX(cgerqf_) \
     XX(cgeru_) \
-    XX(cgesc2_) \
-    XX(cgesdd_) \
     XX(cgesv_) \
-    XX(cgesvd_) \
-    XX(cgesvdq_) \
-    XX(cgesvdx_) \
-    XX(cgesvj_) \
-    XX(cgesvx_) \
-    XX(cgetc2_) \
     XX(cgetf2_) \
-    XX(cgetrf2_) \
     XX(cgetrf_) \
-    XX(cgetri_) \
     XX(cgetrs_) \
-    XX(cgetsls_) \
-    XX(cggbak_) \
-    XX(cggbal_) \
-    XX(cgges3_) \
-    XX(cgges_) \
-    XX(cggesx_) \
-    XX(cggev3_) \
-    XX(cggev_) \
-    XX(cggevx_) \
-    XX(cggglm_) \
-    XX(cgghd3_) \
-    XX(cgghrd_) \
-    XX(cgglse_) \
-    XX(cggqrf_) \
-    XX(cggrqf_) \
-    XX(cggsvd3_) \
-    XX(cggsvp3_) \
-    XX(cgsvj0_) \
-    XX(cgsvj1_) \
-    XX(cgtcon_) \
-    XX(cgtrfs_) \
-    XX(cgtsv_) \
-    XX(cgtsvx_) \
-    XX(cgttrf_) \
-    XX(cgttrs_) \
-    XX(cgtts2_) \
-    XX(chb2st_kernels_) \
-    XX(chbev_) \
-    XX(chbev_2stage_) \
-    XX(chbevd_) \
-    XX(chbevd_2stage_) \
-    XX(chbevx_) \
-    XX(chbevx_2stage_) \
-    XX(chbgst_) \
-    XX(chbgv_) \
-    XX(chbgvd_) \
-    XX(chbgvx_) \
     XX(chbmv_) \
-    XX(chbtrd_) \
-    XX(checon_) \
-    XX(checon_3_) \
-    XX(checon_rook_) \
-    XX(cheequb_) \
-    XX(cheev_) \
-    XX(cheev_2stage_) \
-    XX(cheevd_) \
-    XX(cheevd_2stage_) \
-    XX(cheevr_) \
-    XX(cheevr_2stage_) \
-    XX(cheevx_) \
-    XX(cheevx_2stage_) \
-    XX(chegs2_) \
-    XX(chegst_) \
-    XX(chegv_) \
-    XX(chegv_2stage_) \
-    XX(chegvd_) \
-    XX(chegvx_) \
     XX(chemm_) \
     XX(chemv_) \
     XX(cher2_) \
     XX(cher2k_) \
     XX(cher_) \
-    XX(cherfs_) \
     XX(cherk_) \
-    XX(chesv_) \
-    XX(chesv_aa_) \
-    XX(chesv_aa_2stage_) \
-    XX(chesv_rk_) \
-    XX(chesv_rook_) \
-    XX(chesvx_) \
-    XX(cheswapr_) \
-    XX(chetd2_) \
-    XX(chetf2_) \
-    XX(chetf2_rk_) \
-    XX(chetf2_rook_) \
-    XX(chetrd_) \
-    XX(chetrd_2stage_) \
-    XX(chetrd_hb2st_) \
-    XX(chetrd_he2hb_) \
-    XX(chetrf_) \
-    XX(chetrf_aa_) \
-    XX(chetrf_aa_2stage_) \
-    XX(chetrf_rk_) \
-    XX(chetrf_rook_) \
-    XX(chetri2_) \
-    XX(chetri2x_) \
-    XX(chetri_) \
-    XX(chetri_3_) \
-    XX(chetri_3x_) \
-    XX(chetri_rook_) \
-    XX(chetrs2_) \
-    XX(chetrs_) \
-    XX(chetrs_3_) \
-    XX(chetrs_aa_) \
-    XX(chetrs_aa_2stage_) \
-    XX(chetrs_rook_) \
-    XX(chfrk_) \
-    XX(chgeqz_) \
-    XX(chla_transtype_) \
-    XX(chpcon_) \
-    XX(chpev_) \
-    XX(chpevd_) \
-    XX(chpevx_) \
-    XX(chpgst_) \
-    XX(chpgv_) \
-    XX(chpgvd_) \
-    XX(chpgvx_) \
     XX(chpmv_) \
     XX(chpr2_) \
     XX(chpr_) \
-    XX(chprfs_) \
-    XX(chpsv_) \
-    XX(chpsvx_) \
-    XX(chptrd_) \
-    XX(chptrf_) \
-    XX(chptri_) \
-    XX(chptrs_) \
-    XX(chsein_) \
-    XX(chseqr_) \
     XX(cimatcopy_) \
-    XX(clabrd_) \
-    XX(clacgv_) \
-    XX(clacn2_) \
-    XX(clacon_) \
-    XX(clacp2_) \
-    XX(clacpy_) \
-    XX(clacrm_) \
-    XX(clacrt_) \
-    XX(cladiv_) \
-    XX(claed0_) \
-    XX(claed7_) \
-    XX(claed8_) \
-    XX(claein_) \
-    XX(claesy_) \
-    XX(claev2_) \
-    XX(clag2z_) \
-    XX(clagge_) \
-    XX(claghe_) \
-    XX(clags2_) \
-    XX(clagsy_) \
-    XX(clagtm_) \
-    XX(clahef_) \
-    XX(clahef_aa_) \
-    XX(clahef_rk_) \
-    XX(clahef_rook_) \
-    XX(clahilb_) \
-    XX(clahqr_) \
-    XX(clahr2_) \
-    XX(claic1_) \
-    XX(clakf2_) \
-    XX(clals0_) \
-    XX(clalsa_) \
-    XX(clalsd_) \
-    XX(clamswlq_) \
-    XX(clamtsqr_) \
-    XX(clangb_) \
-    XX(clange_) \
-    XX(clangt_) \
-    XX(clanhb_) \
-    XX(clanhe_) \
-    XX(clanhf_) \
-    XX(clanhp_) \
-    XX(clanhs_) \
-    XX(clanht_) \
-    XX(clansb_) \
-    XX(clansp_) \
-    XX(clansy_) \
-    XX(clantb_) \
-    XX(clantp_) \
-    XX(clantr_) \
-    XX(clapll_) \
-    XX(clapmr_) \
-    XX(clapmt_) \
-    XX(claqgb_) \
-    XX(claqge_) \
-    XX(claqhb_) \
-    XX(claqhe_) \
-    XX(claqhp_) \
-    XX(claqp2_) \
-    XX(claqps_) \
-    XX(claqr0_) \
-    XX(claqr1_) \
-    XX(claqr2_) \
-    XX(claqr3_) \
-    XX(claqr4_) \
-    XX(claqr5_) \
-    XX(claqsb_) \
-    XX(claqsp_) \
-    XX(claqsy_) \
-    XX(clar1v_) \
-    XX(clar2v_) \
-    XX(clarcm_) \
-    XX(clarf_) \
-    XX(clarfb_) \
-    XX(clarfg_) \
-    XX(clarfgp_) \
-    XX(clarft_) \
-    XX(clarfx_) \
-    XX(clarfy_) \
-    XX(clarge_) \
-    XX(clargv_) \
-    XX(clarnd_) \
-    XX(clarnv_) \
-    XX(claror_) \
-    XX(clarot_) \
-    XX(clarrv_) \
-    XX(clartg_) \
-    XX(clartv_) \
-    XX(clarz_) \
-    XX(clarzb_) \
-    XX(clarzt_) \
-    XX(clascl_) \
-    XX(claset_) \
-    XX(clasr_) \
-    XX(classq_) \
-    XX(claswlq_) \
     XX(claswp_) \
-    XX(clasyf_) \
-    XX(clasyf_aa_) \
-    XX(clasyf_rk_) \
-    XX(clasyf_rook_) \
-    XX(clatbs_) \
-    XX(clatdf_) \
-    XX(clatm1_) \
-    XX(clatm2_) \
-    XX(clatm3_) \
-    XX(clatm5_) \
-    XX(clatm6_) \
-    XX(clatme_) \
-    XX(clatmr_) \
-    XX(clatms_) \
-    XX(clatmt_) \
-    XX(clatps_) \
-    XX(clatrd_) \
-    XX(clatrs_) \
-    XX(clatrz_) \
-    XX(clatsqr_) \
-    XX(claunhr_col_getrfnp2_) \
-    XX(claunhr_col_getrfnp_) \
     XX(clauu2_) \
     XX(clauum_) \
     XX(comatcopy_) \
-    XX(cpbcon_) \
-    XX(cpbequ_) \
-    XX(cpbrfs_) \
-    XX(cpbstf_) \
-    XX(cpbsv_) \
-    XX(cpbsvx_) \
-    XX(cpbtf2_) \
-    XX(cpbtrf_) \
-    XX(cpbtrs_) \
-    XX(cpftrf_) \
-    XX(cpftri_) \
-    XX(cpftrs_) \
-    XX(cpocon_) \
-    XX(cpoequ_) \
-    XX(cpoequb_) \
-    XX(cporfs_) \
-    XX(cposv_) \
-    XX(cposvx_) \
     XX(cpotf2_) \
-    XX(cpotrf2_) \
     XX(cpotrf_) \
     XX(cpotri_) \
-    XX(cpotrs_) \
-    XX(cppcon_) \
-    XX(cppequ_) \
-    XX(cpprfs_) \
-    XX(cppsv_) \
-    XX(cppsvx_) \
-    XX(cpptrf_) \
-    XX(cpptri_) \
-    XX(cpptrs_) \
-    XX(cpstf2_) \
-    XX(cpstrf_) \
-    XX(cptcon_) \
-    XX(cpteqr_) \
-    XX(cptrfs_) \
-    XX(cptsv_) \
-    XX(cptsvx_) \
-    XX(cpttrf_) \
-    XX(cpttrs_) \
-    XX(cptts2_) \
-    XX(crot_) \
     XX(crotg_) \
-    XX(csbmv_) \
     XX(cscal_) \
-    XX(cspcon_) \
-    XX(cspmv_) \
-    XX(cspr2_) \
-    XX(cspr_) \
-    XX(csprfs_) \
-    XX(cspsv_) \
-    XX(cspsvx_) \
-    XX(csptrf_) \
-    XX(csptri_) \
-    XX(csptrs_) \
     XX(csrot_) \
-    XX(csrscl_) \
     XX(csscal_) \
-    XX(cstedc_) \
-    XX(cstegr_) \
-    XX(cstein_) \
-    XX(cstemr_) \
-    XX(csteqr_) \
     XX(cswap_) \
-    XX(csycon_) \
-    XX(csycon_3_) \
-    XX(csycon_rook_) \
-    XX(csyconv_) \
-    XX(csyconvf_) \
-    XX(csyconvf_rook_) \
-    XX(csyequb_) \
     XX(csymm_) \
-    XX(csymv_) \
-    XX(csyr2_) \
     XX(csyr2k_) \
-    XX(csyr_) \
-    XX(csyrfs_) \
     XX(csyrk_) \
-    XX(csysv_) \
-    XX(csysv_aa_) \
-    XX(csysv_aa_2stage_) \
-    XX(csysv_rk_) \
-    XX(csysv_rook_) \
-    XX(csysvx_) \
-    XX(csyswapr_) \
-    XX(csytf2_) \
-    XX(csytf2_rk_) \
-    XX(csytf2_rook_) \
-    XX(csytrf_) \
-    XX(csytrf_aa_) \
-    XX(csytrf_aa_2stage_) \
-    XX(csytrf_rk_) \
-    XX(csytrf_rook_) \
-    XX(csytri2_) \
-    XX(csytri2x_) \
-    XX(csytri_) \
-    XX(csytri_3_) \
-    XX(csytri_3x_) \
-    XX(csytri_rook_) \
-    XX(csytrs2_) \
-    XX(csytrs_) \
-    XX(csytrs_3_) \
-    XX(csytrs_aa_) \
-    XX(csytrs_aa_2stage_) \
-    XX(csytrs_rook_) \
-    XX(ctbcon_) \
     XX(ctbmv_) \
-    XX(ctbrfs_) \
     XX(ctbsv_) \
-    XX(ctbtrs_) \
-    XX(ctfsm_) \
-    XX(ctftri_) \
-    XX(ctfttp_) \
-    XX(ctfttr_) \
-    XX(ctgevc_) \
-    XX(ctgex2_) \
-    XX(ctgexc_) \
-    XX(ctgsen_) \
-    XX(ctgsja_) \
-    XX(ctgsna_) \
-    XX(ctgsy2_) \
-    XX(ctgsyl_) \
-    XX(ctpcon_) \
-    XX(ctplqt2_) \
-    XX(ctplqt_) \
-    XX(ctpmlqt_) \
-    XX(ctpmqrt_) \
     XX(ctpmv_) \
-    XX(ctpqrt2_) \
-    XX(ctpqrt_) \
-    XX(ctprfb_) \
-    XX(ctprfs_) \
     XX(ctpsv_) \
-    XX(ctptri_) \
-    XX(ctptrs_) \
-    XX(ctpttf_) \
-    XX(ctpttr_) \
-    XX(ctrcon_) \
-    XX(ctrevc3_) \
-    XX(ctrevc_) \
-    XX(ctrexc_) \
     XX(ctrmm_) \
     XX(ctrmv_) \
-    XX(ctrrfs_) \
-    XX(ctrsen_) \
     XX(ctrsm_) \
-    XX(ctrsna_) \
     XX(ctrsv_) \
-    XX(ctrsyl_) \
     XX(ctrti2_) \
     XX(ctrtri_) \
-    XX(ctrtrs_) \
-    XX(ctrttf_) \
-    XX(ctrttp_) \
-    XX(ctzrzf_) \
-    XX(cunbdb1_) \
-    XX(cunbdb2_) \
-    XX(cunbdb3_) \
-    XX(cunbdb4_) \
-    XX(cunbdb5_) \
-    XX(cunbdb6_) \
-    XX(cunbdb_) \
-    XX(cuncsd2by1_) \
-    XX(cuncsd_) \
-    XX(cung2l_) \
-    XX(cung2r_) \
-    XX(cungbr_) \
-    XX(cunghr_) \
-    XX(cungl2_) \
-    XX(cunglq_) \
-    XX(cungql_) \
-    XX(cungqr_) \
-    XX(cungr2_) \
-    XX(cungrq_) \
-    XX(cungtr_) \
-    XX(cungtsqr_) \
-    XX(cunhr_col_) \
-    XX(cunm22_) \
-    XX(cunm2l_) \
-    XX(cunm2r_) \
-    XX(cunmbr_) \
-    XX(cunmhr_) \
-    XX(cunml2_) \
-    XX(cunmlq_) \
-    XX(cunmql_) \
-    XX(cunmqr_) \
-    XX(cunmr2_) \
-    XX(cunmr3_) \
-    XX(cunmrq_) \
-    XX(cunmrz_) \
-    XX(cunmtr_) \
-    XX(cupgtr_) \
-    XX(cupmtr_) \
     XX(damax_) \
     XX(damin_) \
     XX(dasum_) \
     XX(daxpby_) \
     XX(daxpy_) \
-    XX(dbbcsd_) \
-    XX(dbdsdc_) \
-    XX(dbdsqr_) \
-    XX(dbdsvdx_) \
     XX(dbf16tod_) \
     XX(dcabs1_) \
-    XX(dcombssq_) \
     XX(dcopy_) \
-    XX(ddisna_) \
     XX(ddot_) \
-    XX(dgbbrd_) \
-    XX(dgbcon_) \
-    XX(dgbequ_) \
-    XX(dgbequb_) \
     XX(dgbmv_) \
-    XX(dgbrfs_) \
-    XX(dgbsv_) \
-    XX(dgbsvx_) \
-    XX(dgbtf2_) \
-    XX(dgbtrf_) \
-    XX(dgbtrs_) \
     XX(dgeadd_) \
-    XX(dgebak_) \
-    XX(dgebal_) \
-    XX(dgebd2_) \
-    XX(dgebrd_) \
-    XX(dgecon_) \
-    XX(dgeequ_) \
-    XX(dgeequb_) \
-    XX(dgees_) \
-    XX(dgeesx_) \
-    XX(dgeev_) \
-    XX(dgeevx_) \
-    XX(dgehd2_) \
-    XX(dgehrd_) \
-    XX(dgejsv_) \
-    XX(dgelq2_) \
-    XX(dgelq_) \
-    XX(dgelqf_) \
-    XX(dgelqt3_) \
-    XX(dgelqt_) \
-    XX(dgels_) \
-    XX(dgelsd_) \
-    XX(dgelss_) \
-    XX(dgelsy_) \
-    XX(dgemlq_) \
-    XX(dgemlqt_) \
     XX(dgemm_) \
     XX(dgemmt_) \
-    XX(dgemqr_) \
-    XX(dgemqrt_) \
     XX(dgemv_) \
-    XX(dgeql2_) \
-    XX(dgeqlf_) \
-    XX(dgeqp3_) \
-    XX(dgeqr2_) \
-    XX(dgeqr2p_) \
-    XX(dgeqr_) \
-    XX(dgeqrf_) \
-    XX(dgeqrfp_) \
-    XX(dgeqrt2_) \
-    XX(dgeqrt3_) \
-    XX(dgeqrt_) \
     XX(dger_) \
-    XX(dgerfs_) \
-    XX(dgerq2_) \
-    XX(dgerqf_) \
-    XX(dgesc2_) \
-    XX(dgesdd_) \
     XX(dgesv_) \
-    XX(dgesvd_) \
-    XX(dgesvdq_) \
-    XX(dgesvdx_) \
-    XX(dgesvj_) \
-    XX(dgesvx_) \
-    XX(dgetc2_) \
     XX(dgetf2_) \
-    XX(dgetrf2_) \
     XX(dgetrf_) \
-    XX(dgetri_) \
     XX(dgetrs_) \
-    XX(dgetsls_) \
-    XX(dggbak_) \
-    XX(dggbal_) \
-    XX(dgges3_) \
-    XX(dgges_) \
-    XX(dggesx_) \
-    XX(dggev3_) \
-    XX(dggev_) \
-    XX(dggevx_) \
-    XX(dggglm_) \
-    XX(dgghd3_) \
-    XX(dgghrd_) \
-    XX(dgglse_) \
-    XX(dggqrf_) \
-    XX(dggrqf_) \
-    XX(dggsvd3_) \
-    XX(dggsvp3_) \
-    XX(dgsvj0_) \
-    XX(dgsvj1_) \
-    XX(dgtcon_) \
-    XX(dgtrfs_) \
-    XX(dgtsv_) \
-    XX(dgtsvx_) \
-    XX(dgttrf_) \
-    XX(dgttrs_) \
-    XX(dgtts2_) \
-    XX(dhgeqz_) \
-    XX(dhsein_) \
-    XX(dhseqr_) \
     XX(dimatcopy_) \
-    XX(disnan_) \
-    XX(dlabad_) \
-    XX(dlabrd_) \
-    XX(dlacn2_) \
-    XX(dlacon_) \
-    XX(dlacpy_) \
-    XX(dladiv1_) \
-    XX(dladiv2_) \
-    XX(dladiv_) \
-    XX(dlae2_) \
-    XX(dlaebz_) \
-    XX(dlaed0_) \
-    XX(dlaed1_) \
-    XX(dlaed2_) \
-    XX(dlaed3_) \
-    XX(dlaed4_) \
-    XX(dlaed5_) \
-    XX(dlaed6_) \
-    XX(dlaed7_) \
-    XX(dlaed8_) \
-    XX(dlaed9_) \
-    XX(dlaeda_) \
-    XX(dlaein_) \
-    XX(dlaev2_) \
-    XX(dlaexc_) \
-    XX(dlag2_) \
-    XX(dlag2s_) \
-    XX(dlagge_) \
-    XX(dlags2_) \
-    XX(dlagsy_) \
-    XX(dlagtf_) \
-    XX(dlagtm_) \
-    XX(dlagts_) \
-    XX(dlagv2_) \
-    XX(dlahilb_) \
-    XX(dlahqr_) \
-    XX(dlahr2_) \
-    XX(dlaic1_) \
-    XX(dlaisnan_) \
-    XX(dlakf2_) \
-    XX(dlaln2_) \
-    XX(dlals0_) \
-    XX(dlalsa_) \
-    XX(dlalsd_) \
-    XX(dlamc3_) \
-    XX(dlamch_) \
-    XX(dlamrg_) \
-    XX(dlamswlq_) \
-    XX(dlamtsqr_) \
-    XX(dlaneg_) \
-    XX(dlangb_) \
-    XX(dlange_) \
-    XX(dlangt_) \
-    XX(dlanhs_) \
-    XX(dlansb_) \
-    XX(dlansf_) \
-    XX(dlansp_) \
-    XX(dlanst_) \
-    XX(dlansy_) \
-    XX(dlantb_) \
-    XX(dlantp_) \
-    XX(dlantr_) \
-    XX(dlanv2_) \
-    XX(dlaorhr_col_getrfnp2_) \
-    XX(dlaorhr_col_getrfnp_) \
-    XX(dlapll_) \
-    XX(dlapmr_) \
-    XX(dlapmt_) \
-    XX(dlapy2_) \
-    XX(dlapy3_) \
-    XX(dlaqgb_) \
-    XX(dlaqge_) \
-    XX(dlaqp2_) \
-    XX(dlaqps_) \
-    XX(dlaqr0_) \
-    XX(dlaqr1_) \
-    XX(dlaqr2_) \
-    XX(dlaqr3_) \
-    XX(dlaqr4_) \
-    XX(dlaqr5_) \
-    XX(dlaqsb_) \
-    XX(dlaqsp_) \
-    XX(dlaqsy_) \
-    XX(dlaqtr_) \
-    XX(dlar1v_) \
-    XX(dlar2v_) \
-    XX(dlaran_) \
-    XX(dlarf_) \
-    XX(dlarfb_) \
-    XX(dlarfg_) \
-    XX(dlarfgp_) \
-    XX(dlarft_) \
-    XX(dlarfx_) \
-    XX(dlarfy_) \
-    XX(dlarge_) \
-    XX(dlargv_) \
-    XX(dlarnd_) \
-    XX(dlarnv_) \
-    XX(dlaror_) \
-    XX(dlarot_) \
-    XX(dlarra_) \
-    XX(dlarrb_) \
-    XX(dlarrc_) \
-    XX(dlarrd_) \
-    XX(dlarre_) \
-    XX(dlarrf_) \
-    XX(dlarrj_) \
-    XX(dlarrk_) \
-    XX(dlarrr_) \
-    XX(dlarrv_) \
-    XX(dlartg_) \
-    XX(dlartgp_) \
-    XX(dlartgs_) \
-    XX(dlartv_) \
-    XX(dlaruv_) \
-    XX(dlarz_) \
-    XX(dlarzb_) \
-    XX(dlarzt_) \
-    XX(dlas2_) \
-    XX(dlascl_) \
-    XX(dlasd0_) \
-    XX(dlasd1_) \
-    XX(dlasd2_) \
-    XX(dlasd3_) \
-    XX(dlasd4_) \
-    XX(dlasd5_) \
-    XX(dlasd6_) \
-    XX(dlasd7_) \
-    XX(dlasd8_) \
-    XX(dlasda_) \
-    XX(dlasdq_) \
-    XX(dlasdt_) \
-    XX(dlaset_) \
-    XX(dlasq1_) \
-    XX(dlasq2_) \
-    XX(dlasq3_) \
-    XX(dlasq4_) \
-    XX(dlasq5_) \
-    XX(dlasq6_) \
-    XX(dlasr_) \
-    XX(dlasrt_) \
-    XX(dlassq_) \
-    XX(dlasv2_) \
-    XX(dlaswlq_) \
     XX(dlaswp_) \
-    XX(dlasy2_) \
-    XX(dlasyf_) \
-    XX(dlasyf_aa_) \
-    XX(dlasyf_rk_) \
-    XX(dlasyf_rook_) \
-    XX(dlat2s_) \
-    XX(dlatbs_) \
-    XX(dlatdf_) \
-    XX(dlatm1_) \
-    XX(dlatm2_) \
-    XX(dlatm3_) \
-    XX(dlatm5_) \
-    XX(dlatm6_) \
-    XX(dlatm7_) \
-    XX(dlatme_) \
-    XX(dlatmr_) \
-    XX(dlatms_) \
-    XX(dlatmt_) \
-    XX(dlatps_) \
-    XX(dlatrd_) \
-    XX(dlatrs_) \
-    XX(dlatrz_) \
-    XX(dlatsqr_) \
     XX(dlauu2_) \
     XX(dlauum_) \
     XX(dmax_) \
     XX(dmin_) \
     XX(dnrm2_) \
     XX(domatcopy_) \
-    XX(dopgtr_) \
-    XX(dopmtr_) \
-    XX(dorbdb1_) \
-    XX(dorbdb2_) \
-    XX(dorbdb3_) \
-    XX(dorbdb4_) \
-    XX(dorbdb5_) \
-    XX(dorbdb6_) \
-    XX(dorbdb_) \
-    XX(dorcsd2by1_) \
-    XX(dorcsd_) \
-    XX(dorg2l_) \
-    XX(dorg2r_) \
-    XX(dorgbr_) \
-    XX(dorghr_) \
-    XX(dorgl2_) \
-    XX(dorglq_) \
-    XX(dorgql_) \
-    XX(dorgqr_) \
-    XX(dorgr2_) \
-    XX(dorgrq_) \
-    XX(dorgtr_) \
-    XX(dorgtsqr_) \
-    XX(dorhr_col_) \
-    XX(dorm22_) \
-    XX(dorm2l_) \
-    XX(dorm2r_) \
-    XX(dormbr_) \
-    XX(dormhr_) \
-    XX(dorml2_) \
-    XX(dormlq_) \
-    XX(dormql_) \
-    XX(dormqr_) \
-    XX(dormr2_) \
-    XX(dormr3_) \
-    XX(dormrq_) \
-    XX(dormrz_) \
-    XX(dormtr_) \
-    XX(dpbcon_) \
-    XX(dpbequ_) \
-    XX(dpbrfs_) \
-    XX(dpbstf_) \
-    XX(dpbsv_) \
-    XX(dpbsvx_) \
-    XX(dpbtf2_) \
-    XX(dpbtrf_) \
-    XX(dpbtrs_) \
-    XX(dpftrf_) \
-    XX(dpftri_) \
-    XX(dpftrs_) \
-    XX(dpocon_) \
-    XX(dpoequ_) \
-    XX(dpoequb_) \
-    XX(dporfs_) \
-    XX(dposv_) \
-    XX(dposvx_) \
     XX(dpotf2_) \
-    XX(dpotrf2_) \
     XX(dpotrf_) \
     XX(dpotri_) \
-    XX(dpotrs_) \
-    XX(dppcon_) \
-    XX(dppequ_) \
-    XX(dpprfs_) \
-    XX(dppsv_) \
-    XX(dppsvx_) \
-    XX(dpptrf_) \
-    XX(dpptri_) \
-    XX(dpptrs_) \
-    XX(dpstf2_) \
-    XX(dpstrf_) \
-    XX(dptcon_) \
-    XX(dpteqr_) \
-    XX(dptrfs_) \
-    XX(dptsv_) \
-    XX(dptsvx_) \
-    XX(dpttrf_) \
-    XX(dpttrs_) \
-    XX(dptts2_) \
     XX(drot_) \
     XX(drotg_) \
     XX(drotm_) \
     XX(drotmg_) \
-    XX(drscl_) \
-    XX(dsb2st_kernels_) \
-    XX(dsbev_) \
-    XX(dsbev_2stage_) \
-    XX(dsbevd_) \
-    XX(dsbevd_2stage_) \
-    XX(dsbevx_) \
-    XX(dsbevx_2stage_) \
-    XX(dsbgst_) \
-    XX(dsbgv_) \
-    XX(dsbgvd_) \
-    XX(dsbgvx_) \
     XX(dsbmv_) \
-    XX(dsbtrd_) \
     XX(dscal_) \
     XX(dsdot_) \
-    XX(dsecnd_) \
-    XX(dsfrk_) \
-    XX(dsgesv_) \
-    XX(dspcon_) \
-    XX(dspev_) \
-    XX(dspevd_) \
-    XX(dspevx_) \
-    XX(dspgst_) \
-    XX(dspgv_) \
-    XX(dspgvd_) \
-    XX(dspgvx_) \
     XX(dspmv_) \
-    XX(dsposv_) \
     XX(dspr2_) \
     XX(dspr_) \
-    XX(dsprfs_) \
-    XX(dspsv_) \
-    XX(dspsvx_) \
-    XX(dsptrd_) \
-    XX(dsptrf_) \
-    XX(dsptri_) \
-    XX(dsptrs_) \
-    XX(dstebz_) \
-    XX(dstedc_) \
-    XX(dstegr_) \
-    XX(dstein_) \
-    XX(dstemr_) \
-    XX(dsteqr_) \
-    XX(dsterf_) \
-    XX(dstev_) \
-    XX(dstevd_) \
-    XX(dstevr_) \
-    XX(dstevx_) \
     XX(dsum_) \
     XX(dswap_) \
-    XX(dsycon_) \
-    XX(dsycon_3_) \
-    XX(dsycon_rook_) \
-    XX(dsyconv_) \
-    XX(dsyconvf_) \
-    XX(dsyconvf_rook_) \
-    XX(dsyequb_) \
-    XX(dsyev_) \
-    XX(dsyev_2stage_) \
-    XX(dsyevd_) \
-    XX(dsyevd_2stage_) \
-    XX(dsyevr_) \
-    XX(dsyevr_2stage_) \
-    XX(dsyevx_) \
-    XX(dsyevx_2stage_) \
-    XX(dsygs2_) \
-    XX(dsygst_) \
-    XX(dsygv_) \
-    XX(dsygv_2stage_) \
-    XX(dsygvd_) \
-    XX(dsygvx_) \
     XX(dsymm_) \
     XX(dsymv_) \
     XX(dsyr2_) \
     XX(dsyr2k_) \
     XX(dsyr_) \
-    XX(dsyrfs_) \
     XX(dsyrk_) \
-    XX(dsysv_) \
-    XX(dsysv_aa_) \
-    XX(dsysv_aa_2stage_) \
-    XX(dsysv_rk_) \
-    XX(dsysv_rook_) \
-    XX(dsysvx_) \
-    XX(dsyswapr_) \
-    XX(dsytd2_) \
-    XX(dsytf2_) \
-    XX(dsytf2_rk_) \
-    XX(dsytf2_rook_) \
-    XX(dsytrd_) \
-    XX(dsytrd_2stage_) \
-    XX(dsytrd_sb2st_) \
-    XX(dsytrd_sy2sb_) \
-    XX(dsytrf_) \
-    XX(dsytrf_aa_) \
-    XX(dsytrf_aa_2stage_) \
-    XX(dsytrf_rk_) \
-    XX(dsytrf_rook_) \
-    XX(dsytri2_) \
-    XX(dsytri2x_) \
-    XX(dsytri_) \
-    XX(dsytri_3_) \
-    XX(dsytri_3x_) \
-    XX(dsytri_rook_) \
-    XX(dsytrs2_) \
-    XX(dsytrs_) \
-    XX(dsytrs_3_) \
-    XX(dsytrs_aa_) \
-    XX(dsytrs_aa_2stage_) \
-    XX(dsytrs_rook_) \
-    XX(dtbcon_) \
     XX(dtbmv_) \
-    XX(dtbrfs_) \
     XX(dtbsv_) \
-    XX(dtbtrs_) \
-    XX(dtfsm_) \
-    XX(dtftri_) \
-    XX(dtfttp_) \
-    XX(dtfttr_) \
-    XX(dtgevc_) \
-    XX(dtgex2_) \
-    XX(dtgexc_) \
-    XX(dtgsen_) \
-    XX(dtgsja_) \
-    XX(dtgsna_) \
-    XX(dtgsy2_) \
-    XX(dtgsyl_) \
-    XX(dtpcon_) \
-    XX(dtplqt2_) \
-    XX(dtplqt_) \
-    XX(dtpmlqt_) \
-    XX(dtpmqrt_) \
     XX(dtpmv_) \
-    XX(dtpqrt2_) \
-    XX(dtpqrt_) \
-    XX(dtprfb_) \
-    XX(dtprfs_) \
     XX(dtpsv_) \
-    XX(dtptri_) \
-    XX(dtptrs_) \
-    XX(dtpttf_) \
-    XX(dtpttr_) \
-    XX(dtrcon_) \
-    XX(dtrevc3_) \
-    XX(dtrevc_) \
-    XX(dtrexc_) \
     XX(dtrmm_) \
     XX(dtrmv_) \
-    XX(dtrrfs_) \
-    XX(dtrsen_) \
     XX(dtrsm_) \
-    XX(dtrsna_) \
     XX(dtrsv_) \
-    XX(dtrsyl_) \
     XX(dtrti2_) \
     XX(dtrtri_) \
-    XX(dtrtrs_) \
-    XX(dtrttf_) \
-    XX(dtrttp_) \
-    XX(dtzrzf_) \
     XX(dzamax_) \
     XX(dzamin_) \
     XX(dzasum_) \
     XX(dznrm2_) \
-    XX(dzsum1_) \
     XX(dzsum_) \
     XX(icamax_) \
     XX(icamin_) \
-    XX(icmax1_) \
     XX(idamax_) \
     XX(idamin_) \
     XX(idmax_) \
     XX(idmin_) \
-    XX(ieeeck_) \
-    XX(ilaclc_) \
-    XX(ilaclr_) \
-    XX(iladiag_) \
-    XX(iladlc_) \
-    XX(iladlr_) \
     XX(ilaenv2stage_) \
-    XX(ilaenv_) \
-    XX(ilaprec_) \
-    XX(ilaslc_) \
-    XX(ilaslr_) \
-    XX(ilatrans_) \
-    XX(ilauplo_) \
-    XX(ilaver_) \
-    XX(ilazlc_) \
-    XX(ilazlr_) \
     XX(iparam2stage_) \
-    XX(iparmq_) \
     XX(isamax_) \
     XX(isamin_) \
     XX(ismax_) \
     XX(ismin_) \
     XX(izamax_) \
     XX(izamin_) \
-    XX(izmax1_) \
     XX(lapack_make_complex_double) \
     XX(lapack_make_complex_float) \
     XX(lsame_) \
-    XX(lsamen_) \
     XX(qamax_) \
     XX(qamin_) \
     XX(qasum_) \
@@ -3863,11 +2989,7 @@
     XX(sasum_) \
     XX(saxpby_) \
     XX(saxpy_) \
-    XX(sbbcsd_) \
     XX(sbdot_) \
-    XX(sbdsdc_) \
-    XX(sbdsqr_) \
-    XX(sbdsvdx_) \
     XX(sbdtobf16_) \
     XX(sbf16tos_) \
     XX(sbgemm_) \
@@ -3878,533 +3000,63 @@
     XX(scamin_) \
     XX(scasum_) \
     XX(scnrm2_) \
-    XX(scombssq_) \
     XX(scopy_) \
-    XX(scsum1_) \
     XX(scsum_) \
-    XX(sdisna_) \
     XX(sdot_) \
     XX(sdsdot_) \
-    XX(second_) \
-    XX(sgbbrd_) \
-    XX(sgbcon_) \
-    XX(sgbequ_) \
-    XX(sgbequb_) \
     XX(sgbmv_) \
-    XX(sgbrfs_) \
-    XX(sgbsv_) \
-    XX(sgbsvx_) \
-    XX(sgbtf2_) \
-    XX(sgbtrf_) \
-    XX(sgbtrs_) \
     XX(sgeadd_) \
-    XX(sgebak_) \
-    XX(sgebal_) \
-    XX(sgebd2_) \
-    XX(sgebrd_) \
-    XX(sgecon_) \
-    XX(sgeequ_) \
-    XX(sgeequb_) \
-    XX(sgees_) \
-    XX(sgeesx_) \
-    XX(sgeev_) \
-    XX(sgeevx_) \
-    XX(sgehd2_) \
-    XX(sgehrd_) \
-    XX(sgejsv_) \
-    XX(sgelq2_) \
-    XX(sgelq_) \
-    XX(sgelqf_) \
-    XX(sgelqt3_) \
-    XX(sgelqt_) \
-    XX(sgels_) \
-    XX(sgelsd_) \
-    XX(sgelss_) \
-    XX(sgelsy_) \
-    XX(sgemlq_) \
-    XX(sgemlqt_) \
     XX(sgemm_) \
     XX(sgemmt_) \
-    XX(sgemqr_) \
-    XX(sgemqrt_) \
     XX(sgemv_) \
-    XX(sgeql2_) \
-    XX(sgeqlf_) \
-    XX(sgeqp3_) \
-    XX(sgeqr2_) \
-    XX(sgeqr2p_) \
-    XX(sgeqr_) \
-    XX(sgeqrf_) \
-    XX(sgeqrfp_) \
-    XX(sgeqrt2_) \
-    XX(sgeqrt3_) \
-    XX(sgeqrt_) \
     XX(sger_) \
-    XX(sgerfs_) \
-    XX(sgerq2_) \
-    XX(sgerqf_) \
-    XX(sgesc2_) \
-    XX(sgesdd_) \
     XX(sgesv_) \
-    XX(sgesvd_) \
-    XX(sgesvdq_) \
-    XX(sgesvdx_) \
-    XX(sgesvj_) \
-    XX(sgesvx_) \
-    XX(sgetc2_) \
     XX(sgetf2_) \
-    XX(sgetrf2_) \
     XX(sgetrf_) \
-    XX(sgetri_) \
     XX(sgetrs_) \
-    XX(sgetsls_) \
-    XX(sggbak_) \
-    XX(sggbal_) \
-    XX(sgges3_) \
-    XX(sgges_) \
-    XX(sggesx_) \
-    XX(sggev3_) \
-    XX(sggev_) \
-    XX(sggevx_) \
-    XX(sggglm_) \
-    XX(sgghd3_) \
-    XX(sgghrd_) \
-    XX(sgglse_) \
-    XX(sggqrf_) \
-    XX(sggrqf_) \
-    XX(sggsvd3_) \
-    XX(sggsvp3_) \
-    XX(sgsvj0_) \
-    XX(sgsvj1_) \
-    XX(sgtcon_) \
-    XX(sgtrfs_) \
-    XX(sgtsv_) \
-    XX(sgtsvx_) \
-    XX(sgttrf_) \
-    XX(sgttrs_) \
-    XX(sgtts2_) \
-    XX(shgeqz_) \
-    XX(shsein_) \
-    XX(shseqr_) \
     XX(simatcopy_) \
-    XX(sisnan_) \
-    XX(slabad_) \
-    XX(slabrd_) \
-    XX(slacn2_) \
-    XX(slacon_) \
-    XX(slacpy_) \
-    XX(sladiv1_) \
-    XX(sladiv2_) \
-    XX(sladiv_) \
-    XX(slae2_) \
-    XX(slaebz_) \
-    XX(slaed0_) \
-    XX(slaed1_) \
-    XX(slaed2_) \
-    XX(slaed3_) \
-    XX(slaed4_) \
-    XX(slaed5_) \
-    XX(slaed6_) \
-    XX(slaed7_) \
-    XX(slaed8_) \
-    XX(slaed9_) \
-    XX(slaeda_) \
-    XX(slaein_) \
-    XX(slaev2_) \
-    XX(slaexc_) \
-    XX(slag2_) \
-    XX(slag2d_) \
-    XX(slagge_) \
-    XX(slags2_) \
-    XX(slagsy_) \
-    XX(slagtf_) \
-    XX(slagtm_) \
-    XX(slagts_) \
-    XX(slagv2_) \
-    XX(slahilb_) \
-    XX(slahqr_) \
-    XX(slahr2_) \
-    XX(slaic1_) \
-    XX(slaisnan_) \
-    XX(slakf2_) \
-    XX(slaln2_) \
-    XX(slals0_) \
-    XX(slalsa_) \
-    XX(slalsd_) \
-    XX(slamc3_) \
-    XX(slamch_) \
-    XX(slamrg_) \
-    XX(slamswlq_) \
-    XX(slamtsqr_) \
-    XX(slaneg_) \
-    XX(slangb_) \
-    XX(slange_) \
-    XX(slangt_) \
-    XX(slanhs_) \
-    XX(slansb_) \
-    XX(slansf_) \
-    XX(slansp_) \
-    XX(slanst_) \
-    XX(slansy_) \
-    XX(slantb_) \
-    XX(slantp_) \
-    XX(slantr_) \
-    XX(slanv2_) \
-    XX(slaorhr_col_getrfnp2_) \
-    XX(slaorhr_col_getrfnp_) \
-    XX(slapll_) \
-    XX(slapmr_) \
-    XX(slapmt_) \
-    XX(slapy2_) \
-    XX(slapy3_) \
-    XX(slaqgb_) \
-    XX(slaqge_) \
-    XX(slaqp2_) \
-    XX(slaqps_) \
-    XX(slaqr0_) \
-    XX(slaqr1_) \
-    XX(slaqr2_) \
-    XX(slaqr3_) \
-    XX(slaqr4_) \
-    XX(slaqr5_) \
-    XX(slaqsb_) \
-    XX(slaqsp_) \
-    XX(slaqsy_) \
-    XX(slaqtr_) \
-    XX(slar1v_) \
-    XX(slar2v_) \
-    XX(slaran_) \
-    XX(slarf_) \
-    XX(slarfb_) \
-    XX(slarfg_) \
-    XX(slarfgp_) \
-    XX(slarft_) \
-    XX(slarfx_) \
-    XX(slarfy_) \
-    XX(slarge_) \
-    XX(slargv_) \
-    XX(slarnd_) \
-    XX(slarnv_) \
-    XX(slaror_) \
-    XX(slarot_) \
-    XX(slarra_) \
-    XX(slarrb_) \
-    XX(slarrc_) \
-    XX(slarrd_) \
-    XX(slarre_) \
-    XX(slarrf_) \
-    XX(slarrj_) \
-    XX(slarrk_) \
-    XX(slarrr_) \
-    XX(slarrv_) \
-    XX(slartg_) \
-    XX(slartgp_) \
-    XX(slartgs_) \
-    XX(slartv_) \
-    XX(slaruv_) \
-    XX(slarz_) \
-    XX(slarzb_) \
-    XX(slarzt_) \
-    XX(slas2_) \
-    XX(slascl_) \
-    XX(slasd0_) \
-    XX(slasd1_) \
-    XX(slasd2_) \
-    XX(slasd3_) \
-    XX(slasd4_) \
-    XX(slasd5_) \
-    XX(slasd6_) \
-    XX(slasd7_) \
-    XX(slasd8_) \
-    XX(slasda_) \
-    XX(slasdq_) \
-    XX(slasdt_) \
-    XX(slaset_) \
-    XX(slasq1_) \
-    XX(slasq2_) \
-    XX(slasq3_) \
-    XX(slasq4_) \
-    XX(slasq5_) \
-    XX(slasq6_) \
-    XX(slasr_) \
-    XX(slasrt_) \
-    XX(slassq_) \
-    XX(slasv2_) \
-    XX(slaswlq_) \
     XX(slaswp_) \
-    XX(slasy2_) \
-    XX(slasyf_) \
-    XX(slasyf_aa_) \
-    XX(slasyf_rk_) \
-    XX(slasyf_rook_) \
-    XX(slatbs_) \
-    XX(slatdf_) \
-    XX(slatm1_) \
-    XX(slatm2_) \
-    XX(slatm3_) \
-    XX(slatm5_) \
-    XX(slatm6_) \
-    XX(slatm7_) \
-    XX(slatme_) \
-    XX(slatmr_) \
-    XX(slatms_) \
-    XX(slatmt_) \
-    XX(slatps_) \
-    XX(slatrd_) \
-    XX(slatrs_) \
-    XX(slatrz_) \
-    XX(slatsqr_) \
     XX(slauu2_) \
     XX(slauum_) \
     XX(smax_) \
     XX(smin_) \
     XX(snrm2_) \
     XX(somatcopy_) \
-    XX(sopgtr_) \
-    XX(sopmtr_) \
-    XX(sorbdb1_) \
-    XX(sorbdb2_) \
-    XX(sorbdb3_) \
-    XX(sorbdb4_) \
-    XX(sorbdb5_) \
-    XX(sorbdb6_) \
-    XX(sorbdb_) \
-    XX(sorcsd2by1_) \
-    XX(sorcsd_) \
-    XX(sorg2l_) \
-    XX(sorg2r_) \
-    XX(sorgbr_) \
-    XX(sorghr_) \
-    XX(sorgl2_) \
-    XX(sorglq_) \
-    XX(sorgql_) \
-    XX(sorgqr_) \
-    XX(sorgr2_) \
-    XX(sorgrq_) \
-    XX(sorgtr_) \
-    XX(sorgtsqr_) \
-    XX(sorhr_col_) \
-    XX(sorm22_) \
-    XX(sorm2l_) \
-    XX(sorm2r_) \
-    XX(sormbr_) \
-    XX(sormhr_) \
-    XX(sorml2_) \
-    XX(sormlq_) \
-    XX(sormql_) \
-    XX(sormqr_) \
-    XX(sormr2_) \
-    XX(sormr3_) \
-    XX(sormrq_) \
-    XX(sormrz_) \
-    XX(sormtr_) \
-    XX(spbcon_) \
-    XX(spbequ_) \
-    XX(spbrfs_) \
-    XX(spbstf_) \
-    XX(spbsv_) \
-    XX(spbsvx_) \
-    XX(spbtf2_) \
-    XX(spbtrf_) \
-    XX(spbtrs_) \
-    XX(spftrf_) \
-    XX(spftri_) \
-    XX(spftrs_) \
-    XX(spocon_) \
-    XX(spoequ_) \
-    XX(spoequb_) \
-    XX(sporfs_) \
-    XX(sposv_) \
-    XX(sposvx_) \
     XX(spotf2_) \
-    XX(spotrf2_) \
     XX(spotrf_) \
     XX(spotri_) \
-    XX(spotrs_) \
-    XX(sppcon_) \
-    XX(sppequ_) \
-    XX(spprfs_) \
-    XX(sppsv_) \
-    XX(sppsvx_) \
-    XX(spptrf_) \
-    XX(spptri_) \
-    XX(spptrs_) \
-    XX(spstf2_) \
-    XX(spstrf_) \
-    XX(sptcon_) \
-    XX(spteqr_) \
-    XX(sptrfs_) \
-    XX(sptsv_) \
-    XX(sptsvx_) \
-    XX(spttrf_) \
-    XX(spttrs_) \
-    XX(sptts2_) \
     XX(srot_) \
     XX(srotg_) \
     XX(srotm_) \
     XX(srotmg_) \
-    XX(srscl_) \
-    XX(ssb2st_kernels_) \
-    XX(ssbev_) \
-    XX(ssbev_2stage_) \
-    XX(ssbevd_) \
-    XX(ssbevd_2stage_) \
-    XX(ssbevx_) \
-    XX(ssbevx_2stage_) \
-    XX(ssbgst_) \
-    XX(ssbgv_) \
-    XX(ssbgvd_) \
-    XX(ssbgvx_) \
     XX(ssbmv_) \
-    XX(ssbtrd_) \
     XX(sscal_) \
-    XX(ssfrk_) \
-    XX(sspcon_) \
-    XX(sspev_) \
-    XX(sspevd_) \
-    XX(sspevx_) \
-    XX(sspgst_) \
-    XX(sspgv_) \
-    XX(sspgvd_) \
-    XX(sspgvx_) \
     XX(sspmv_) \
     XX(sspr2_) \
     XX(sspr_) \
-    XX(ssprfs_) \
-    XX(sspsv_) \
-    XX(sspsvx_) \
-    XX(ssptrd_) \
-    XX(ssptrf_) \
-    XX(ssptri_) \
-    XX(ssptrs_) \
-    XX(sstebz_) \
-    XX(sstedc_) \
-    XX(sstegr_) \
-    XX(sstein_) \
-    XX(sstemr_) \
-    XX(ssteqr_) \
-    XX(ssterf_) \
-    XX(sstev_) \
-    XX(sstevd_) \
-    XX(sstevr_) \
-    XX(sstevx_) \
     XX(ssum_) \
     XX(sswap_) \
-    XX(ssycon_) \
-    XX(ssycon_3_) \
-    XX(ssycon_rook_) \
-    XX(ssyconv_) \
-    XX(ssyconvf_rook_) \
-    XX(ssyequb_) \
-    XX(ssyev_) \
-    XX(ssyev_2stage_) \
-    XX(ssyevd_) \
-    XX(ssyevd_2stage_) \
-    XX(ssyevr_) \
-    XX(ssyevr_2stage_) \
-    XX(ssyevx_) \
-    XX(ssyevx_2stage_) \
-    XX(ssygs2_) \
-    XX(ssygst_) \
-    XX(ssygv_) \
-    XX(ssygv_2stage_) \
-    XX(ssygvd_) \
-    XX(ssygvx_) \
     XX(ssymm_) \
     XX(ssymv_) \
     XX(ssyr2_) \
     XX(ssyr2k_) \
     XX(ssyr_) \
-    XX(ssyrfs_) \
     XX(ssyrk_) \
-    XX(ssysv_) \
-    XX(ssysv_aa_) \
-    XX(ssysv_aa_2stage_) \
-    XX(ssysv_rk_) \
-    XX(ssysv_rook_) \
-    XX(ssysvx_) \
-    XX(ssyswapr_) \
-    XX(ssytd2_) \
-    XX(ssytf2_) \
-    XX(ssytf2_rk_) \
-    XX(ssytf2_rook_) \
-    XX(ssytrd_) \
-    XX(ssytrd_2stage_) \
-    XX(ssytrd_sb2st_) \
-    XX(ssytrd_sy2sb_) \
-    XX(ssytrf_) \
-    XX(ssytrf_aa_) \
-    XX(ssytrf_aa_2stage_) \
-    XX(ssytrf_rk_) \
-    XX(ssytrf_rook_) \
-    XX(ssytri2_) \
-    XX(ssytri2x_) \
-    XX(ssytri_) \
-    XX(ssytri_3_) \
-    XX(ssytri_3x_) \
-    XX(ssytri_rook_) \
-    XX(ssytrs2_) \
-    XX(ssytrs_) \
-    XX(ssytrs_3_) \
-    XX(ssytrs_aa_) \
-    XX(ssytrs_aa_2stage_) \
-    XX(ssytrs_rook_) \
-    XX(stbcon_) \
     XX(stbmv_) \
-    XX(stbrfs_) \
     XX(stbsv_) \
-    XX(stbtrs_) \
-    XX(stfsm_) \
-    XX(stftri_) \
-    XX(stfttp_) \
-    XX(stfttr_) \
-    XX(stgevc_) \
-    XX(stgex2_) \
-    XX(stgexc_) \
-    XX(stgsen_) \
-    XX(stgsja_) \
-    XX(stgsna_) \
-    XX(stgsy2_) \
-    XX(stgsyl_) \
-    XX(stpcon_) \
-    XX(stplqt2_) \
-    XX(stplqt_) \
-    XX(stpmlqt_) \
-    XX(stpmqrt_) \
     XX(stpmv_) \
-    XX(stpqrt2_) \
-    XX(stpqrt_) \
-    XX(stprfb_) \
-    XX(stprfs_) \
     XX(stpsv_) \
-    XX(stptri_) \
-    XX(stptrs_) \
-    XX(stpttf_) \
-    XX(stpttr_) \
-    XX(strcon_) \
-    XX(strevc3_) \
-    XX(strevc_) \
-    XX(strexc_) \
     XX(strmm_) \
     XX(strmv_) \
-    XX(strrfs_) \
-    XX(strsen_) \
     XX(strsm_) \
-    XX(strsna_) \
     XX(strsv_) \
-    XX(strsyl_) \
     XX(strti2_) \
     XX(strtri_) \
-    XX(strtrs_) \
-    XX(strttf_) \
-    XX(strttp_) \
-    XX(stzrzf_) \
     XX(xaxpy_) \
     XX(xcopy_) \
     XX(xdotc_) \
     XX(xdotu_) \
     XX(xerbla_) \
-    XX(xerbla_array_) \
     XX(xgbmv_) \
     XX(xgemm_) \
     XX(xgemv_) \
@@ -4436,567 +3088,101 @@
     XX(xtrsv_) \
     XX(zaxpby_) \
     XX(zaxpy_) \
-    XX(zbbcsd_) \
-    XX(zbdsqr_) \
-    XX(zcgesv_) \
     XX(zcopy_) \
-    XX(zcposv_) \
     XX(zdotc_) \
     XX(zdotu_) \
     XX(zdrot_) \
-    XX(zdrscl_) \
     XX(zdscal_) \
-    XX(zgbbrd_) \
-    XX(zgbcon_) \
-    XX(zgbequ_) \
-    XX(zgbequb_) \
     XX(zgbmv_) \
-    XX(zgbrfs_) \
-    XX(zgbsv_) \
-    XX(zgbsvx_) \
-    XX(zgbtf2_) \
-    XX(zgbtrf_) \
-    XX(zgbtrs_) \
     XX(zgeadd_) \
-    XX(zgebak_) \
-    XX(zgebal_) \
-    XX(zgebd2_) \
-    XX(zgebrd_) \
-    XX(zgecon_) \
-    XX(zgeequ_) \
-    XX(zgeequb_) \
-    XX(zgees_) \
-    XX(zgeesx_) \
-    XX(zgeev_) \
-    XX(zgeevx_) \
-    XX(zgehd2_) \
-    XX(zgehrd_) \
-    XX(zgejsv_) \
-    XX(zgelq2_) \
-    XX(zgelq_) \
-    XX(zgelqf_) \
-    XX(zgelqt3_) \
-    XX(zgelqt_) \
-    XX(zgels_) \
-    XX(zgelsd_) \
-    XX(zgelss_) \
-    XX(zgelsy_) \
-    XX(zgemlq_) \
-    XX(zgemlqt_) \
     XX(zgemm3m_) \
     XX(zgemm_) \
     XX(zgemmt_) \
-    XX(zgemqr_) \
-    XX(zgemqrt_) \
     XX(zgemv_) \
-    XX(zgeql2_) \
-    XX(zgeqlf_) \
-    XX(zgeqp3_) \
-    XX(zgeqr2_) \
-    XX(zgeqr2p_) \
-    XX(zgeqr_) \
-    XX(zgeqrf_) \
-    XX(zgeqrfp_) \
-    XX(zgeqrt2_) \
-    XX(zgeqrt3_) \
-    XX(zgeqrt_) \
     XX(zgerc_) \
-    XX(zgerfs_) \
-    XX(zgerq2_) \
-    XX(zgerqf_) \
     XX(zgeru_) \
-    XX(zgesc2_) \
-    XX(zgesdd_) \
     XX(zgesv_) \
-    XX(zgesvd_) \
-    XX(zgesvdq_) \
-    XX(zgesvdx_) \
-    XX(zgesvj_) \
-    XX(zgesvx_) \
-    XX(zgetc2_) \
     XX(zgetf2_) \
-    XX(zgetrf2_) \
     XX(zgetrf_) \
-    XX(zgetri_) \
     XX(zgetrs_) \
-    XX(zgetsls_) \
-    XX(zggbak_) \
-    XX(zggbal_) \
-    XX(zgges3_) \
-    XX(zgges_) \
-    XX(zggesx_) \
-    XX(zggev3_) \
-    XX(zggev_) \
-    XX(zggevx_) \
-    XX(zggglm_) \
-    XX(zgghd3_) \
-    XX(zgghrd_) \
-    XX(zgglse_) \
-    XX(zggqrf_) \
-    XX(zggrqf_) \
-    XX(zggsvd3_) \
-    XX(zggsvp3_) \
-    XX(zgsvj0_) \
-    XX(zgsvj1_) \
-    XX(zgtcon_) \
-    XX(zgtrfs_) \
-    XX(zgtsv_) \
-    XX(zgtsvx_) \
-    XX(zgttrf_) \
-    XX(zgttrs_) \
-    XX(zgtts2_) \
-    XX(zhb2st_kernels_) \
-    XX(zhbev_) \
-    XX(zhbev_2stage_) \
-    XX(zhbevd_) \
-    XX(zhbevd_2stage_) \
-    XX(zhbevx_) \
-    XX(zhbevx_2stage_) \
-    XX(zhbgst_) \
-    XX(zhbgv_) \
-    XX(zhbgvd_) \
-    XX(zhbgvx_) \
     XX(zhbmv_) \
-    XX(zhbtrd_) \
-    XX(zhecon_) \
-    XX(zhecon_3_) \
-    XX(zhecon_rook_) \
-    XX(zheequb_) \
-    XX(zheev_) \
-    XX(zheev_2stage_) \
-    XX(zheevd_) \
-    XX(zheevd_2stage_) \
-    XX(zheevr_) \
-    XX(zheevr_2stage_) \
-    XX(zheevx_) \
-    XX(zheevx_2stage_) \
-    XX(zhegs2_) \
-    XX(zhegst_) \
-    XX(zhegv_) \
-    XX(zhegv_2stage_) \
-    XX(zhegvd_) \
-    XX(zhegvx_) \
     XX(zhemm_) \
     XX(zhemv_) \
     XX(zher2_) \
     XX(zher2k_) \
     XX(zher_) \
-    XX(zherfs_) \
     XX(zherk_) \
-    XX(zhesv_) \
-    XX(zhesv_aa_) \
-    XX(zhesv_aa_2stage_) \
-    XX(zhesv_rk_) \
-    XX(zhesv_rook_) \
-    XX(zhesvx_) \
-    XX(zheswapr_) \
-    XX(zhetd2_) \
-    XX(zhetf2_) \
-    XX(zhetf2_rk_) \
-    XX(zhetf2_rook_) \
-    XX(zhetrd_) \
-    XX(zhetrd_2stage_) \
-    XX(zhetrd_hb2st_) \
-    XX(zhetrd_he2hb_) \
-    XX(zhetrf_) \
-    XX(zhetrf_aa_) \
-    XX(zhetrf_aa_2stage_) \
-    XX(zhetrf_rk_) \
-    XX(zhetrf_rook_) \
-    XX(zhetri2_) \
-    XX(zhetri2x_) \
-    XX(zhetri_) \
-    XX(zhetri_3_) \
-    XX(zhetri_3x_) \
-    XX(zhetri_rook_) \
-    XX(zhetrs2_) \
-    XX(zhetrs_) \
-    XX(zhetrs_3_) \
-    XX(zhetrs_aa_) \
-    XX(zhetrs_aa_2stage_) \
-    XX(zhetrs_rook_) \
-    XX(zhfrk_) \
-    XX(zhgeqz_) \
-    XX(zhpcon_) \
-    XX(zhpev_) \
-    XX(zhpevd_) \
-    XX(zhpevx_) \
-    XX(zhpgst_) \
-    XX(zhpgv_) \
-    XX(zhpgvd_) \
-    XX(zhpgvx_) \
     XX(zhpmv_) \
     XX(zhpr2_) \
     XX(zhpr_) \
-    XX(zhprfs_) \
-    XX(zhpsv_) \
-    XX(zhpsvx_) \
-    XX(zhptrd_) \
-    XX(zhptrf_) \
-    XX(zhptri_) \
-    XX(zhptrs_) \
-    XX(zhsein_) \
-    XX(zhseqr_) \
     XX(zimatcopy_) \
-    XX(zlabrd_) \
-    XX(zlacgv_) \
-    XX(zlacn2_) \
-    XX(zlacon_) \
-    XX(zlacp2_) \
-    XX(zlacpy_) \
-    XX(zlacrm_) \
-    XX(zlacrt_) \
-    XX(zladiv_) \
-    XX(zlaed0_) \
-    XX(zlaed7_) \
-    XX(zlaed8_) \
-    XX(zlaein_) \
-    XX(zlaesy_) \
-    XX(zlaev2_) \
-    XX(zlag2c_) \
-    XX(zlagge_) \
-    XX(zlaghe_) \
-    XX(zlags2_) \
-    XX(zlagsy_) \
-    XX(zlagtm_) \
-    XX(zlahef_) \
-    XX(zlahef_aa_) \
-    XX(zlahef_rk_) \
-    XX(zlahef_rook_) \
-    XX(zlahilb_) \
-    XX(zlahqr_) \
-    XX(zlahr2_) \
-    XX(zlaic1_) \
-    XX(zlakf2_) \
-    XX(zlals0_) \
-    XX(zlalsa_) \
-    XX(zlalsd_) \
-    XX(zlamswlq_) \
-    XX(zlamtsqr_) \
-    XX(zlangb_) \
-    XX(zlange_) \
-    XX(zlangt_) \
-    XX(zlanhb_) \
-    XX(zlanhe_) \
-    XX(zlanhf_) \
-    XX(zlanhp_) \
-    XX(zlanhs_) \
-    XX(zlanht_) \
-    XX(zlansb_) \
-    XX(zlansp_) \
-    XX(zlansy_) \
-    XX(zlantb_) \
-    XX(zlantp_) \
-    XX(zlantr_) \
-    XX(zlapll_) \
-    XX(zlapmr_) \
-    XX(zlapmt_) \
-    XX(zlaqgb_) \
-    XX(zlaqge_) \
-    XX(zlaqhb_) \
-    XX(zlaqhe_) \
-    XX(zlaqhp_) \
-    XX(zlaqp2_) \
-    XX(zlaqps_) \
-    XX(zlaqr0_) \
-    XX(zlaqr1_) \
-    XX(zlaqr2_) \
-    XX(zlaqr3_) \
-    XX(zlaqr4_) \
-    XX(zlaqr5_) \
-    XX(zlaqsb_) \
-    XX(zlaqsp_) \
-    XX(zlaqsy_) \
-    XX(zlar1v_) \
-    XX(zlar2v_) \
-    XX(zlarcm_) \
-    XX(zlarf_) \
-    XX(zlarfb_) \
-    XX(zlarfg_) \
-    XX(zlarfgp_) \
-    XX(zlarft_) \
-    XX(zlarfx_) \
-    XX(zlarfy_) \
-    XX(zlarge_) \
-    XX(zlargv_) \
-    XX(zlarnd_) \
-    XX(zlarnv_) \
-    XX(zlaror_) \
-    XX(zlarot_) \
-    XX(zlarrv_) \
-    XX(zlartg_) \
-    XX(zlartv_) \
-    XX(zlarz_) \
-    XX(zlarzb_) \
-    XX(zlarzt_) \
-    XX(zlascl_) \
-    XX(zlaset_) \
-    XX(zlasr_) \
-    XX(zlassq_) \
-    XX(zlaswlq_) \
     XX(zlaswp_) \
-    XX(zlasyf_) \
-    XX(zlasyf_aa_) \
-    XX(zlasyf_rk_) \
-    XX(zlasyf_rook_) \
-    XX(zlat2c_) \
-    XX(zlatbs_) \
-    XX(zlatdf_) \
-    XX(zlatm1_) \
-    XX(zlatm2_) \
-    XX(zlatm3_) \
-    XX(zlatm5_) \
-    XX(zlatm6_) \
-    XX(zlatme_) \
-    XX(zlatmr_) \
-    XX(zlatms_) \
-    XX(zlatmt_) \
-    XX(zlatps_) \
-    XX(zlatrd_) \
-    XX(zlatrs_) \
-    XX(zlatrz_) \
-    XX(zlatsqr_) \
-    XX(zlaunhr_col_getrfnp2_) \
-    XX(zlaunhr_col_getrfnp_) \
     XX(zlauu2_) \
     XX(zlauum_) \
     XX(zomatcopy_) \
-    XX(zpbcon_) \
-    XX(zpbequ_) \
-    XX(zpbrfs_) \
-    XX(zpbstf_) \
-    XX(zpbsv_) \
-    XX(zpbsvx_) \
-    XX(zpbtf2_) \
-    XX(zpbtrf_) \
-    XX(zpbtrs_) \
-    XX(zpftrf_) \
-    XX(zpftri_) \
-    XX(zpftrs_) \
-    XX(zpocon_) \
-    XX(zpoequ_) \
-    XX(zpoequb_) \
-    XX(zporfs_) \
-    XX(zposv_) \
-    XX(zposvx_) \
     XX(zpotf2_) \
-    XX(zpotrf2_) \
     XX(zpotrf_) \
     XX(zpotri_) \
-    XX(zpotrs_) \
-    XX(zppcon_) \
-    XX(zppequ_) \
-    XX(zpprfs_) \
-    XX(zppsv_) \
-    XX(zppsvx_) \
-    XX(zpptrf_) \
-    XX(zpptri_) \
-    XX(zpptrs_) \
-    XX(zpstf2_) \
-    XX(zpstrf_) \
-    XX(zptcon_) \
-    XX(zpteqr_) \
-    XX(zptrfs_) \
-    XX(zptsv_) \
-    XX(zptsvx_) \
-    XX(zpttrf_) \
-    XX(zpttrs_) \
-    XX(zptts2_) \
-    XX(zrot_) \
     XX(zrotg_) \
-    XX(zsbmv_) \
     XX(zscal_) \
-    XX(zspcon_) \
-    XX(zspmv_) \
-    XX(zspr2_) \
-    XX(zspr_) \
-    XX(zsprfs_) \
-    XX(zspsv_) \
-    XX(zspsvx_) \
-    XX(zsptrf_) \
-    XX(zsptri_) \
-    XX(zsptrs_) \
-    XX(zstedc_) \
-    XX(zstegr_) \
-    XX(zstein_) \
-    XX(zstemr_) \
-    XX(zsteqr_) \
     XX(zswap_) \
-    XX(zsycon_) \
-    XX(zsycon_3_) \
-    XX(zsycon_rook_) \
-    XX(zsyconv_) \
-    XX(zsyconvf_) \
-    XX(zsyconvf_rook_) \
-    XX(zsyequb_) \
     XX(zsymm_) \
-    XX(zsymv_) \
-    XX(zsyr2_) \
     XX(zsyr2k_) \
-    XX(zsyr_) \
-    XX(zsyrfs_) \
     XX(zsyrk_) \
-    XX(zsysv_) \
-    XX(zsysv_aa_) \
-    XX(zsysv_aa_2stage_) \
-    XX(zsysv_rk_) \
-    XX(zsysv_rook_) \
-    XX(zsysvx_) \
-    XX(zsyswapr_) \
-    XX(zsytf2_) \
-    XX(zsytf2_rk_) \
-    XX(zsytf2_rook_) \
-    XX(zsytrf_) \
-    XX(zsytrf_aa_) \
-    XX(zsytrf_aa_2stage_) \
-    XX(zsytrf_rk_) \
-    XX(zsytrf_rook_) \
-    XX(zsytri2_) \
-    XX(zsytri2x_) \
-    XX(zsytri_) \
-    XX(zsytri_3_) \
-    XX(zsytri_3x_) \
-    XX(zsytri_rook_) \
-    XX(zsytrs2_) \
-    XX(zsytrs_) \
-    XX(zsytrs_3_) \
-    XX(zsytrs_aa_) \
-    XX(zsytrs_aa_2stage_) \
-    XX(zsytrs_rook_) \
-    XX(ztbcon_) \
     XX(ztbmv_) \
-    XX(ztbrfs_) \
     XX(ztbsv_) \
-    XX(ztbtrs_) \
-    XX(ztfsm_) \
-    XX(ztftri_) \
-    XX(ztfttp_) \
-    XX(ztfttr_) \
-    XX(ztgevc_) \
-    XX(ztgex2_) \
-    XX(ztgexc_) \
-    XX(ztgsen_) \
-    XX(ztgsja_) \
-    XX(ztgsna_) \
-    XX(ztgsy2_) \
-    XX(ztgsyl_) \
-    XX(ztpcon_) \
-    XX(ztplqt2_) \
-    XX(ztplqt_) \
-    XX(ztpmlqt_) \
-    XX(ztpmqrt_) \
     XX(ztpmv_) \
-    XX(ztpqrt2_) \
-    XX(ztpqrt_) \
-    XX(ztprfb_) \
-    XX(ztprfs_) \
     XX(ztpsv_) \
-    XX(ztptri_) \
-    XX(ztptrs_) \
-    XX(ztpttf_) \
-    XX(ztpttr_) \
-    XX(ztrcon_) \
-    XX(ztrevc3_) \
-    XX(ztrevc_) \
-    XX(ztrexc_) \
     XX(ztrmm_) \
     XX(ztrmv_) \
-    XX(ztrrfs_) \
-    XX(ztrsen_) \
     XX(ztrsm_) \
-    XX(ztrsna_) \
     XX(ztrsv_) \
-    XX(ztrsyl_) \
     XX(ztrti2_) \
     XX(ztrtri_) \
-    XX(ztrtrs_) \
-    XX(ztrttf_) \
-    XX(ztrttp_) \
-    XX(ztzrzf_) \
-    XX(zunbdb1_) \
-    XX(zunbdb2_) \
-    XX(zunbdb3_) \
-    XX(zunbdb4_) \
-    XX(zunbdb5_) \
-    XX(zunbdb6_) \
-    XX(zunbdb_) \
-    XX(zuncsd2by1_) \
-    XX(zuncsd_) \
-    XX(zung2l_) \
-    XX(zung2r_) \
-    XX(zungbr_) \
-    XX(zunghr_) \
-    XX(zungl2_) \
-    XX(zunglq_) \
-    XX(zungql_) \
-    XX(zungqr_) \
-    XX(zungr2_) \
-    XX(zungrq_) \
-    XX(zungtr_) \
-    XX(zungtsqr_) \
-    XX(zunhr_col_) \
-    XX(zunm22_) \
-    XX(zunm2l_) \
-    XX(zunm2r_) \
-    XX(zunmbr_) \
-    XX(zunmhr_) \
-    XX(zunml2_) \
-    XX(zunmlq_) \
-    XX(zunmql_) \
-    XX(zunmqr_) \
-    XX(zunmr2_) \
-    XX(zunmr3_) \
-    XX(zunmrq_) \
-    XX(zunmrz_) \
-    XX(zunmtr_) \
-    XX(zupgtr_) \
-    XX(zupmtr_) \
 
-#define NUM_EXPORTED_FUNCS 4949
+#define NUM_EXPORTED_FUNCS 3137
 #endif
 
 #ifndef FLOAT32_FUNCS
 #define FLOAT32_FUNCS(XX) \
-    XX(sdot_, 3881) \
-    XX(sdsdot_, 3882) \
-    XX(sasum_, 3858) \
-    XX(scasum_, 3874) \
-    XX(ssum_, 4286) \
-    XX(scsum_, 3879) \
-    XX(samax_, 3856) \
-    XX(scamax_, 3872) \
-    XX(samin_, 3857) \
-    XX(scamin_, 3873) \
-    XX(smax_, 4154) \
-    XX(smin_, 4155) \
-    XX(snrm2_, 4156) \
-    XX(scnrm2_, 3875) \
-    XX(slamch_, 4030) \
-    XX(slamc3_, 4029) \
+    XX(sdot_, 3000) \
+    XX(sdsdot_, 3001) \
+    XX(sasum_, 2984) \
+    XX(scasum_, 2996) \
+    XX(ssum_, 3032) \
+    XX(scsum_, 2999) \
+    XX(samax_, 2982) \
+    XX(scamax_, 2994) \
+    XX(samin_, 2983) \
+    XX(scamin_, 2995) \
+    XX(smax_, 3016) \
+    XX(smin_, 3017) \
+    XX(snrm2_, 3018) \
+    XX(scnrm2_, 2997) \
 
 #endif
 
 #ifndef COMPLEX64_FUNCS
 #define COMPLEX64_FUNCS(XX) \
-    XX(cdotu_, 2733) \
-    XX(cdotc_, 2732) \
+    XX(cdotu_, 2815) \
+    XX(cdotc_, 2814) \
 
 #endif
 
 #ifndef COMPLEX128_FUNCS
 #define COMPLEX128_FUNCS(XX) \
-    XX(zdotu_, 4440) \
-    XX(zdotc_, 4439) \
+    XX(zdotu_, 3088) \
+    XX(zdotc_, 3087) \
 
 #endif
 
 #ifndef CBLAS_WORKAROUND_FUNCS
 #define CBLAS_WORKAROUND_FUNCS(XX) \
-    XX(cblas_cdotc_sub, 2547) \
-    XX(cblas_cdotu_sub, 2549) \
-    XX(cblas_zdotc_sub, 2695) \
-    XX(cblas_zdotu_sub, 2697) \
-    XX(cblas_ddot, 2588) \
-    XX(cblas_sdot, 2655) \
+    XX(cblas_cdotc_sub, 2612) \
+    XX(cblas_cdotu_sub, 2614) \
+    XX(cblas_zdotc_sub, 2774) \
+    XX(cblas_zdotu_sub, 2776) \
+    XX(cblas_ddot, 2658) \
+    XX(cblas_sdot, 2732) \
 
 #endif
