@@ -2759,6 +2759,8 @@
     XX(cgeesx_) \
     XX(cgeev_) \
     XX(cgeevx_) \
+    XX(cgegs_) \
+    XX(cgegv_) \
     XX(cgehd2_) \
     XX(cgehrd_) \
     XX(cgejsv_) \
@@ -2770,6 +2772,7 @@
     XX(cgels_) \
     XX(cgelsd_) \
     XX(cgelss_) \
+    XX(cgelsx_) \
     XX(cgelsy_) \
     XX(cgemlq_) \
     XX(cgemlqt_) \
@@ -2782,6 +2785,7 @@
     XX(cgeql2_) \
     XX(cgeqlf_) \
     XX(cgeqp3_) \
+    XX(cgeqpf_) \
     XX(cgeqr2_) \
     XX(cgeqr2p_) \
     XX(cgeqr_) \
@@ -2825,7 +2829,9 @@
     XX(cggqrf_) \
     XX(cggrqf_) \
     XX(cggsvd3_) \
+    XX(cggsvd_) \
     XX(cggsvp3_) \
+    XX(cggsvp_) \
     XX(cgsvj0_) \
     XX(cgsvj1_) \
     XX(cgtcon_) \
@@ -2957,6 +2963,7 @@
     XX(clahilb_) \
     XX(clahqr_) \
     XX(clahr2_) \
+    XX(clahrd_) \
     XX(claic1_) \
     XX(clakf2_) \
     XX(clals0_) \
@@ -3046,6 +3053,7 @@
     XX(clatrs_) \
     XX(clatrz_) \
     XX(clatsqr_) \
+    XX(clatzm_) \
     XX(claunhr_col_getrfnp2_) \
     XX(claunhr_col_getrfnp_) \
     XX(clauu2_) \
@@ -3205,6 +3213,7 @@
     XX(ctrtrs_) \
     XX(ctrttf_) \
     XX(ctrttp_) \
+    XX(ctzrqf_) \
     XX(ctzrzf_) \
     XX(cunbdb1_) \
     XX(cunbdb2_) \
@@ -3282,6 +3291,8 @@
     XX(dgeesx_) \
     XX(dgeev_) \
     XX(dgeevx_) \
+    XX(dgegs_) \
+    XX(dgegv_) \
     XX(dgehd2_) \
     XX(dgehrd_) \
     XX(dgejsv_) \
@@ -3293,6 +3304,7 @@
     XX(dgels_) \
     XX(dgelsd_) \
     XX(dgelss_) \
+    XX(dgelsx_) \
     XX(dgelsy_) \
     XX(dgemlq_) \
     XX(dgemlqt_) \
@@ -3304,6 +3316,7 @@
     XX(dgeql2_) \
     XX(dgeqlf_) \
     XX(dgeqp3_) \
+    XX(dgeqpf_) \
     XX(dgeqr2_) \
     XX(dgeqr2p_) \
     XX(dgeqr_) \
@@ -3346,7 +3359,9 @@
     XX(dggqrf_) \
     XX(dggrqf_) \
     XX(dggsvd3_) \
+    XX(dggsvd_) \
     XX(dggsvp3_) \
+    XX(dggsvp_) \
     XX(dgsvj0_) \
     XX(dgsvj1_) \
     XX(dgtcon_) \
@@ -3397,6 +3412,7 @@
     XX(dlahilb_) \
     XX(dlahqr_) \
     XX(dlahr2_) \
+    XX(dlahrd_) \
     XX(dlaic1_) \
     XX(dlaisnan_) \
     XX(dlakf2_) \
@@ -3528,6 +3544,7 @@
     XX(dlatrs_) \
     XX(dlatrz_) \
     XX(dlatsqr_) \
+    XX(dlatzm_) \
     XX(dlauu2_) \
     XX(dlauum_) \
     XX(dmax_) \
@@ -3777,6 +3794,7 @@
     XX(dtrtrs_) \
     XX(dtrttf_) \
     XX(dtrttp_) \
+    XX(dtzrqf_) \
     XX(dtzrzf_) \
     XX(dzamax_) \
     XX(dzamin_) \
@@ -3909,6 +3927,8 @@
     XX(sgeesx_) \
     XX(sgeev_) \
     XX(sgeevx_) \
+    XX(sgegs_) \
+    XX(sgegv_) \
     XX(sgehd2_) \
     XX(sgehrd_) \
     XX(sgejsv_) \
@@ -3920,6 +3940,7 @@
     XX(sgels_) \
     XX(sgelsd_) \
     XX(sgelss_) \
+    XX(sgelsx_) \
     XX(sgelsy_) \
     XX(sgemlq_) \
     XX(sgemlqt_) \
@@ -3931,6 +3952,7 @@
     XX(sgeql2_) \
     XX(sgeqlf_) \
     XX(sgeqp3_) \
+    XX(sgeqpf_) \
     XX(sgeqr2_) \
     XX(sgeqr2p_) \
     XX(sgeqr_) \
@@ -3973,7 +3995,9 @@
     XX(sggqrf_) \
     XX(sggrqf_) \
     XX(sggsvd3_) \
+    XX(sggsvd_) \
     XX(sggsvp3_) \
+    XX(sggsvp_) \
     XX(sgsvj0_) \
     XX(sgsvj1_) \
     XX(sgtcon_) \
@@ -4024,6 +4048,7 @@
     XX(slahilb_) \
     XX(slahqr_) \
     XX(slahr2_) \
+    XX(slahrd_) \
     XX(slaic1_) \
     XX(slaisnan_) \
     XX(slakf2_) \
@@ -4154,6 +4179,7 @@
     XX(slatrs_) \
     XX(slatrz_) \
     XX(slatsqr_) \
+    XX(slatzm_) \
     XX(slauu2_) \
     XX(slauum_) \
     XX(smax_) \
@@ -4398,6 +4424,7 @@
     XX(strtrs_) \
     XX(strttf_) \
     XX(strttp_) \
+    XX(stzrqf_) \
     XX(stzrzf_) \
     XX(xaxpy_) \
     XX(xcopy_) \
@@ -4469,6 +4496,8 @@
     XX(zgeesx_) \
     XX(zgeev_) \
     XX(zgeevx_) \
+    XX(zgegs_) \
+    XX(zgegv_) \
     XX(zgehd2_) \
     XX(zgehrd_) \
     XX(zgejsv_) \
@@ -4480,6 +4509,7 @@
     XX(zgels_) \
     XX(zgelsd_) \
     XX(zgelss_) \
+    XX(zgelsx_) \
     XX(zgelsy_) \
     XX(zgemlq_) \
     XX(zgemlqt_) \
@@ -4492,6 +4522,7 @@
     XX(zgeql2_) \
     XX(zgeqlf_) \
     XX(zgeqp3_) \
+    XX(zgeqpf_) \
     XX(zgeqr2_) \
     XX(zgeqr2p_) \
     XX(zgeqr_) \
@@ -4535,7 +4566,9 @@
     XX(zggqrf_) \
     XX(zggrqf_) \
     XX(zggsvd3_) \
+    XX(zggsvd_) \
     XX(zggsvp3_) \
+    XX(zggsvp_) \
     XX(zgsvj0_) \
     XX(zgsvj1_) \
     XX(zgtcon_) \
@@ -4666,6 +4699,7 @@
     XX(zlahilb_) \
     XX(zlahqr_) \
     XX(zlahr2_) \
+    XX(zlahrd_) \
     XX(zlaic1_) \
     XX(zlakf2_) \
     XX(zlals0_) \
@@ -4756,6 +4790,7 @@
     XX(zlatrs_) \
     XX(zlatrz_) \
     XX(zlatsqr_) \
+    XX(zlatzm_) \
     XX(zlaunhr_col_getrfnp2_) \
     XX(zlaunhr_col_getrfnp_) \
     XX(zlauu2_) \
@@ -4912,6 +4947,7 @@
     XX(ztrtrs_) \
     XX(ztrttf_) \
     XX(ztrttp_) \
+    XX(ztzrqf_) \
     XX(ztzrzf_) \
     XX(zunbdb1_) \
     XX(zunbdb2_) \
@@ -4952,27 +4988,27 @@
     XX(zupgtr_) \
     XX(zupmtr_) \
 
-#define NUM_EXPORTED_FUNCS 4949
+#define NUM_EXPORTED_FUNCS 4985
 #endif
 
 #ifndef FLOAT32_FUNCS
 #define FLOAT32_FUNCS(XX) \
-    XX(sdot_, 3881) \
-    XX(sdsdot_, 3882) \
-    XX(sasum_, 3858) \
-    XX(scasum_, 3874) \
-    XX(ssum_, 4286) \
-    XX(scsum_, 3879) \
-    XX(samax_, 3856) \
-    XX(scamax_, 3872) \
-    XX(samin_, 3857) \
-    XX(scamin_, 3873) \
-    XX(smax_, 4154) \
-    XX(smin_, 4155) \
-    XX(snrm2_, 4156) \
-    XX(scnrm2_, 3875) \
-    XX(slamch_, 4030) \
-    XX(slamc3_, 4029) \
+    XX(sdot_, 3899) \
+    XX(sdsdot_, 3900) \
+    XX(sasum_, 3876) \
+    XX(scasum_, 3892) \
+    XX(ssum_, 4312) \
+    XX(scsum_, 3897) \
+    XX(samax_, 3874) \
+    XX(scamax_, 3890) \
+    XX(samin_, 3875) \
+    XX(scamin_, 3891) \
+    XX(smax_, 4180) \
+    XX(smin_, 4181) \
+    XX(snrm2_, 4182) \
+    XX(scnrm2_, 3893) \
+    XX(slamch_, 4055) \
+    XX(slamc3_, 4054) \
 
 #endif
 
@@ -4985,8 +5021,8 @@
 
 #ifndef COMPLEX128_FUNCS
 #define COMPLEX128_FUNCS(XX) \
-    XX(zdotu_, 4440) \
-    XX(zdotc_, 4439) \
+    XX(zdotu_, 4467) \
+    XX(zdotc_, 4466) \
 
 #endif
 
