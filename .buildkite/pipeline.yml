@@ -15,21 +15,21 @@ steps:
         
         ARCH="x86_64"
         AGENT_ARCH="x86_64"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v5.26/package_linux.x86_64.tar.gz"
-        ROOTFS_HASH="5b0b851aca3c941b900a1301c13922c6cfc7f211"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v6.00/package_linux.x86_64.tar.gz"
+        ROOTFS_HASH="4dcde853eb5baaa0a8f087b633eaf955dc94b5dc"
         upload_pipeline
 
         # We still schedule this one on an x86_64 machine, but use an i686 rootfs
         ARCH="i686"
         AGENT_ARCH="x86_64"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v5.26/package_linux.i686.tar.gz"
-        ROOTFS_HASH="abe9ca251b93980e444738b3996779d60ea7045d"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v6.00/package_linux.i686.tar.gz"
+        ROOTFS_HASH="a0c4756ee7827b3a75d4a62ff543315c1547e3d6"
         upload_pipeline
 
         ARCH="aarch64"
         AGENT_ARCH="aarch64"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v5.26/package_linux.aarch64.tar.gz"
-        ROOTFS_HASH="dcf39d10ba43bf13c75d5031c3a88f125780033b"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v6.00/package_linux.aarch64.tar.gz"
+        ROOTFS_HASH="e32c05f36d0a5bb0f94a17d99647f0b3352a8256"
         upload_pipeline
 
 
