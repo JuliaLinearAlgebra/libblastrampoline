@@ -9,7 +9,7 @@ steps:
       }
 
       # We'll test on the following julia versions
-      for JULIA_VERSION in 1.8 nightly; do
+      for JULIA_VERSION in 1.10 nightly; do
         # First, linux
         OS="linux"
         
