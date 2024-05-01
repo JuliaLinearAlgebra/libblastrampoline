@@ -37,6 +37,10 @@
     XX(LAPACKE_cgebrd_work) \
     XX(LAPACKE_cgecon) \
     XX(LAPACKE_cgecon_work) \
+    XX(LAPACKE_cgedmd) \
+    XX(LAPACKE_cgedmd_work) \
+    XX(LAPACKE_cgedmdq) \
+    XX(LAPACKE_cgedmdq_work) \
     XX(LAPACKE_cgeequ) \
     XX(LAPACKE_cgeequ_work) \
     XX(LAPACKE_cgeequb) \
@@ -103,6 +107,8 @@
     XX(LAPACKE_cgesv_work) \
     XX(LAPACKE_cgesvd) \
     XX(LAPACKE_cgesvd_work) \
+    XX(LAPACKE_cgesvdq) \
+    XX(LAPACKE_cgesvdq_work) \
     XX(LAPACKE_cgesvdx) \
     XX(LAPACKE_cgesvdx_work) \
     XX(LAPACKE_cgesvj) \
@@ -121,6 +127,8 @@
     XX(LAPACKE_cgetrs_work) \
     XX(LAPACKE_cgetsls) \
     XX(LAPACKE_cgetsls_work) \
+    XX(LAPACKE_cgetsqrhrt) \
+    XX(LAPACKE_cgetsqrhrt_work) \
     XX(LAPACKE_cgg_nancheck) \
     XX(LAPACKE_cgg_trans) \
     XX(LAPACKE_cggbak) \
@@ -336,6 +344,8 @@
     XX(LAPACKE_claghe_work) \
     XX(LAPACKE_clagsy) \
     XX(LAPACKE_clagsy_work) \
+    XX(LAPACKE_clangb) \
+    XX(LAPACKE_clangb_work) \
     XX(LAPACKE_clange) \
     XX(LAPACKE_clange_work) \
     XX(LAPACKE_clanhe) \
@@ -607,6 +617,8 @@
     XX(LAPACKE_ctrsna) \
     XX(LAPACKE_ctrsna_work) \
     XX(LAPACKE_ctrsyl) \
+    XX(LAPACKE_ctrsyl3) \
+    XX(LAPACKE_ctrsyl3_work) \
     XX(LAPACKE_ctrsyl_work) \
     XX(LAPACKE_ctrtri) \
     XX(LAPACKE_ctrtri_work) \
@@ -616,6 +628,8 @@
     XX(LAPACKE_ctrttf_work) \
     XX(LAPACKE_ctrttp) \
     XX(LAPACKE_ctrttp_work) \
+    XX(LAPACKE_ctz_nancheck) \
+    XX(LAPACKE_ctz_trans) \
     XX(LAPACKE_ctzrzf) \
     XX(LAPACKE_ctzrzf_work) \
     XX(LAPACKE_cunbdb) \
@@ -638,6 +652,10 @@
     XX(LAPACKE_cungrq_work) \
     XX(LAPACKE_cungtr) \
     XX(LAPACKE_cungtr_work) \
+    XX(LAPACKE_cungtsqr_row) \
+    XX(LAPACKE_cungtsqr_row_work) \
+    XX(LAPACKE_cunhr_col) \
+    XX(LAPACKE_cunhr_col_work) \
     XX(LAPACKE_cunmbr) \
     XX(LAPACKE_cunmbr_work) \
     XX(LAPACKE_cunmhr) \
@@ -699,6 +717,10 @@
     XX(LAPACKE_dgebrd_work) \
     XX(LAPACKE_dgecon) \
     XX(LAPACKE_dgecon_work) \
+    XX(LAPACKE_dgedmd) \
+    XX(LAPACKE_dgedmd_work) \
+    XX(LAPACKE_dgedmdq) \
+    XX(LAPACKE_dgedmdq_work) \
     XX(LAPACKE_dgeequ) \
     XX(LAPACKE_dgeequ_work) \
     XX(LAPACKE_dgeequb) \
@@ -785,6 +807,8 @@
     XX(LAPACKE_dgetrs_work) \
     XX(LAPACKE_dgetsls) \
     XX(LAPACKE_dgetsls_work) \
+    XX(LAPACKE_dgetsqrhrt) \
+    XX(LAPACKE_dgetsqrhrt_work) \
     XX(LAPACKE_dgg_nancheck) \
     XX(LAPACKE_dgg_trans) \
     XX(LAPACKE_dggbak) \
@@ -856,6 +880,8 @@
     XX(LAPACKE_dlagsy_work) \
     XX(LAPACKE_dlamch) \
     XX(LAPACKE_dlamch_work) \
+    XX(LAPACKE_dlangb) \
+    XX(LAPACKE_dlangb_work) \
     XX(LAPACKE_dlange) \
     XX(LAPACKE_dlange_work) \
     XX(LAPACKE_dlansy) \
@@ -922,6 +948,10 @@
     XX(LAPACKE_dorgrq_work) \
     XX(LAPACKE_dorgtr) \
     XX(LAPACKE_dorgtr_work) \
+    XX(LAPACKE_dorgtsqr_row) \
+    XX(LAPACKE_dorgtsqr_row_work) \
+    XX(LAPACKE_dorhr_col) \
+    XX(LAPACKE_dorhr_col_work) \
     XX(LAPACKE_dormbr) \
     XX(LAPACKE_dormbr_work) \
     XX(LAPACKE_dormhr) \
@@ -1257,6 +1287,8 @@
     XX(LAPACKE_dtrsna) \
     XX(LAPACKE_dtrsna_work) \
     XX(LAPACKE_dtrsyl) \
+    XX(LAPACKE_dtrsyl3) \
+    XX(LAPACKE_dtrsyl3_work) \
     XX(LAPACKE_dtrsyl_work) \
     XX(LAPACKE_dtrtri) \
     XX(LAPACKE_dtrtri_work) \
@@ -1266,6 +1298,8 @@
     XX(LAPACKE_dtrttf_work) \
     XX(LAPACKE_dtrttp) \
     XX(LAPACKE_dtrttp_work) \
+    XX(LAPACKE_dtz_nancheck) \
+    XX(LAPACKE_dtz_trans) \
     XX(LAPACKE_dtzrzf) \
     XX(LAPACKE_dtzrzf_work) \
     XX(LAPACKE_get_nancheck) \
@@ -1313,6 +1347,10 @@
     XX(LAPACKE_sgebrd_work) \
     XX(LAPACKE_sgecon) \
     XX(LAPACKE_sgecon_work) \
+    XX(LAPACKE_sgedmd) \
+    XX(LAPACKE_sgedmd_work) \
+    XX(LAPACKE_sgedmdq) \
+    XX(LAPACKE_sgedmdq_work) \
     XX(LAPACKE_sgeequ) \
     XX(LAPACKE_sgeequ_work) \
     XX(LAPACKE_sgeequb) \
@@ -1399,6 +1437,8 @@
     XX(LAPACKE_sgetrs_work) \
     XX(LAPACKE_sgetsls) \
     XX(LAPACKE_sgetsls_work) \
+    XX(LAPACKE_sgetsqrhrt) \
+    XX(LAPACKE_sgetsqrhrt_work) \
     XX(LAPACKE_sgg_nancheck) \
     XX(LAPACKE_sgg_trans) \
     XX(LAPACKE_sggbak) \
@@ -1470,6 +1510,8 @@
     XX(LAPACKE_slagsy_work) \
     XX(LAPACKE_slamch) \
     XX(LAPACKE_slamch_work) \
+    XX(LAPACKE_slangb) \
+    XX(LAPACKE_slangb_work) \
     XX(LAPACKE_slange) \
     XX(LAPACKE_slange_work) \
     XX(LAPACKE_slansy) \
@@ -1536,6 +1578,10 @@
     XX(LAPACKE_sorgrq_work) \
     XX(LAPACKE_sorgtr) \
     XX(LAPACKE_sorgtr_work) \
+    XX(LAPACKE_sorgtsqr_row) \
+    XX(LAPACKE_sorgtsqr_row_work) \
+    XX(LAPACKE_sorhr_col) \
+    XX(LAPACKE_sorhr_col_work) \
     XX(LAPACKE_sormbr) \
     XX(LAPACKE_sormbr_work) \
     XX(LAPACKE_sormhr) \
@@ -1867,6 +1913,8 @@
     XX(LAPACKE_strsna) \
     XX(LAPACKE_strsna_work) \
     XX(LAPACKE_strsyl) \
+    XX(LAPACKE_strsyl3) \
+    XX(LAPACKE_strsyl3_work) \
     XX(LAPACKE_strsyl_work) \
     XX(LAPACKE_strtri) \
     XX(LAPACKE_strtri_work) \
@@ -1876,6 +1924,8 @@
     XX(LAPACKE_strttf_work) \
     XX(LAPACKE_strttp) \
     XX(LAPACKE_strttp_work) \
+    XX(LAPACKE_stz_nancheck) \
+    XX(LAPACKE_stz_trans) \
     XX(LAPACKE_stzrzf) \
     XX(LAPACKE_stzrzf_work) \
     XX(LAPACKE_xerbla) \
@@ -1918,6 +1968,10 @@
     XX(LAPACKE_zgebrd_work) \
     XX(LAPACKE_zgecon) \
     XX(LAPACKE_zgecon_work) \
+    XX(LAPACKE_zgedmd) \
+    XX(LAPACKE_zgedmd_work) \
+    XX(LAPACKE_zgedmdq) \
+    XX(LAPACKE_zgedmdq_work) \
     XX(LAPACKE_zgeequ) \
     XX(LAPACKE_zgeequ_work) \
     XX(LAPACKE_zgeequb) \
@@ -2004,6 +2058,8 @@
     XX(LAPACKE_zgetrs_work) \
     XX(LAPACKE_zgetsls) \
     XX(LAPACKE_zgetsls_work) \
+    XX(LAPACKE_zgetsqrhrt) \
+    XX(LAPACKE_zgetsqrhrt_work) \
     XX(LAPACKE_zgg_nancheck) \
     XX(LAPACKE_zgg_trans) \
     XX(LAPACKE_zggbak) \
@@ -2219,6 +2275,8 @@
     XX(LAPACKE_zlaghe_work) \
     XX(LAPACKE_zlagsy) \
     XX(LAPACKE_zlagsy_work) \
+    XX(LAPACKE_zlangb) \
+    XX(LAPACKE_zlangb_work) \
     XX(LAPACKE_zlange) \
     XX(LAPACKE_zlange_work) \
     XX(LAPACKE_zlanhe) \
@@ -2490,6 +2548,8 @@
     XX(LAPACKE_ztrsna) \
     XX(LAPACKE_ztrsna_work) \
     XX(LAPACKE_ztrsyl) \
+    XX(LAPACKE_ztrsyl3) \
+    XX(LAPACKE_ztrsyl3_work) \
     XX(LAPACKE_ztrsyl_work) \
     XX(LAPACKE_ztrtri) \
     XX(LAPACKE_ztrtri_work) \
@@ -2499,6 +2559,8 @@
     XX(LAPACKE_ztrttf_work) \
     XX(LAPACKE_ztrttp) \
     XX(LAPACKE_ztrttp_work) \
+    XX(LAPACKE_ztz_nancheck) \
+    XX(LAPACKE_ztz_trans) \
     XX(LAPACKE_ztzrzf) \
     XX(LAPACKE_ztzrzf_work) \
     XX(LAPACKE_zunbdb) \
@@ -2521,6 +2583,10 @@
     XX(LAPACKE_zungrq_work) \
     XX(LAPACKE_zungtr) \
     XX(LAPACKE_zungtr_work) \
+    XX(LAPACKE_zungtsqr_row) \
+    XX(LAPACKE_zungtsqr_row_work) \
+    XX(LAPACKE_zunhr_col) \
+    XX(LAPACKE_zunhr_col_work) \
     XX(LAPACKE_zunmbr) \
     XX(LAPACKE_zunmbr_work) \
     XX(LAPACKE_zunmhr) \
@@ -2547,6 +2613,7 @@
     XX(cbdsqr_) \
     XX(cblas_caxpby) \
     XX(cblas_caxpy) \
+    XX(cblas_caxpyc) \
     XX(cblas_ccopy) \
     XX(cblas_cdotc) \
     XX(cblas_cdotc_sub) \
@@ -2556,6 +2623,7 @@
     XX(cblas_cgeadd) \
     XX(cblas_cgemm) \
     XX(cblas_cgemm3m) \
+    XX(cblas_cgemmt) \
     XX(cblas_cgemv) \
     XX(cblas_cgerc) \
     XX(cblas_cgeru) \
@@ -2571,7 +2639,9 @@
     XX(cblas_chpr2) \
     XX(cblas_cimatcopy) \
     XX(cblas_comatcopy) \
+    XX(cblas_crotg) \
     XX(cblas_cscal) \
+    XX(cblas_csrot) \
     XX(cblas_csscal) \
     XX(cblas_cswap) \
     XX(cblas_csymm) \
@@ -2585,6 +2655,8 @@
     XX(cblas_ctrmv) \
     XX(cblas_ctrsm) \
     XX(cblas_ctrsv) \
+    XX(cblas_damax) \
+    XX(cblas_damin) \
     XX(cblas_dasum) \
     XX(cblas_daxpby) \
     XX(cblas_daxpy) \
@@ -2594,6 +2666,7 @@
     XX(cblas_dgbmv) \
     XX(cblas_dgeadd) \
     XX(cblas_dgemm) \
+    XX(cblas_dgemmt) \
     XX(cblas_dgemv) \
     XX(cblas_dger) \
     XX(cblas_dimatcopy) \
@@ -2625,6 +2698,8 @@
     XX(cblas_dtrmv) \
     XX(cblas_dtrsm) \
     XX(cblas_dtrsv) \
+    XX(cblas_dzamax) \
+    XX(cblas_dzamin) \
     XX(cblas_dzasum) \
     XX(cblas_dznrm2) \
     XX(cblas_dzsum) \
@@ -2644,6 +2719,8 @@
     XX(cblas_izamin) \
     XX(cblas_izmax) \
     XX(cblas_izmin) \
+    XX(cblas_samax) \
+    XX(cblas_samin) \
     XX(cblas_sasum) \
     XX(cblas_saxpby) \
     XX(cblas_saxpy) \
@@ -2653,6 +2730,8 @@
     XX(cblas_sbgemm) \
     XX(cblas_sbgemv) \
     XX(cblas_sbstobf16) \
+    XX(cblas_scamax) \
+    XX(cblas_scamin) \
     XX(cblas_scasum) \
     XX(cblas_scnrm2) \
     XX(cblas_scopy) \
@@ -2662,6 +2741,7 @@
     XX(cblas_sgbmv) \
     XX(cblas_sgeadd) \
     XX(cblas_sgemm) \
+    XX(cblas_sgemmt) \
     XX(cblas_sgemv) \
     XX(cblas_sger) \
     XX(cblas_simatcopy) \
@@ -2705,6 +2785,7 @@
     XX(cblas_zgeadd) \
     XX(cblas_zgemm) \
     XX(cblas_zgemm3m) \
+    XX(cblas_zgemmt) \
     XX(cblas_zgemv) \
     XX(cblas_zgerc) \
     XX(cblas_zgeru) \
@@ -2753,6 +2834,8 @@
     XX(cgebd2_) \
     XX(cgebrd_) \
     XX(cgecon_) \
+    XX(cgedmd_) \
+    XX(cgedmdq_) \
     XX(cgeequ_) \
     XX(cgeequb_) \
     XX(cgees_) \
@@ -2767,11 +2850,13 @@
     XX(cgelq2_) \
     XX(cgelq_) \
     XX(cgelqf_) \
+    XX(cgelqs_) \
     XX(cgelqt3_) \
     XX(cgelqt_) \
     XX(cgels_) \
     XX(cgelsd_) \
     XX(cgelss_) \
+    XX(cgelst_) \
     XX(cgelsx_) \
     XX(cgelsy_) \
     XX(cgemlq_) \
@@ -2785,12 +2870,14 @@
     XX(cgeql2_) \
     XX(cgeqlf_) \
     XX(cgeqp3_) \
+    XX(cgeqp3rk_) \
     XX(cgeqpf_) \
     XX(cgeqr2_) \
     XX(cgeqr2p_) \
     XX(cgeqr_) \
     XX(cgeqrf_) \
     XX(cgeqrfp_) \
+    XX(cgeqrs_) \
     XX(cgeqrt2_) \
     XX(cgeqrt3_) \
     XX(cgeqrt_) \
@@ -2814,6 +2901,7 @@
     XX(cgetri_) \
     XX(cgetrs_) \
     XX(cgetsls_) \
+    XX(cgetsqrhrt_) \
     XX(cggbak_) \
     XX(cggbal_) \
     XX(cgges3_) \
@@ -2995,6 +3083,8 @@
     XX(claqhe_) \
     XX(claqhp_) \
     XX(claqp2_) \
+    XX(claqp2rk_) \
+    XX(claqp3rk_) \
     XX(claqps_) \
     XX(claqr0_) \
     XX(claqr1_) \
@@ -3010,6 +3100,7 @@
     XX(clarcm_) \
     XX(clarf_) \
     XX(clarfb_) \
+    XX(clarfb_gett_) \
     XX(clarfg_) \
     XX(clarfgp_) \
     XX(clarft_) \
@@ -3050,6 +3141,7 @@
     XX(clatmt_) \
     XX(clatps_) \
     XX(clatrd_) \
+    XX(clatrs3_) \
     XX(clatrs_) \
     XX(clatrz_) \
     XX(clatsqr_) \
@@ -3102,6 +3194,7 @@
     XX(cptts2_) \
     XX(crot_) \
     XX(crotg_) \
+    XX(crscl_) \
     XX(csbmv_) \
     XX(cscal_) \
     XX(cspcon_) \
@@ -3207,6 +3300,7 @@
     XX(ctrsm_) \
     XX(ctrsna_) \
     XX(ctrsv_) \
+    XX(ctrsyl3_) \
     XX(ctrsyl_) \
     XX(ctrti2_) \
     XX(ctrtri_) \
@@ -3236,6 +3330,7 @@
     XX(cungrq_) \
     XX(cungtr_) \
     XX(cungtsqr_) \
+    XX(cungtsqr_row_) \
     XX(cunhr_col_) \
     XX(cunm22_) \
     XX(cunm2l_) \
@@ -3285,6 +3380,8 @@
     XX(dgebd2_) \
     XX(dgebrd_) \
     XX(dgecon_) \
+    XX(dgedmd_) \
+    XX(dgedmdq_) \
     XX(dgeequ_) \
     XX(dgeequb_) \
     XX(dgees_) \
@@ -3299,11 +3396,13 @@
     XX(dgelq2_) \
     XX(dgelq_) \
     XX(dgelqf_) \
+    XX(dgelqs_) \
     XX(dgelqt3_) \
     XX(dgelqt_) \
     XX(dgels_) \
     XX(dgelsd_) \
     XX(dgelss_) \
+    XX(dgelst_) \
     XX(dgelsx_) \
     XX(dgelsy_) \
     XX(dgemlq_) \
@@ -3316,12 +3415,14 @@
     XX(dgeql2_) \
     XX(dgeqlf_) \
     XX(dgeqp3_) \
+    XX(dgeqp3rk_) \
     XX(dgeqpf_) \
     XX(dgeqr2_) \
     XX(dgeqr2p_) \
     XX(dgeqr_) \
     XX(dgeqrf_) \
     XX(dgeqrfp_) \
+    XX(dgeqrs_) \
     XX(dgeqrt2_) \
     XX(dgeqrt3_) \
     XX(dgeqrt_) \
@@ -3344,6 +3445,7 @@
     XX(dgetri_) \
     XX(dgetrs_) \
     XX(dgetsls_) \
+    XX(dgetsqrhrt_) \
     XX(dggbak_) \
     XX(dggbal_) \
     XX(dgges3_) \
@@ -3449,6 +3551,8 @@
     XX(dlaqgb_) \
     XX(dlaqge_) \
     XX(dlaqp2_) \
+    XX(dlaqp2rk_) \
+    XX(dlaqp3rk_) \
     XX(dlaqps_) \
     XX(dlaqr0_) \
     XX(dlaqr1_) \
@@ -3465,6 +3569,7 @@
     XX(dlaran_) \
     XX(dlarf_) \
     XX(dlarfb_) \
+    XX(dlarfb_gett_) \
     XX(dlarfg_) \
     XX(dlarfgp_) \
     XX(dlarft_) \
@@ -3472,6 +3577,7 @@
     XX(dlarfy_) \
     XX(dlarge_) \
     XX(dlargv_) \
+    XX(dlarmm_) \
     XX(dlarnd_) \
     XX(dlarnv_) \
     XX(dlaror_) \
@@ -3541,6 +3647,7 @@
     XX(dlatmt_) \
     XX(dlatps_) \
     XX(dlatrd_) \
+    XX(dlatrs3_) \
     XX(dlatrs_) \
     XX(dlatrz_) \
     XX(dlatsqr_) \
@@ -3574,6 +3681,7 @@
     XX(dorgrq_) \
     XX(dorgtr_) \
     XX(dorgtsqr_) \
+    XX(dorgtsqr_row_) \
     XX(dorhr_col_) \
     XX(dorm22_) \
     XX(dorm2l_) \
@@ -3788,6 +3896,7 @@
     XX(dtrsm_) \
     XX(dtrsna_) \
     XX(dtrsv_) \
+    XX(dtrsyl3_) \
     XX(dtrsyl_) \
     XX(dtrti2_) \
     XX(dtrtri_) \
@@ -3921,6 +4030,8 @@
     XX(sgebd2_) \
     XX(sgebrd_) \
     XX(sgecon_) \
+    XX(sgedmd_) \
+    XX(sgedmdq_) \
     XX(sgeequ_) \
     XX(sgeequb_) \
     XX(sgees_) \
@@ -3935,11 +4046,13 @@
     XX(sgelq2_) \
     XX(sgelq_) \
     XX(sgelqf_) \
+    XX(sgelqs_) \
     XX(sgelqt3_) \
     XX(sgelqt_) \
     XX(sgels_) \
     XX(sgelsd_) \
     XX(sgelss_) \
+    XX(sgelst_) \
     XX(sgelsx_) \
     XX(sgelsy_) \
     XX(sgemlq_) \
@@ -3952,12 +4065,14 @@
     XX(sgeql2_) \
     XX(sgeqlf_) \
     XX(sgeqp3_) \
+    XX(sgeqp3rk_) \
     XX(sgeqpf_) \
     XX(sgeqr2_) \
     XX(sgeqr2p_) \
     XX(sgeqr_) \
     XX(sgeqrf_) \
     XX(sgeqrfp_) \
+    XX(sgeqrs_) \
     XX(sgeqrt2_) \
     XX(sgeqrt3_) \
     XX(sgeqrt_) \
@@ -3980,6 +4095,7 @@
     XX(sgetri_) \
     XX(sgetrs_) \
     XX(sgetsls_) \
+    XX(sgetsqrhrt_) \
     XX(sggbak_) \
     XX(sggbal_) \
     XX(sgges3_) \
@@ -4085,6 +4201,8 @@
     XX(slaqgb_) \
     XX(slaqge_) \
     XX(slaqp2_) \
+    XX(slaqp2rk_) \
+    XX(slaqp3rk_) \
     XX(slaqps_) \
     XX(slaqr0_) \
     XX(slaqr1_) \
@@ -4101,6 +4219,7 @@
     XX(slaran_) \
     XX(slarf_) \
     XX(slarfb_) \
+    XX(slarfb_gett_) \
     XX(slarfg_) \
     XX(slarfgp_) \
     XX(slarft_) \
@@ -4108,6 +4227,7 @@
     XX(slarfy_) \
     XX(slarge_) \
     XX(slargv_) \
+    XX(slarmm_) \
     XX(slarnd_) \
     XX(slarnv_) \
     XX(slaror_) \
@@ -4176,6 +4296,7 @@
     XX(slatmt_) \
     XX(slatps_) \
     XX(slatrd_) \
+    XX(slatrs3_) \
     XX(slatrs_) \
     XX(slatrz_) \
     XX(slatsqr_) \
@@ -4209,6 +4330,7 @@
     XX(sorgrq_) \
     XX(sorgtr_) \
     XX(sorgtsqr_) \
+    XX(sorgtsqr_row_) \
     XX(sorhr_col_) \
     XX(sorm22_) \
     XX(sorm2l_) \
@@ -4320,6 +4442,7 @@
     XX(ssycon_3_) \
     XX(ssycon_rook_) \
     XX(ssyconv_) \
+    XX(ssyconvf_) \
     XX(ssyconvf_rook_) \
     XX(ssyequb_) \
     XX(ssyev_) \
@@ -4418,6 +4541,7 @@
     XX(strsm_) \
     XX(strsna_) \
     XX(strsv_) \
+    XX(strsyl3_) \
     XX(strsyl_) \
     XX(strti2_) \
     XX(strtri_) \
@@ -4490,6 +4614,8 @@
     XX(zgebd2_) \
     XX(zgebrd_) \
     XX(zgecon_) \
+    XX(zgedmd_) \
+    XX(zgedmdq_) \
     XX(zgeequ_) \
     XX(zgeequb_) \
     XX(zgees_) \
@@ -4504,11 +4630,13 @@
     XX(zgelq2_) \
     XX(zgelq_) \
     XX(zgelqf_) \
+    XX(zgelqs_) \
     XX(zgelqt3_) \
     XX(zgelqt_) \
     XX(zgels_) \
     XX(zgelsd_) \
     XX(zgelss_) \
+    XX(zgelst_) \
     XX(zgelsx_) \
     XX(zgelsy_) \
     XX(zgemlq_) \
@@ -4522,12 +4650,14 @@
     XX(zgeql2_) \
     XX(zgeqlf_) \
     XX(zgeqp3_) \
+    XX(zgeqp3rk_) \
     XX(zgeqpf_) \
     XX(zgeqr2_) \
     XX(zgeqr2p_) \
     XX(zgeqr_) \
     XX(zgeqrf_) \
     XX(zgeqrfp_) \
+    XX(zgeqrs_) \
     XX(zgeqrt2_) \
     XX(zgeqrt3_) \
     XX(zgeqrt_) \
@@ -4551,6 +4681,7 @@
     XX(zgetri_) \
     XX(zgetrs_) \
     XX(zgetsls_) \
+    XX(zgetsqrhrt_) \
     XX(zggbak_) \
     XX(zggbal_) \
     XX(zgges3_) \
@@ -4731,6 +4862,8 @@
     XX(zlaqhe_) \
     XX(zlaqhp_) \
     XX(zlaqp2_) \
+    XX(zlaqp2rk_) \
+    XX(zlaqp3rk_) \
     XX(zlaqps_) \
     XX(zlaqr0_) \
     XX(zlaqr1_) \
@@ -4746,6 +4879,7 @@
     XX(zlarcm_) \
     XX(zlarf_) \
     XX(zlarfb_) \
+    XX(zlarfb_gett_) \
     XX(zlarfg_) \
     XX(zlarfgp_) \
     XX(zlarft_) \
@@ -4787,6 +4921,7 @@
     XX(zlatmt_) \
     XX(zlatps_) \
     XX(zlatrd_) \
+    XX(zlatrs3_) \
     XX(zlatrs_) \
     XX(zlatrz_) \
     XX(zlatsqr_) \
@@ -4839,6 +4974,7 @@
     XX(zptts2_) \
     XX(zrot_) \
     XX(zrotg_) \
+    XX(zrscl_) \
     XX(zsbmv_) \
     XX(zscal_) \
     XX(zspcon_) \
@@ -4941,6 +5077,7 @@
     XX(ztrsm_) \
     XX(ztrsna_) \
     XX(ztrsv_) \
+    XX(ztrsyl3_) \
     XX(ztrsyl_) \
     XX(ztrti2_) \
     XX(ztrtri_) \
@@ -4970,6 +5107,7 @@
     XX(zungrq_) \
     XX(zungtr_) \
     XX(zungtsqr_) \
+    XX(zungtsqr_row_) \
     XX(zunhr_col_) \
     XX(zunm22_) \
     XX(zunm2l_) \
@@ -4988,51 +5126,51 @@
     XX(zupgtr_) \
     XX(zupmtr_) \
 
-#define NUM_EXPORTED_FUNCS 4985
+#define NUM_EXPORTED_FUNCS 5123
 #endif
 
 #ifndef FLOAT32_FUNCS
 #define FLOAT32_FUNCS(XX) \
-    XX(sdot_, 3899) \
-    XX(sdsdot_, 3900) \
-    XX(sasum_, 3876) \
-    XX(scasum_, 3892) \
-    XX(ssum_, 4312) \
-    XX(scsum_, 3897) \
-    XX(samax_, 3874) \
-    XX(scamax_, 3890) \
-    XX(samin_, 3875) \
-    XX(scamin_, 3891) \
-    XX(smax_, 4180) \
-    XX(smin_, 4181) \
-    XX(snrm2_, 4182) \
-    XX(scnrm2_, 3893) \
-    XX(slamch_, 4055) \
-    XX(slamc3_, 4054) \
+    XX(sdot_, 4008) \
+    XX(sdsdot_, 4009) \
+    XX(sasum_, 3985) \
+    XX(scasum_, 4001) \
+    XX(ssum_, 4434) \
+    XX(scsum_, 4006) \
+    XX(samax_, 3983) \
+    XX(scamax_, 3999) \
+    XX(samin_, 3984) \
+    XX(scamin_, 4000) \
+    XX(smax_, 4301) \
+    XX(smin_, 4302) \
+    XX(snrm2_, 4303) \
+    XX(scnrm2_, 4002) \
+    XX(slamch_, 4171) \
+    XX(slamc3_, 4170) \
 
 #endif
 
 #ifndef COMPLEX64_FUNCS
 #define COMPLEX64_FUNCS(XX) \
-    XX(cdotu_, 2733) \
-    XX(cdotc_, 2732) \
+    XX(cdotu_, 2814) \
+    XX(cdotc_, 2813) \
 
 #endif
 
 #ifndef COMPLEX128_FUNCS
 #define COMPLEX128_FUNCS(XX) \
-    XX(zdotu_, 4467) \
-    XX(zdotc_, 4466) \
+    XX(zdotu_, 4591) \
+    XX(zdotc_, 4590) \
 
 #endif
 
 #ifndef CBLAS_WORKAROUND_FUNCS
 #define CBLAS_WORKAROUND_FUNCS(XX) \
-    XX(cblas_cdotc_sub, 2547) \
-    XX(cblas_cdotu_sub, 2549) \
-    XX(cblas_zdotc_sub, 2695) \
-    XX(cblas_zdotu_sub, 2697) \
-    XX(cblas_ddot, 2588) \
-    XX(cblas_sdot, 2655) \
+    XX(cblas_cdotc_sub, 2614) \
+    XX(cblas_cdotu_sub, 2616) \
+    XX(cblas_zdotc_sub, 2775) \
+    XX(cblas_zdotu_sub, 2777) \
+    XX(cblas_ddot, 2660) \
+    XX(cblas_sdot, 2734) \
 
 #endif
