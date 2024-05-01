@@ -821,19 +821,28 @@ zpotri,
 );
 
 @lapack_deprecated_objsc = (
-    cgegs,   cggsvd,  
-    cgegv,   cggsvp,  
-    cgelsx,  clahrd,  
-    cgeqpf,  clatzm,  
+    cgegs,
+    cggsvd,
+    cgegv,
+    cggsvp,
+    cgelsx,
+    clahrd,
+    cgeqpf,
+    clatzm,
     ctzrqf,
     );
+
 @lapack_deprecated_objsd = (
-    dgegs,   dgeqpf,
-    dgegv,   dggsvd,
-    dgelsx,  dggsvp,
-             dlahrd,
-  dlatzm,  dtzrqf);
-  
+    dgegs,
+    dgeqpf,
+    dgegv,
+    dggsvd,
+    dgelsx,
+    dggsvp,
+    dlahrd,
+    dlatzm,
+    dtzrqf);
+
 @lapack_deprecated_objss = ( 
   sgelsx,
   sgegs,
@@ -843,7 +852,7 @@ zpotri,
   sggsvp,
   slahrd,
   slatzm,
-  stzrqf
+  stzrqf,
   );
 
 @lapack_deprecated_objsz = ( 
@@ -855,7 +864,7 @@ zpotri,
   zggsvp,
   zlahrd,
   zlatzm,
-  ztzrqf
+  ztzrqf,
   );
 
 @lapacke_deprecated_objsc = (
@@ -3693,6 +3702,11 @@ if ($ARGV[8] == 1) {
     }
 } else {
     @underscore_objs = (@blasobjs, @lapackobjs, @lapackobjs2, @lapack_embeded_underscore_objs, @misc_underscore_objs);
+
+    if ($ARGV[11] == 1) {
+        #BUILD_LAPACK_DEPRECATED=1
+        @underscore_objs = (@underscore_objs, @lapack_deprecated_objs);
+    }
 }
 
 if ($ARGV[8] == 1) {
