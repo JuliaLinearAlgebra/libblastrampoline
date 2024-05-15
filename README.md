@@ -1,5 +1,3 @@
-[![Drone Build Status](https://cloud.drone.io/api/badges/staticfloat/libblastrampoline/status.svg)](https://cloud.drone.io/staticfloat/libblastrampoline)
-
 # libblastrampoline
 
 > All problems in computer science can be solved by another level of indirection
@@ -7,11 +5,14 @@
 Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library. Watch a detailed [JuliaCon 2021 talk on libblastrampoline](https://www.youtube.com/watch?v=t6hptekOR7s).
 
 These BLAS libraries are known to work with libblastrampoline (successfully tested in Julia):
-1. OpenBLAS through [OpenBLASHighCoreCount.jl](https://github.com/giordano/OpenBLASHighCoreCount.jl)
-2. Intel MKL through [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)
-3. Apple Accelerate through [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl)
-4. BLIS through [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl)
-5. Fujitsu BLAS through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl)
+
+1. [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) (supported by default in Julia)
+2. [Intel oneMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html) (use in Julia through [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl))
+3. [Apple Accelerate](https://developer.apple.com/documentation/accelerate/blas) (use in Julia through [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl))
+4. [BLIS](https://github.com/flame/blis/) (use in Julia through [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl))
+5. Fujitsu BLAS (use in Julia through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl))
+6. [ARMPL BLAS](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries)
+7. [NVPL BLAS](https://docs.nvidia.com/nvpl/_static/blas/)
 
 ## Basic usage
 
