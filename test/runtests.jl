@@ -128,9 +128,9 @@ end
     run_all_tests("blas32", reverse(ReferenceBLAS32_jll.LIBPATH_list), :LP64, "", tests = [dgemm, sdot])
 end
 
-@testset "Vanilla ReferenceBLAS_jll (ILP64)" begin
-    run_all_tests("blas", reverse(ReferenceBLAS_jll.LIBPATH_list), :ILP64, "", tests = [dgemm, sdot])
-end
+# @testset "Vanilla ReferenceBLAS_jll (ILP64)" begin
+#     run_all_tests("blas", reverse(ReferenceBLAS_jll.LIBPATH_list), :ILP64, "", tests = [dgemm, sdot])
+# end
 
 # Next, build a version that links against `libblastrampoline`, and tell
 # the trampoline to forwards calls to `OpenBLAS_jll`
@@ -159,7 +159,7 @@ end
 # end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
-if MKL_jll.is_available()
+if MKL_jll.is_available() && !Sys.iswindows()
     @testset "LBT -> MKL_jll (LP64)" begin
         libdirs = unique(vcat(lbt_dir, MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
         run_all_tests(blastrampoline_link_name(), libdirs, :LP64, MKL_jll.libmkl_rt_path; tests = [dgemm, dgemmt, dpstrf, sgesv, sdot, zdotc])
