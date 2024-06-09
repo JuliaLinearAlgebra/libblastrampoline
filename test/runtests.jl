@@ -1,4 +1,5 @@
 using OpenBLAS_jll, OpenBLAS32_jll, MKL_jll, CompilerSupportLibraries_jll
+using ReferenceBLAS32_jll, LAPACK32_jll, ReferenceBLAS_jll, LAPACK_jll
 using Pkg, Artifacts, Base.BinaryPlatforms, Libdl, Test
 
 include("utils.jl")
@@ -137,6 +138,16 @@ end
 @testset "LBT -> OpenBLAS32_jll (LP64)" begin
     libdirs = unique(vcat(lbt_dir, OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
     run_all_tests(blastrampoline_link_name(), libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+end
+
+@testset "LBT -> ReferenceBLAS32_jll / LAPACK32_jll (LP64)" begin
+    libdirs = unique(vcat(lbt_dir, ReferenceBLAS32_jll.LIBPATH_list..., LAPACK32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
+    run_all_tests(blastrampoline_link_name(), libdirs, :LP64, string(ReferenceBLAS32_jll.libblas32_path, ";", LAPACK32_jll.liblapack32_path))
+end
+
+@testset "LBT -> ReferenceBLAS_jll / LAPACK_jll (ILP64)" begin
+    libdirs = unique(vcat(lbt_dir, ReferenceBLAS_jll.LIBPATH_list..., LAPACK_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
+    run_all_tests(blastrampoline_link_name(), libdirs, :ILP64, string(ReferenceBLAS_jll.libblas_path, ";", LAPACK_jll.liblapack_path))
 end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
