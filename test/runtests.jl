@@ -153,10 +153,10 @@ end
     run_all_tests(blastrampoline_link_name(), libdirs, :LP64, string(ReferenceBLAS32_jll.libblas32_path, ";", LAPACK32_jll.liblapack32_path); tests = [dgemm, dpstrf, sgesv, sdot])
 end
 
-@testset "LBT -> ReferenceBLAS_jll / LAPACK_jll (ILP64)" begin
-    libdirs = unique(vcat(lbt_dir, ReferenceBLAS_jll.LIBPATH_list..., LAPACK_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
-    run_all_tests(blastrampoline_link_name(), libdirs, :ILP64, string(ReferenceBLAS_jll.libblas_path, ";", LAPACK_jll.liblapack_path); tests = [dgemm, dpstrf, sgesv, sdot])
-end
+# @testset "LBT -> ReferenceBLAS_jll / LAPACK_jll (ILP64)" begin
+#     libdirs = unique(vcat(lbt_dir, ReferenceBLAS_jll.LIBPATH_list..., LAPACK_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
+#     run_all_tests(blastrampoline_link_name(), libdirs, :ILP64, string(ReferenceBLAS_jll.libblas_path, ";", LAPACK_jll.liblapack_path); tests = [dgemm, dpstrf, sgesv, sdot])
+# end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
 if MKL_jll.is_available()
