@@ -13,6 +13,7 @@ These BLAS libraries are known to work with libblastrampoline (successfully test
 5. Fujitsu BLAS (use in Julia through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl))
 6. [ARMPL BLAS](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries)
 7. [NVPL BLAS](https://docs.nvidia.com/nvpl/_static/blas/)
+8. [Reference BLAS and LAPACK](https://github.com/Reference-LAPACK/lapack)
 
 ## Basic usage
 
