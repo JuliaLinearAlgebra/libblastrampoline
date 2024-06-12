@@ -214,6 +214,9 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
     if (env_lowercase_match("LBT_FORCE_RETSTYLE", "argument")) {
         return LBT_COMPLEX_RETSTYLE_ARGUMENT;
     }
+    if (env_lowercase_match("LBT_FORCE_RETSTYLE", "fnda")) {
+        return LBT_COMPLEX_RETSTYLE_FNDA;
+    }
     char symbol_name[MAX_SYMBOL_LEN];
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
@@ -222,37 +225,84 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
         return LBT_COMPLEX_RETSTYLE_UNKNOWN;
     }
 
+    build_symbol_name(symbol_name, "cdotc_", suffix);
+    void * cdotc_addr = lookup_symbol(handle, symbol_name);
+    if (cdotc_addr == NULL) {
+        return LBT_COMPLEX_RETSTYLE_UNKNOWN;
+    }
+
     // Typecast to function pointer for easier usage below
     double complex (*zdotc_normal)(                  int64_t *, double complex *, int64_t *, double complex *, int64_t *) = zdotc_addr;
     void           (*zdotc_retarg)(double complex *, int64_t *, double complex *, int64_t *, double complex *, int64_t *) = zdotc_addr;
+
+    // Typecast to function pointer for easier usage below
+    float complex (*cdotc_normal)(                 int64_t *, float complex *, int64_t *, float complex *, int64_t *) = cdotc_addr;
+    void          (*cdotc_retarg)(float complex *, int64_t *, float complex *, int64_t *, float complex *, int64_t *) = cdotc_addr;
 
     /*
      * First, check to see if `zdotc` zeros out the first argument if all arguments are zero.
      * Supposedly, most well-behaved implementations will return `0 + 0*I` if the length of
      * the inputs is zero; so if it is using a "return argument", that's a good way to find out.
      * 
-     * We detect this by setting `retval` to an initial value of `0.0 + 1.0*I`.  This has the
-     * added benefit of being interpretable as `0` if looked at as an `int{32,64}_t *`, which
-     * makes this invocation safe across the full normal-return/argument-return vs. lp64/ilp64
-     * compatibility square.
+     * We detect this by setting `retval` to an initial value of `-1` typecast to a complex
+     * value.  The floating-point values are unimportant as they will be written to, but if
+     * it is interpreted as an `int{32,64}_t`, it will be a negative value (which is not
+     * allowed and should end the routine immediately).  This makes this invocation safe
+     * across the full normal/argument, lp64/ilp64, cdotc/zdotc compatibility cube.
      */
-    double complex retval = 0.0 + 1.0*I;
+    double complex retval_double = 0.0 + 1.0*I;
     int64_t zero = 0;
-    double complex zeroc = 0.0 + 0.0*I;
-    zdotc_retarg(&retval, &zero, &zeroc, &zero, &zeroc, &zero);
+    double complex zeroc_double = 0.0 + 0.0*I;
+    zdotc_retarg(&retval_double, &zero, &zeroc_double, &zero, &zeroc_double, &zero);
 
-    if (creal(retval) == 0.0 && cimag(retval) == 0.0) {
-        return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+    /*
+     * Next, do the same with `cdotc`, in order to detect situations where the ABI is
+     * automatically inserting an extra argument to return 128-bit-wide values.
+     * We call this `FNDA` for "Float Normal, Double Argument" style.
+     */
+    int64_t neg1 = -1;
+    float complex retval_float = *(complex float *)(&neg1);
+    float complex zeroc_float = 0.0f + 0.0f*I;
+    cdotc_retarg(&retval_float, &zero, &zeroc_float, &zero, &zeroc_float, &zero);
+
+    if (creal(retval_double) == 0.0 && cimag(retval_double) == 0.0) {
+        // If the double values were reset, and the float values were also,
+        // this is easy, we're just always argument-style:
+        if (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f) {
+            return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+        }
+
+        // If the float values were not, let's try the normal return style:
+        retval_float = 0.0f + 1.0f*I;
+        retval_float = cdotc_normal(&zero, &zeroc_float, &zero, &zeroc_float, &zero);
+
+
+        // If this works, we are in FNDA style (currently only observed on Windows x64)
+        if (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f) {
+            return LBT_COMPLEX_RETSTYLE_FNDA;
+        }
+
+        // Otherwise, cdotc is throwing a fit and we don't know what's up.
+        return LBT_COMPLEX_RETSTYLE_UNKNOWN;
     }
 
-    // If it was _not_ reset, let's hazard a guess that we're dealing with a normal return style:
-    retval = 0.0 + 1.0*I;
-    retval = zdotc_normal(&zero, &zeroc, &zero, &zeroc, &zero);
-    if (creal(retval) == 0.0 && cimag(retval) == 0.0) {
+    // If our double values were _not_ reset, let's hazard a guess that
+    // we're dealing with a normal return style and test both types again:
+    retval_double = 0.0 + 1.0*I;
+    retval_double = zdotc_normal(&zero, &zeroc_double, &zero, &zeroc_double, &zero);
+    retval_float = 0.0f + 1.0f*I;
+    retval_float = cdotc_normal(&zero, &zeroc_float, &zero, &zeroc_float, &zero);
+
+
+    // We only test for both working; we don't have a retstyle for float
+    // being argument style and double being normal style.
+    if ((creal(retval_double) == 0.0 && cimag(retval_double) == 0.0) &&
+        (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f)) {
         return LBT_COMPLEX_RETSTYLE_NORMAL;
     }
 
-    // If that was not reset either, we have no idea what's going on.
+    // If we get here, zdotc and cdotc are being uncooperative and we
+    // do not appreciate it at all, not we don't my precious.
     return LBT_COMPLEX_RETSTYLE_UNKNOWN;
 }
 #endif // COMPLEX_RETSTYLE_AUTODETECTION
