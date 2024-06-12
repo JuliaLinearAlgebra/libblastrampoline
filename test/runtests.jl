@@ -54,7 +54,7 @@ function run_test((test_name, test_expected_outputs, expect_success), libblas_na
         cmd = `$(dir)/$(test_name)`
         p, output = capture_output(addenv(cmd, env))
 
-        expected_return_value = success(p) ^ expect_success
+        expected_return_value = !xor(success(p), expect_success)
         if !expected_return_value
             @error("Test failed", env, p.exitcode, p.termsignal, expect_success)
             println(output)
@@ -63,7 +63,7 @@ function run_test((test_name, test_expected_outputs, expect_success), libblas_na
 
         # Expect to see the path to `libblastrampoline` within the output,
         # since we have `LBT_VERBOSE=1` and at startup, it announces its own path:
-        if startswith(libblas_name, "blastrampoline")
+        if startswith(libblas_name, "blastrampoline") && expect_success
             lbt_libdir = first(libdirs)
             @test occursin(lbt_libdir, output)
         end
@@ -131,12 +131,25 @@ lbt_dir = joinpath(lbt_dir, binlib)
 @testset "LBT -> OpenBLAS_jll ($(openblas_interface))" begin
     libdirs = unique(vcat(lbt_dir, OpenBLAS_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
     run_all_tests(blastrampoline_link_name(), libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+
+    # Test that setting bad `LBT_FORCE_*` values actually breaks things
+    withenv("LBT_FORCE_RETSTYLE" => "ARGUMENT") do
+        zdotc_fail = ("zdotc_test", [], false)
+        run_test(zdotc_fail, blastrampoline_link_name(), libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    end
 end
 
 # And again, but this time with OpenBLAS32_jll
 @testset "LBT -> OpenBLAS32_jll (LP64)" begin
     libdirs = unique(vcat(lbt_dir, OpenBLAS32_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
     run_all_tests(blastrampoline_link_name(), libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
+
+    # Test that setting bad `LBT_FORCE_*` values actually breaks things
+    withenv("LBT_FORCE_INTERFACE" => "ILP64") do
+        # `max_idx: 2` is incorrect, it's what happens when ILP64 data is given to an LP64 backend
+        isamax_fail = ("isamax_test", ["max_idx: 2"], true)
+        run_test(isamax_fail, blastrampoline_link_name(), libdirs, :ILP64, OpenBLAS32_jll.libopenblas_path)
+    end
 end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default

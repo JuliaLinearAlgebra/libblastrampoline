@@ -416,10 +416,9 @@ __attribute__((constructor)) void init(void) {
     // Initialize config structures
     init_config();
 
-    // If LBT_VERBOSE == "1", the startup invocation should be verbose
+    // If LBT_VERBOSE is set, the startup invocation should be verbose
     int verbose = 0;
-    const char * verbose_str = getenv("LBT_VERBOSE");
-    if (verbose_str != NULL && strcmp(verbose_str, "1") == 0) {
+    if (env_match_bool("LBT_VERBOSE", 0)) {
         verbose = 1;
         printf("libblastrampoline initializing from %s\n", lookup_self_path());
     }
@@ -428,8 +427,7 @@ __attribute__((constructor)) void init(void) {
     // If LBT_USE_RTLD_DEEPBIND == "0", we avoid using RTLD_DEEPBIND on a
     // deepbind-capable system.  This is mostly useful for sanitizers, which
     // abhor such library loading shenanigans.
-    const char * deepbindless_str = getenv("LBT_USE_RTLD_DEEPBIND");
-    if (deepbindless_str != NULL && strcmp(deepbindless_str, "0") == 0) {
+    if (env_match_bool("LBT_USE_RTLD_DEEPBIND", 1)) {
         use_deepbind = 0x00;
         if (verbose) {
             printf("LBT_USE_RTLD_DEEPBIND=0 detected; avoiding usage of RTLD_DEEPBIND\n");
@@ -437,8 +435,7 @@ __attribute__((constructor)) void init(void) {
     }
 #endif // !defined(LBT_DEEPBINDLESS)
 
-    const char * strict_str = getenv("LBT_STRICT");
-    if (strict_str != NULL && strcmp(strict_str, "1") == 0) {
+    if (env_match_bool("LBT_STRICT", 0)) {
         if (verbose) {
             printf("LBT_STRICT=1 detected; calling missing symbols will print an error, then exit\n");
         }

@@ -96,6 +96,12 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
  * incorrect `N` to cause it to change its return value based on how it is interpreting arugments.
  */
 int32_t autodetect_blas_interface(void * isamax_addr) {
+    if (env_lowercase_match("LBT_FORCE_INTERFACE", "ilp64")) {
+        return LBT_INTERFACE_ILP64;
+    }
+    if (env_lowercase_match("LBT_FORCE_INTERFACE", "lp64")) {
+        return LBT_INTERFACE_LP64;
+    }
     // Typecast to function pointer for easier usage below
     int64_t (*isamax)(int64_t *, float *, int64_t *) = isamax_addr;
 
@@ -145,6 +151,12 @@ int32_t autodetect_blas_interface(void * isamax_addr) {
  * and determine if the internal pointer dereferences were 32-bit or 64-bit.
  */
 int32_t autodetect_lapack_interface(void * dpotrf_addr) {
+    if (env_lowercase_match("LBT_FORCE_INTERFACE", "ilp64")) {
+        return LBT_INTERFACE_ILP64;
+    }
+    if (env_lowercase_match("LBT_FORCE_INTERFACE", "lp64")) {
+        return LBT_INTERFACE_LP64;
+    }
     // Typecast to function pointer for easier usage below
     void (*dpotrf)(char *, int64_t *, double *, int64_t *, int64_t *) = dpotrf_addr;
 
@@ -196,6 +208,12 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
 
 #ifdef COMPLEX_RETSTYLE_AUTODETECTION
 int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_RETSTYLE", "normal")) {
+        return LBT_COMPLEX_RETSTYLE_NORMAL;
+    }
+    if (env_lowercase_match("LBT_FORCE_RETSTYLE", "argument")) {
+        return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+    }
     char symbol_name[MAX_SYMBOL_LEN];
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
@@ -241,6 +259,13 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
 
 #ifdef F2C_AUTODETECTION
 int32_t autodetect_f2c(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_F2C", "plain")) {
+        return LBT_F2C_PLAIN;
+    }
+    if (env_lowercase_match("LBT_FORCE_F2C", "required")) {
+        return LBT_F2C_REQUIRED;
+    }
+
     char symbol_name[MAX_SYMBOL_LEN];
 
     // Attempt BLAS `sdot()` test
@@ -278,6 +303,13 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
 
 #ifdef CBLAS_DIVERGENCE_AUTODETECTION
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_CBLAS", "conformant")) {
+        return LBT_CBLAS_CONFORMANT;
+    }
+    if (env_lowercase_match("LBT_FORCE_CBLAS", "divergent")) {
+        return LBT_CBLAS_DIVERGENT;
+    }
+
     char symbol_name[MAX_SYMBOL_LEN];
 
     build_symbol_name(symbol_name, "zdotc_", suffix);

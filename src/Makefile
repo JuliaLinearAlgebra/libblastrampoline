@@ -15,7 +15,7 @@ maintarget=$(word 1,$(TARGET_LIBRARIES))
 all: $(maintarget)
 
 # Objects we'll build
-MAIN_OBJS := libblastrampoline.o dl_utils.o config.o \
+MAIN_OBJS := libblastrampoline.o dl_utils.o env_utils.o config.o \
 			 autodetection.o \
 			 threading.o deepbindless.o trampolines/trampolines_$(ARCH).o
 

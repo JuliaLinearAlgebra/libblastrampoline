@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <unistd.h>
 
 // Load in our publicly-defined functions/types
@@ -74,6 +75,11 @@ void * lookup_symbol(const void * lib_handle, const char * symbol_name);
 void * lookup_self_symbol(const char * symbol_name);
 const char * lookup_self_path();
 void close_library(void * handle);
+
+// Functions in `env_utils.c`
+uint8_t env_lowercase_match(const char * env_name, const char * value);
+uint8_t env_lowercase_match_any(const char * env_name, uint32_t num_values, ...);
+uint8_t env_match_bool(const char * env_name, uint8_t default_value);
 
 // Functions in `autodetection.c`
 void build_symbol_name(char * out, const char *symbol_name, const char *suffix);
