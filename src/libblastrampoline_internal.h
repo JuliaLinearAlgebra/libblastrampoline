@@ -87,16 +87,9 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint);
 int32_t autodetect_blas_interface(void * isamax_addr);
 int32_t autodetect_lapack_interface(void * dpotrf_addr);
 int32_t autodetect_interface(void * handle, const char * suffix);
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 int32_t autodetect_complex_return_style(void * handle, const char * suffix);
-#endif
-
-#ifdef F2C_AUTODETECTION
 int32_t autodetect_f2c(void * handle, const char * suffix);
-#endif
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix);
-#endif
 
 // Functions in deepbindless_surrogates.c
 uint8_t push_fake_lsame();

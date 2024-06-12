@@ -4,7 +4,7 @@ using Pkg, Artifacts, Base.BinaryPlatforms, Libdl, Test
 include("utils.jl")
 
 # Compile `dgemm_test.c` and `sgesv_test.c` against the given BLAS/LAPACK
-function run_test((test_name, test_expected_outputs, expect_success), libblas_name, libdirs, interface, backing_libs)
+function run_test((test_name, test_expected_outputs, expect_success), libblas_name, libdirs, interface, backing_libs; extra_env = Dict())
     # We need to configure this C build a bit
     cflags = String[
         "-g",
@@ -50,6 +50,7 @@ function run_test((test_name, test_expected_outputs, expect_success), libblas_na
             "LBT_DEFAULT_LIBS" => backing_libs,
             "LBT_STRICT" => 1,
             "LBT_VERBOSE" => 1,
+            pairs(extra_env)...,
         )
         cmd = `$(dir)/$(test_name)`
         p, output = capture_output(addenv(cmd, env))
@@ -101,9 +102,9 @@ cdotc =         ("cdotc_test", (
 
 # Helper function to run all the tests with the given arguments
 # Does not include `dgemmt` because that's MKL-only
-function run_all_tests(args...; tests = [dgemm, dpstrf, sgesv, sdot, cdotc])
+function run_all_tests(args...; tests = [dgemm, dpstrf, sgesv, sdot, cdotc], kwargs...)
     for test in tests
-        run_test(test, args...)
+        run_test(test, args...; kwargs...)
     end
 end
 
@@ -158,9 +159,15 @@ end
 
 # Test against MKL_jll using `libmkl_rt`, which is :LP64 by default
 if MKL_jll.is_available()
+    # On i686, we can't do complex return style autodetection, so we manually set it,
+    # knowing that MKL is argument-style.
+    extra_env = Dict{String,String}()
+    if Sys.ARCH == :i686
+        extra_env["LBT_FORCE_RETSTYLE"] = "ARGUMENT"
+    end
     @testset "LBT -> MKL_jll (LP64)" begin
         libdirs = unique(vcat(lbt_dir, MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
-        run_all_tests(blastrampoline_link_name(), libdirs, :LP64, MKL_jll.libmkl_rt_path; tests = [dgemm, dgemmt, dpstrf, sgesv, sdot, cdotc])
+        run_all_tests(blastrampoline_link_name(), libdirs, :LP64, MKL_jll.libmkl_rt_path; tests = [dgemm, dgemmt, dpstrf, sgesv, sdot, cdotc], extra_env)
     end
 
     # Test that we can set MKL's interface via an environment variable to select ILP64, and LBT detects it properly
@@ -168,7 +175,7 @@ if MKL_jll.is_available()
         @testset "LBT -> MKL_jll (ILP64, via env)" begin
             withenv("MKL_INTERFACE_LAYER" => "ILP64") do
                 libdirs = unique(vcat(lbt_dir, MKL_jll.LIBPATH_list..., CompilerSupportLibraries_jll.LIBPATH_list...))
-                run_all_tests(blastrampoline_link_name(), libdirs, :ILP64, MKL_jll.libmkl_rt_path; tests = [dgemm, dgemmt, dpstrf, sgesv, sdot, cdotc])
+                run_all_tests(blastrampoline_link_name(), libdirs, :ILP64, MKL_jll.libmkl_rt_path; tests = [dgemm, dgemmt, dpstrf, sgesv, sdot, cdotc], extra_env)
             end
         end
     end
