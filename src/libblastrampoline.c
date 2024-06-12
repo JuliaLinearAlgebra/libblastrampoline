@@ -1,15 +1,8 @@
 #include "libblastrampoline_internal.h"
 #include "libblastrampoline_trampdata.h"
-
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 #include "libblastrampoline_complex_retdata.h"
-#endif
-#ifdef F2C_AUTODETECTION
 #include "libblastrampoline_f2cdata.h"
-#endif
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
 #include "libblastrampoline_cblasdata.h"
-#endif
 
 // Sentinel to tell us if we've got a deepbindless workaround active or not
 #define DEEPBINDLESS_INTERFACE_LP64_LOADED    0x01
@@ -69,7 +62,6 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
         }
     }
 
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
     for (int array_idx=0; array_idx < sizeof(cmplxret_func_idxs)/sizeof(int *); ++array_idx) {
         if ((complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT) ||
            ((complex_retstyle == LBT_COMPLEX_RETSTYLE_FNDA) && array_idx == 1)) {
@@ -96,7 +88,6 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
             }
         }
     }
-#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
 #ifdef F2C_AUTODETECTION
     if (f2c == LBT_F2C_REQUIRED) {
@@ -224,11 +215,12 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
 
     // Next, let's figure out what the complex return style is:
     int complex_retstyle = LBT_COMPLEX_RETSTYLE_UNKNOWN;
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
     complex_retstyle = autodetect_complex_return_style(handle, lib_suffix);
     if (complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN) {
-        fprintf(stderr, "Unable to autodetect complex return style of \"%s\"\n", libname);
-        return 0;
+        #ifdef COMPLEX_RETSTYLE_AUTODETECTION
+            fprintf(stderr, "Unable to autodetect complex return style of \"%s\"\n", libname);
+            return 0;
+        #endif // COMPLEX_RETSTYLE_AUTODETECTION
     }
     if (verbose) {
         if (complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL) {
@@ -238,16 +230,16 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             printf(" -> Autodetected argument-passing complex return style\n");
         }
     }
-#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
     int f2c = LBT_F2C_PLAIN;
-#ifdef F2C_AUTODETECTION
     // Next, we need to probe to see if this is an f2c-style calling convention library
     // The only major example of this that we know of is Accelerate on macOS
     f2c = autodetect_f2c(handle, lib_suffix);
     if (f2c == LBT_F2C_UNKNOWN) {
-        fprintf(stderr, "Unable to autodetect calling convention of \"%s\"\n", libname);
-        return 0;
+        #ifdef F2C_AUTODETECTION
+            fprintf(stderr, "Unable to autodetect f2c calling convention of \"%s\"\n", libname);
+            return 0;
+        #endif // F2C_AUTODETECTION
     }
     if (verbose) {
         if (f2c == LBT_F2C_REQUIRED) {
@@ -257,10 +249,8 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             printf(" -> Autodetected gfortran calling convention\n");
         }
     }
-#endif // F2C_AUTODETECTION
 
     int cblas = LBT_CBLAS_UNKNOWN;
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
     // Next, we need to probe to see if this is MKL v2022 with missing ILP64-suffixed
     // CBLAS symbols, but only if it's an ILP64 library.
     if (interface == LBT_INTERFACE_ILP64) {
@@ -274,7 +264,9 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
                     printf(" -> Autodetected CBLAS-divergent library!\n");
                     break;
                 case LBT_CBLAS_UNKNOWN:
-                    printf(" -> CBLAS not found\n");
+                    #ifdef CBLAS_DIVERGENCE_AUTODETECTION
+                        printf(" -> CBLAS not found/autodetection unavailable\n");
+                    #endif // CBLAS_DIVERGENCE_AUTODETECTION
                     break;
                 default:
                     printf(" -> ERROR: Impossible CBLAS detection result: %d\n", cblas);
@@ -283,7 +275,6 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
         }
     }
-#endif // CBLAS_DIVERGENCE_AUTODETECTION
 
     /*
      * Now, if we are opening a 64-bit library with 32-bit names (e.g. suffix == ""),
@@ -367,7 +358,6 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         }
     }
 
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
     // If we're loading a divergent CBLAS library, we need to scan through all
     // CBLAS symbols, and forward them to wrappers which will convert them to
     // the FORTRAN equivalents.
@@ -390,7 +380,6 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
         }
     }
-#endif // CBLAS_DIVERGENCE_AUTODETECTION
 
     record_library_load(libname, handle, lib_suffix, &forwards[0], interface, complex_retstyle, f2c, cblas);
     if (verbose) {

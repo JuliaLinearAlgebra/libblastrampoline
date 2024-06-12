@@ -206,7 +206,6 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
     return LBT_INTERFACE_UNKNOWN;
 }
 
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
     if (env_lowercase_match("LBT_FORCE_RETSTYLE", "normal")) {
         return LBT_COMPLEX_RETSTYLE_NORMAL;
@@ -217,6 +216,8 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
     if (env_lowercase_match("LBT_FORCE_RETSTYLE", "fnda")) {
         return LBT_COMPLEX_RETSTYLE_FNDA;
     }
+
+#ifdef COMPLEX_RETSTYLE_AUTODETECTION
     char symbol_name[MAX_SYMBOL_LEN];
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
@@ -300,14 +301,13 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
         (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f)) {
         return LBT_COMPLEX_RETSTYLE_NORMAL;
     }
+#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
     // If we get here, zdotc and cdotc are being uncooperative and we
     // do not appreciate it at all, not we don't my precious.
     return LBT_COMPLEX_RETSTYLE_UNKNOWN;
 }
-#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
-#ifdef F2C_AUTODETECTION
 int32_t autodetect_f2c(void * handle, const char * suffix) {
     if (env_lowercase_match("LBT_FORCE_F2C", "plain")) {
         return LBT_F2C_PLAIN;
@@ -315,7 +315,7 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
     if (env_lowercase_match("LBT_FORCE_F2C", "required")) {
         return LBT_F2C_REQUIRED;
     }
-
+#ifdef F2C_AUTODETECTION
     char symbol_name[MAX_SYMBOL_LEN];
 
     // Attempt BLAS `sdot()` test
@@ -346,12 +346,12 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
         // It's an f2c style calling convention
         return LBT_F2C_REQUIRED;
     }
+#endif // F2C_AUTODETECTION
+
     // We have no idea what happened; nothing works and everything is broken
     return LBT_F2C_UNKNOWN;
 }
-#endif // F2C_AUTODETECTION
 
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
     if (env_lowercase_match("LBT_FORCE_CBLAS", "conformant")) {
         return LBT_CBLAS_CONFORMANT;
@@ -360,6 +360,7 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
         return LBT_CBLAS_DIVERGENT;
     }
 
+#ifdef CBLAS_DIVERGENCE_AUTODETECTION
     char symbol_name[MAX_SYMBOL_LEN];
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
@@ -382,7 +383,8 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
             return LBT_CBLAS_DIVERGENT;
         }
     }
+#endif // CBLAS_DIVERGENCE_AUTODETECTION
+
     // If we can't even find `zdotc_64`, we don't know what this is.
     return LBT_CBLAS_UNKNOWN;
 }
-#endif // CBLAS_DIVERGENCE_AUTODETECTION
