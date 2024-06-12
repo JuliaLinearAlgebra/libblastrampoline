@@ -70,26 +70,29 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
     }
 
 #ifdef COMPLEX_RETSTYLE_AUTODETECTION
-    if (complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT) {
-        // Check to see if this symbol is one of the complex-returning functions
-        for (int complex_symbol_idx=0; cmplxret_func_idxs[complex_symbol_idx] != -1; ++complex_symbol_idx) {
-            // Skip any symbols that aren't ours
-            if (cmplxret_func_idxs[complex_symbol_idx] != symbol_idx)
-                continue;
+    for (int array_idx=0; array_idx < sizeof(cmplxret_func_idxs)/sizeof(int *); ++array_idx) {
+        if ((complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT) ||
+           ((complex_retstyle == LBT_COMPLEX_RETSTYLE_FNDA) && array_idx == 1)) {
+            // Check to see if this symbol is one of the complex-returning functions
+            for (int complex_symbol_idx=0; cmplxret_func_idxs[array_idx][complex_symbol_idx] != -1; ++complex_symbol_idx) {
+                // Skip any symbols that aren't ours
+                if (cmplxret_func_idxs[array_idx][complex_symbol_idx] != symbol_idx)
+                    continue;
 
-            // Report to the user that we're cblas-wrapping this one
-            if (verbose) {
-                char exported_name[MAX_SYMBOL_LEN];
-                build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
-                printf(" - [%04d] complex(%s)\n", symbol_idx, exported_name);
-            }
+                // Report to the user that we're cmplxret-wrapping this one
+                if (verbose) {
+                    char exported_name[MAX_SYMBOL_LEN];
+                    build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
+                    printf(" - [%04d] complex(%s)\n", symbol_idx, exported_name);
+                }
 
-            if (interface == LBT_INTERFACE_LP64) {
-                (*cmplxret_func32_addrs[complex_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
-                (*exported_func32_addrs[symbol_idx]) = cmplxret32_func_wrappers[complex_symbol_idx];
-            } else {
-                (*cmplxret_func64_addrs[complex_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
-                (*exported_func64_addrs[symbol_idx]) = cmplxret64_func_wrappers[complex_symbol_idx];
+                if (interface == LBT_INTERFACE_LP64) {
+                    (*cmplxret_func32_addrs[array_idx][complex_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
+                    (*exported_func32_addrs[symbol_idx]) = cmplxret_func32_wrappers[array_idx][complex_symbol_idx];
+                } else {
+                    (*cmplxret_func64_addrs[array_idx][complex_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
+                    (*exported_func64_addrs[symbol_idx]) = cmplxret_func64_wrappers[array_idx][complex_symbol_idx];
+                }
             }
         }
     }

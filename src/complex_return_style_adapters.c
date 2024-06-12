@@ -72,8 +72,8 @@ extern void (*cmplxret_cdotc__addr)(float complex * z,
                                     const float complex *, const int32_t *,
                                     const float complex *, const int32_t *);
 float complex cmplxret_cdotc_(const int32_t * N,
-                               const float complex *X, const int32_t * incX,
-                               const float complex *Y, const int32_t * incY)
+                              const float complex *X, const int32_t * incX,
+                              const float complex *Y, const int32_t * incY)
 {
    float complex c;
    cmplxret_cdotc__addr(&c, N, X, incX, Y, incY);
@@ -85,8 +85,8 @@ extern void (*cmplxret_cdotc_64__addr)(float complex * z,
                                        const float complex *, const int64_t *,
                                        const float complex *, const int64_t *);
 float complex cmplxret_cdotc_64_(const int64_t * N,
-                                  const float complex *X, const int64_t * incX,
-                                  const float complex *Y, const int64_t * incY)
+                                 const float complex *X, const int64_t * incX,
+                                 const float complex *Y, const int64_t * incY)
 {
    float complex c;
    cmplxret_cdotc_64__addr(&c, N, X, incX, Y, incY);
@@ -100,8 +100,8 @@ extern void (*cmplxret_cdotu__addr)(float complex * z,
                                     const float complex *, const int32_t *,
                                     const float complex *, const int32_t *);
 float complex cmplxret_cdotu_(const int32_t * N,
-                               const float complex *X, const int32_t * incX,
-                               const float complex *Y, const int32_t * incY)
+                              const float complex *X, const int32_t * incX,
+                              const float complex *Y, const int32_t * incY)
 {
    float complex c;
    cmplxret_cdotu__addr(&c, N, X, incX, Y, incY);
@@ -113,8 +113,8 @@ extern void (*cmplxret_cdotu_64__addr)(float complex * z,
                                        const float complex *, const int64_t *,
                                        const float complex *, const int64_t *);
 float complex cmplxret_cdotu_64_(const int64_t * N,
-                                  const float complex *X, const int64_t * incX,
-                                  const float complex *Y, const int64_t * incY)
+                                 const float complex *X, const int64_t * incX,
+                                 const float complex *Y, const int64_t * incY)
 {
    float complex c;
    cmplxret_cdotu_64__addr(&c, N, X, incX, Y, incY);

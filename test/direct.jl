@@ -71,7 +71,7 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[1].f2c == LBT_F2C_PLAIN
     if Sys.ARCH ∈ (:x86_64, :aarch64)
         if Sys.iswindows()
-            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_FNDA
         else
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL
         end
