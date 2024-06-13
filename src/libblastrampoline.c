@@ -415,17 +415,15 @@ __attribute__((constructor)) void init(void) {
         printf("libblastrampoline initializing from %s\n", lookup_self_path());
     }
 
-#if !defined(LBT_DEEPBINDLESS)
     // If LBT_USE_RTLD_DEEPBIND == "0", we avoid using RTLD_DEEPBIND on a
     // deepbind-capable system.  This is mostly useful for sanitizers, which
     // abhor such library loading shenanigans.
-    if (env_match_bool("LBT_USE_RTLD_DEEPBIND", 1)) {
+    if (!env_match_bool("LBT_USE_RTLD_DEEPBIND", 1)) {
         use_deepbind = 0x00;
         if (verbose) {
             printf("LBT_USE_RTLD_DEEPBIND=0 detected; avoiding usage of RTLD_DEEPBIND\n");
         }
     }
-#endif // !defined(LBT_DEEPBINDLESS)
 
     if (env_match_bool("LBT_STRICT", 0)) {
         if (verbose) {
