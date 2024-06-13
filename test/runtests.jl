@@ -142,6 +142,15 @@ lbt_dir = joinpath(lbt_dir, binlib)
         run_test(cdotc_fail, blastrampoline_link_name(), libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
     end
     =#
+
+    withenv("LBT_USE_RTLD_DEEPBIND" => "false") do
+        dgemm_deepbindless = (
+            "dgemm_test",
+            ("||C||^2 is:  24.3384", "avoiding usage of RTLD_DEEPBIND"),
+            true,
+        )
+        run_test(dgemm_deepbindless, blastrampoline_link_name(), libdirs, openblas_interface, OpenBLAS_jll.libopenblas_path)
+    end
 end
 
 # And again, but this time with OpenBLAS32_jll
