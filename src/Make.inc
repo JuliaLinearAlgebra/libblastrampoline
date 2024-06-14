@@ -24,8 +24,8 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
 endif
 
 LBT_SOVERSION_MAJOR := 5
-LBT_SOVERSION_MINOR := 4
-LBT_SOVERSION_PATCH := 0
+LBT_SOVERSION_MINOR := 10
+LBT_SOVERSION_PATCH := 1
 
 ifeq ($(OS), WINNT)
   SHLIB_EXT := dll
