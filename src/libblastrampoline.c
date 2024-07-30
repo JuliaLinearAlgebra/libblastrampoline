@@ -45,11 +45,20 @@ LBT_DLLEXPORT void lbt_default_func_print_error() {
     // We mark as `volatile` to discourage the compiler from moving us around too much
     volatile uint64_t name_idx = get_forward_name_idx();
     const char * suffix = "";
+
+    // We encode `64_` by just shifting the name index up a bunch
     if (name_idx >= NUM_EXPORTED_FUNCS) {
         suffix = "64_";
         name_idx -= NUM_EXPORTED_FUNCS;
     }
-    fprintf(stderr, "Error: no BLAS/LAPACK library loaded for %s%s()\n", exported_func_names[name_idx], suffix);
+
+    // If we're still off the end of our list of names, some corruption has occured,
+    // and we should not try to index into `exported_func_names`.
+    if (name_idx >= NUM_EXPORTED_FUNCS) {
+        fprintf(stderr, "Error: no BLAS/LAPACK library loaded for (unknown function)\n");
+    } else {
+        fprintf(stderr, "Error: no BLAS/LAPACK library loaded for %s%s()\n", exported_func_names[name_idx], suffix);
+    }
 }
 void lbt_default_func_print_error_and_exit() {
     lbt_default_func_print_error();
