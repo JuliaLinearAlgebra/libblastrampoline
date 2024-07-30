@@ -30,6 +30,8 @@ __attribute__((always_inline)) inline unsigned int get_forward_name_idx() {
     asm("\t mov %%r12,%0" : "=r"(idx));
 #elif defined(ARCH_i686)
     asm("\t mov %%eax,%0" : "=r"(idx));
+#elif defined(ARCH_powerpc64le)
+    asm("\t addi %0,11,0" : "=r"(idx));
 #elif defined(ARCH_riscv64)
     asm("\t mov %%t4,%0" : "=r"(idx));
 #elif defined(ARCH_x86_64)
