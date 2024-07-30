@@ -107,6 +107,18 @@ echo "#endif" >> "${OUTPUT_FILE}"
 NUM_COMPLEX128_SYMBOLS="${NUM_SYMBOLS}"
 
 NUM_SYMBOLS=0
+CBLAS_FUNCS="$(grep -e '^cblas_.*$' <<< "${EXPORTED_FUNCS}")"
+echo >> "${OUTPUT_FILE}"
+echo "#ifndef CBLAS_FUNCS" >> "${OUTPUT_FILE}"
+echo "#define CBLAS_FUNCS(XX) \\" >> "${OUTPUT_FILE}"
+for func_name in ${CBLAS_FUNCS}; do
+    output_func "${func_name}"
+done
+echo >> "${OUTPUT_FILE}"
+echo "#endif" >> "${OUTPUT_FILE}"
+NUM_CBLAS_SYMBOLS="${NUM_SYMBOLS}"
+
+NUM_SYMBOLS=0
 # We manually curate a list of cblas functions that we have defined adapters for
 # in `src/cblas_adapters.c`.  This is our compromise between the crushing workload
 # of manually defining every single CBLAS function we need, and the practical need
@@ -123,9 +135,10 @@ echo >> "${OUTPUT_FILE}"
 echo "#endif" >> "${OUTPUT_FILE}"
 NUM_CBLAS_WORKAROUND_SYMBOLS="${NUM_SYMBOLS}"
 
+
 # Report to the user and cleanup
 echo
 NUM_F2C_SYMBOLS="$((NUM_FLOAT32_SYMBOLS + NUM_COMPLEX64_SYMBOLS + NUM_COMPLEX128_SYMBOLS))"
 NUM_CMPLX_SYMBOLS="$((NUM_COMPLEX64_SYMBOLS + NUM_COMPLEX128_SYMBOLS))"
-echo "Done, with ${NUM_EXPORTED} symbols generated (${NUM_F2C_SYMBOLS} f2c, ${NUM_CMPLX_SYMBOLS} complex-returning, ${NUM_CBLAS_WORKAROUND_SYMBOLS} cblas-workaround functions)."
+echo "Done, with ${NUM_EXPORTED} symbols generated (${NUM_F2C_SYMBOLS} f2c, ${NUM_CMPLX_SYMBOLS} complex-returning, ${NUM_CBLAS_SYMBOLS} cblas, ${NUM_CBLAS_WORKAROUND_SYMBOLS} cblas-workaround functions)."
 rm -f tempsymbols.def

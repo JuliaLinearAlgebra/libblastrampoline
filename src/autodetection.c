@@ -362,11 +362,20 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
 
 #ifdef CBLAS_DIVERGENCE_AUTODETECTION
     char symbol_name[MAX_SYMBOL_LEN];
+    char extra_underscore_suffix[MAX_SYMBOL_LEN];
+    snprintf(extra_underscore_suffix, MAX_SYMBOL_LEN, "_%s", suffix);
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
     if (lookup_symbol(handle, symbol_name) != NULL ) {
         // If we have both `zdotc_64` and `cblas_zdotc_sub64`, it's all good:
         build_symbol_name(symbol_name, "cblas_zdotc_sub", suffix);
+        if (lookup_symbol(handle, symbol_name) != NULL ) {
+            return LBT_CBLAS_CONFORMANT;
+        }
+
+        // Do the fallback extra-underscore suffix search here, so we don't mistakenly
+        // mark MKL v2024 as CBLAS-divergent
+        build_symbol_name(symbol_name, "cblas_zdotc_sub", extra_underscore_suffix);
         if (lookup_symbol(handle, symbol_name) != NULL ) {
             return LBT_CBLAS_CONFORMANT;
         }

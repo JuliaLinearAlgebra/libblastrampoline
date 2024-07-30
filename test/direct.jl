@@ -288,7 +288,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         libs = unpack_loaded_libraries(config)
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
-        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].cblas ∈ (LBT_CBLAS_DIVERGENT, LBT_CBLAS_CONFORMANT)
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_zdotc_sub, asserting that it does not try to call a forwardless-symbol
@@ -318,7 +318,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         libs = unpack_loaded_libraries(config)
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
-        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].cblas ∈ (LBT_CBLAS_DIVERGENT, LBT_CBLAS_CONFORMANT)
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_cdotc_sub64_ to test the full CBLAS workaround -> complex return style handling chain
