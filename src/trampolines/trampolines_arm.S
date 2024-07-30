@@ -6,7 +6,6 @@
 .cfi_startproc; \
 MANGLE(UNDERSCORE(name))##:; \
     ldr ip, CONCAT(.L,NAMEADDR(name)); \
-    ldr r12,=#SYMBOL_IDX(idx); \
 CONCAT(.L,MANGLE(UNDERSCORE(name))): ;\
     add ip, pc, ip; \
     ldr pc, [ip]; \
@@ -14,7 +13,6 @@ CONCAT(.L,MANGLE(UNDERSCORE(name))): ;\
 CONCAT(.L,NAMEADDR(name))##: ; \
     .word NAMEADDR(name)##-(CONCAT(.L,MANGLE(UNDERSCORE(name))) + 8); \
 .cfi_endproc; \
-.ltorg; \
 
 // Generate both `dgemm_` and `dgemm_64_`
 #include "ilp64_doubling.h"
