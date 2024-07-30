@@ -1,8 +1,10 @@
 using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
-openblas32_version = pkgversion(OpenBLAS32_jll)
-openblas32_version = VersionNumber(openblas32_version.major, openblas32_version.minor, openblas32_version.patch)
-if openblas32_version != v"0.3.10"
-    throw(ArgumentError("Wrong version of OpenBLAS32_jll ($(pkgversion(OpenBLAS32_jll))); this test suite requires an old OpenBLAS32_jll!"))
+if isdefined(Base, :pkgversion)
+    openblas32_version = pkgversion(OpenBLAS32_jll)
+    openblas32_version = VersionNumber(openblas32_version.major, openblas32_version.minor, openblas32_version.patch)
+    if openblas32_version != v"0.3.10"
+        throw(ArgumentError("Wrong version of OpenBLAS32_jll ($(pkgversion(OpenBLAS32_jll))); this test suite requires an old OpenBLAS32_jll!"))
+    end
 end
 
 include("utils.jl")
