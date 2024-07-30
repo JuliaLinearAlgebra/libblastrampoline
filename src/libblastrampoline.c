@@ -19,9 +19,37 @@ int32_t find_symbol_idx(const char * name) {
     return -1;
 }
 
+// This function un-smuggles our name index from the scratch register it was placed
+// into by the trampoline; We really need this to be the first thing `lbt_default_func_print_error()`
+// calls, so that our temporary register doesn't get clobbered by other code.
+__attribute__((always_inline)) inline unsigned int get_forward_name_idx() {
+    uintptr_t idx;
+#if defined(ARCH_aarch64)
+    asm("\t mov %0,x17" : "=r"(idx));
+#elif defined(ARCH_arm)
+    asm("\t mov %%r12,%0" : "=r"(idx));
+#elif defined(ARCH_i686)
+    asm("\t mov %%eax,%0" : "=r"(idx));
+#elif defined(ARCH_riscv64)
+    asm("\t mov %%t4,%0" : "=r"(idx));
+#elif defined(ARCH_x86_64)
+    asm("\t movq %%r10,%0" : "=r"(idx));
+#else
+#error "Unrecognized ARCH for `get_forward_name_idx()`"
+#endif
+    return idx;
+}
+
 
 LBT_DLLEXPORT void lbt_default_func_print_error() {
-    fprintf(stderr, "Error: no BLAS/LAPACK library loaded!\n");
+    // We mark as `volatile` to discourage the compiler from moving us around too much
+    volatile uint64_t name_idx = get_forward_name_idx();
+    const char * suffix = "";
+    if (name_idx >= NUM_EXPORTED_FUNCS) {
+        suffix = "64_";
+        name_idx -= NUM_EXPORTED_FUNCS;
+    }
+    fprintf(stderr, "Error: no BLAS/LAPACK library loaded for %s%s()\n", exported_func_names[name_idx], suffix);
 }
 void lbt_default_func_print_error_and_exit() {
     lbt_default_func_print_error();
@@ -39,7 +67,7 @@ LBT_DLLEXPORT void lbt_set_default_func(const void * addr) {
 /*
  * Force a forward to a particular value.
  */
-int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t verbose) {
+LBT_DLLEXPORT int32_t lbt_set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t verbose) {
     // Quit out immediately if this is not a interface setting
     if (interface != LBT_INTERFACE_LP64 && interface != LBT_INTERFACE_ILP64) {
         return -1;
@@ -121,7 +149,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
 }
 
 LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t interface, int32_t f2c) {
-    // Search symbol list for `symbol_name`, then sub off to `set_forward_by_index()`
+    // Search symbol list for `symbol_name``
     int32_t symbol_idx = find_symbol_idx(symbol_name);
     if (symbol_idx == -1)
         return (const void *)-1;
@@ -164,7 +192,7 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
     if (symbol_idx == -1)
         return -1;
 
-    int32_t ret = set_forward_by_index(symbol_idx, addr, interface, complex_retstyle, f2c, verbose);
+    int32_t ret = lbt_set_forward_by_index(symbol_idx, addr, interface, complex_retstyle, f2c, verbose);
     if (ret == 0) {
         // Un-mark this symbol as being provided by any of our libraries;
         // if you use the footgun API, you can keep track of who is providing what.
@@ -352,7 +380,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         void *self_symbol_addr = interface == LBT_INTERFACE_ILP64 ? exported_func64[symbol_idx] \
                                                                   : exported_func32[symbol_idx];
         if (addr != NULL && addr != self_symbol_addr) {
-            set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
+            lbt_set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
             BITFIELD_SET(forwards, symbol_idx);
             nforwards++;
         }

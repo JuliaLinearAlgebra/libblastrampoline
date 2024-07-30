@@ -1,12 +1,13 @@
 #include "common.h"
 #include "../exported_funcs.inc"
 
-#define XX(name) \
+#define XX(name, idx) \
 DEBUGINFO(name); \
 .global MANGLE(UNDERSCORE(name)); \
 .cfi_startproc; \
 MANGLE(UNDERSCORE(name))##:; \
     CET_START(); \
+    mov $SYMBOL_IDX(idx),%eax; \
     jmpl *(NAMEADDR(name)); \
     ud2; \
 .cfi_endproc; \
