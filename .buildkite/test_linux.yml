@@ -27,5 +27,5 @@ steps:
     agents:
       queue: "juliaecosystem"
       os: "linux"
-      sandbox.jl: "true"
+      sandbox_capable: "true"
       arch: "${AGENT_ARCH?}"
