@@ -22,12 +22,14 @@ int32_t find_symbol_idx(const char * name) {
 // This function un-smuggles our name index from the scratch register it was placed
 // into by the trampoline; We really need this to be the first thing `lbt_default_func_print_error()`
 // calls, so that our temporary register doesn't get clobbered by other code.
-__attribute__((always_inline)) inline unsigned int get_forward_name_idx() {
+__attribute__((always_inline)) inline uintptr_t get_forward_name_idx() {
     uintptr_t idx;
 #if defined(ARCH_aarch64)
     asm("\t mov %0,x17" : "=r"(idx));
 #elif defined(ARCH_arm)
-    asm("\t mov %%r12,%0" : "=r"(idx));
+    // armv7l only has a single volatile register for use, which is already in use
+    // to calculate the jump target, so we can't smuggle the information out. :(
+    return ((uintptr_t)-1);
 #elif defined(ARCH_i686)
     asm("\t mov %%eax,%0" : "=r"(idx));
 #elif defined(ARCH_powerpc64le)

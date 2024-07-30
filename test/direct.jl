@@ -203,7 +203,11 @@ end
         Base.Libc.flush_cstdio();
     end
     close(io.in)
-    @test chomp(String(read(io))) == "Error: no BLAS/LAPACK library loaded for cblas_sbstobf16()\nError: no BLAS/LAPACK library loaded for cblas_sbstobf1664_()"
+    if Sys.ARCH != :arm
+        @test chomp(String(read(io))) == "Error: no BLAS/LAPACK library loaded for cblas_sbstobf16()\nError: no BLAS/LAPACK library loaded for cblas_sbstobf1664_()"
+    else
+        @test chomp(String(read(io))) == "Error: no BLAS/LAPACK library loaded for (unknown function)\nError: no BLAS/LAPACK library loaded for (unknown function)"
+    end
 
     # Override the default function to keep track of people who try to call uninitialized BLAS functions
     @test lbt_get_default_func(lbt_handle) != C_NULL
