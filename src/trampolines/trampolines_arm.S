@@ -1,11 +1,12 @@
 #include "common.h"
 #include "../exported_funcs.inc"
 
-#define XX(name) \
+#define XX(name, idx) \
 .global MANGLE(UNDERSCORE(name)); \
 .cfi_startproc; \
 MANGLE(UNDERSCORE(name))##:; \
     ldr ip, CONCAT(.L,NAMEADDR(name)); \
+    mov r12, SYMBOL_IDX(idx); \
 CONCAT(.L,MANGLE(UNDERSCORE(name))): ;\
     add ip, pc, ip; \
     ldr pc, [ip]; \

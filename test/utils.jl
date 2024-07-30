@@ -185,6 +185,10 @@ function lbt_set_forward(handle, symbol_name, addr, interface, complex_retstyle 
     return ccall(dlsym(handle, :lbt_set_forward), Int32, (Cstring, Ptr{Cvoid}, Int32, Int32, Int32, Int32), symbol_name, addr, interface, complex_retstyle, f2c, verbose ? 1 : 0)
 end
 
+function lbt_set_forward_by_index(handle, symbol_idx, addr, interface, complex_retstyle = LBT_COMPLEX_RETSTYLE_NORMAL, f2c = LBT_F2C_PLAIN; verbose::Bool = false)
+    return ccall(dlsym(handle, :lbt_set_forward_by_index), Int32, (Int32, Ptr{Cvoid}, Int32, Int32, Int32, Int32), symbol_idx, addr, interface, complex_retstyle, f2c, verbose ? 1 : 0)
+end
+
 function lbt_set_default_func(handle, addr)
     return ccall(dlsym(handle, :lbt_set_default_func), Cvoid, (Ptr{Cvoid},), addr)
 end

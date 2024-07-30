@@ -5,15 +5,15 @@
 // Define holder locations for function addresses as `const void * $(name)_addr`
 // We define a second set the same as the first, but with `_64` on the end, to
 // provide our ILP64 interface, which is a perfect clone of the
-#define XX(name)    LBT_HIDDEN const void * name##_addr;
-#define XX_64(name) LBT_HIDDEN const void * name##64__addr;
+#define XX(name, idx)    LBT_HIDDEN const void * name##_addr;
+#define XX_64(name, idx) LBT_HIDDEN const void * name##64__addr;
 EXPORTED_FUNCS(XX)
 EXPORTED_FUNCS(XX_64)
 #undef XX
 #undef XX_64
 
 // Generate list of function names
-#define XX(name)    #name,
+#define XX(name, idx)    #name,
 const char *const exported_func_names[] = {
     EXPORTED_FUNCS(XX)
     NULL
@@ -21,8 +21,8 @@ const char *const exported_func_names[] = {
 #undef XX
 
 // Generate list of function addresses to tie names -> variables
-#define XX(name)    &name##_addr,
-#define XX_64(name) &name##64__addr,
+#define XX(name, idx)    &name##_addr,
+#define XX_64(name, idx) &name##64__addr,
 const void ** exported_func32_addrs[] = {
     EXPORTED_FUNCS(XX)
     NULL
@@ -37,8 +37,8 @@ const void ** exported_func64_addrs[] = {
 // Generate list of our own function addresses, so that we can filter
 // out libraries that link against us (such as LAPACK_jll) so that we
 // don't accidentally loop back to ourselves.
-#define XX(name)    NULL,
-#define XX_64(name) NULL,
+#define XX(name, idx)    NULL,
+#define XX_64(name, idx) NULL,
 const void ** exported_func32[] = {
     EXPORTED_FUNCS(XX)
     NULL

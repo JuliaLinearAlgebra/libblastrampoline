@@ -1,4 +1,9 @@
 using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
+openblas32_version = pkgversion(OpenBLAS32_jll)
+openblas32_version = VersionNumber(openblas32_version.major, openblas32_version.minor, openblas32_version.patch)
+if openblas32_version != v"0.3.10"
+    throw(ArgumentError("Wrong version of OpenBLAS32_jll ($(pkgversion(OpenBLAS32_jll))); this test suite requires an old OpenBLAS32_jll!"))
+end
 
 include("utils.jl")
 
@@ -178,7 +183,9 @@ end
     # Now, test that we can muck this up
     my_slamch = @cfunction(record_slamch_args, Float32, (Cstring,))
     @test lbt_set_forward(lbt_handle, "slamch_", my_slamch, LBT_INTERFACE_LP64) == 0
+    @test lbt_set_forward_by_index(lbt_handle, slamch_idx, my_slamch, LBT_INTERFACE_ILP64) == 0
     @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_LP64) == my_slamch
+    @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_ILP64) == my_slamch
 
     config = lbt_get_config(lbt_handle)
     libs = unpack_loaded_libraries(config)
@@ -187,6 +194,16 @@ end
     # Ensure that we actually overrode the symbol
     @test ccall(dlsym(lbt_handle, "slamch_"), Float32, (Cstring,), "test") == 13.37f0
     @test slamch_args == ["test"]
+
+    # OpenBLAS32_jll v0.3.10 is known to not have this cblas symbol, so we can test the default function behavior:
+    io = Pipe()
+    Base.redirect_stdio(;stderr=io) do
+        ccall(dlsym(lbt_handle, "cblas_sbstobf16"), Cvoid, ())
+        ccall(dlsym(lbt_handle, "cblas_sbstobf1664_"), Cvoid, ())
+        Base.Libc.flush_cstdio();
+    end
+    close(io.in)
+    @test chomp(String(read(io))) == "Error: no BLAS/LAPACK library loaded for cblas_sbstobf16()\nError: no BLAS/LAPACK library loaded for cblas_sbstobf1664_()"
 
     # Override the default function to keep track of people who try to call uninitialized BLAS functions
     @test lbt_get_default_func(lbt_handle) != C_NULL

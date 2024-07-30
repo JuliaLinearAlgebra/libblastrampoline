@@ -37,7 +37,7 @@ echo "#ifndef EXPORTED_FUNCS" >> "${OUTPUT_FILE}"
 echo "#define EXPORTED_FUNCS(XX) \\" >> "${OUTPUT_FILE}"
 NUM_EXPORTED=0
 for s in ${EXPORTED_FUNCS}; do
-    echo "    XX(${s}) \\" >> "${OUTPUT_FILE}"
+    echo "    XX(${s}, ${NUM_EXPORTED}) \\" >> "${OUTPUT_FILE}"
     NUM_EXPORTED=$((${NUM_EXPORTED} + 1))
     [ $((${NUM_EXPORTED} % 100)) == 0 ] && echo -n "."
 done
