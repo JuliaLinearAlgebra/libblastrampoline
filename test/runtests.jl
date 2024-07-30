@@ -159,10 +159,14 @@ end
     run_all_tests(blastrampoline_link_name(), libdirs, :LP64, OpenBLAS32_jll.libopenblas_path)
 
     # Test that setting bad `LBT_FORCE_*` values actually breaks things
-    withenv("LBT_FORCE_INTERFACE" => "ILP64") do
-        # `max_idx: 2` is incorrect, it's what happens when ILP64 data is given to an LP64 backend
-        isamax_fail = ("isamax_test", ["max_idx: 2"], true)
-        run_test(isamax_fail, blastrampoline_link_name(), libdirs, :ILP64, OpenBLAS32_jll.libopenblas_path)
+    # but only on non-armv7l, because our `isamax` test is doubly broken there, due to a
+    # `int64_t` return being passed on the stack, thus being filled with half trash.
+    if Sys.ARCH != :arm
+        withenv("LBT_FORCE_INTERFACE" => "ILP64") do
+            # `max_idx: 2` is incorrect, it's what happens when ILP64 data is given to an LP64 backend
+            isamax_fail = ("isamax_test", ["max_idx: 2"], true)
+            run_test(isamax_fail, blastrampoline_link_name(), libdirs, :ILP64, OpenBLAS32_jll.libopenblas_path)
+        end
     end
 end
 
