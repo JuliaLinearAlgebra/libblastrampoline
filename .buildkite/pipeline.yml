@@ -15,21 +15,27 @@ steps:
         
         ARCH="x86_64"
         AGENT_ARCH="x86_64"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v6.00/package_linux.x86_64.tar.gz"
-        ROOTFS_HASH="4dcde853eb5baaa0a8f087b633eaf955dc94b5dc"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.x86_64.tar.gz"
+        ROOTFS_HASH="c615fcc0a6923d520f11cc17934d4f7ea2ddb78d"
         upload_pipeline
 
         # We still schedule this one on an x86_64 machine, but use an i686 rootfs
         ARCH="i686"
         AGENT_ARCH="x86_64"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v6.00/package_linux.i686.tar.gz"
-        ROOTFS_HASH="a0c4756ee7827b3a75d4a62ff543315c1547e3d6"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.i686.tar.gz"
+        ROOTFS_HASH="6c24bdecd727cc6027039e2514d1d5a6490a99fd"
         upload_pipeline
 
         ARCH="aarch64"
         AGENT_ARCH="aarch64"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v6.00/package_linux.aarch64.tar.gz"
-        ROOTFS_HASH="e32c05f36d0a5bb0f94a17d99647f0b3352a8256"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.aarch64.tar.gz"
+        ROOTFS_HASH="c4223131e1c45aa676d5feca888668477d6e69a4"
+        upload_pipeline
+
+        ARCH="powerpc64le"
+        AGENT_ARCH="powerpc64le"
+        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.powerpc64le.tar.gz"
+        ROOTFS_HASH="34e09e7c13821ce690c86a7e92307171965a9eb8"
         upload_pipeline
 
 
@@ -37,14 +43,14 @@ steps:
         OS="windows"
         ARCH="x86_64"
         AGENT_ARCH="x86_64"
-        DOCKER_IMAGE="juliapackaging/package-windows-x86_64:v5.44"
+        DOCKER_IMAGE="juliapackaging/package-windows-x86_64:v7.5"
         upload_pipeline
 
         # same as for Linux, we schedule on an x86_64 machine, but use an i686 docker image
         OS="windows"
         ARCH="i686"
         AGENT_ARCH="x86_64"
-        DOCKER_IMAGE="juliapackaging/package-windows-i686:v5.44"
+        DOCKER_IMAGE="juliapackaging/package-windows-i686:v7.5"
         upload_pipeline
         
 
@@ -56,6 +62,15 @@ steps:
           upload_pipeline
         done
       done
+
+      # We don't have nightly or 1.10 for this one, we have to use Julia v1.7
+      JULIA_VERSION="1.7"
+      ARCH="armv7l"
+      AGENT_ARCH="armv7l"
+      ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.armv7l.tar.gz"
+      ROOTFS_HASH="1fcb42491944e00429fa3cab96692d3795435d50"
+      OS="linux"
+      upload_pipeline
     agents:
       queue: "juliaecosystem"
 

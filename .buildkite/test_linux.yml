@@ -3,7 +3,7 @@ steps:
     plugins:
       # Install Julia for the agent first, so that we can run `sandbox`
       - JuliaCI/julia#v1:
-          version: "1"
+          version: "1.7"
           arch: "${AGENT_ARCH?}"
       - staticfloat/sandbox#v1:
           rootfs_url: "${ROOTFS_URL?}"
