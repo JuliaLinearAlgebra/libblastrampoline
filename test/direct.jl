@@ -73,7 +73,11 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
         @test libs[1].suffix == ""
         @test libs[1].interface == LBT_INTERFACE_LP64
     end
-    @test libs[1].f2c == LBT_F2C_PLAIN
+    if (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
+        @test libs[1].f2c == LBT_F2C_PLAIN
+    else
+        @test libs[1].f2c == LBT_F2C_UNKNOWN
+    end
     if Sys.ARCH ∈ (:x86_64, :aarch64)
         if Sys.iswindows()
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_FNDA
@@ -96,7 +100,11 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[2].libname == OpenBLAS32_jll.libopenblas_path
     @test libs[2].suffix == ""
     @test libs[2].interface == LBT_INTERFACE_LP64
-    @test libs[2].f2c == LBT_F2C_PLAIN
+    if (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
+        @test libs[2].f2c == LBT_F2C_PLAIN
+    else
+        @test libs[2].f2c == LBT_F2C_UNKNOWN
+    end
 
     # If OpenBLAS32 and OpenBLAS are the same interface (e.g. i686)
     # then libs[2].active_forwards should be all zero!
@@ -114,7 +122,11 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[1].libname == OpenBLAS32_jll.libopenblas_path
     @test libs[1].suffix == ""
     @test libs[1].interface == LBT_INTERFACE_LP64
-    @test libs[1].f2c == LBT_F2C_PLAIN
+    if (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
+        @test libs[1].f2c == LBT_F2C_PLAIN
+    else
+        @test libs[1].f2c == LBT_F2C_UNKNOWN
+    end
 end
 
 @testset "get/set threads" begin
