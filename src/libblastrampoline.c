@@ -35,7 +35,7 @@ __attribute__((always_inline)) inline uintptr_t get_forward_name_idx() {
 #elif defined(ARCH_powerpc64le)
     asm("\t addi %0,11,0" : "=r"(idx));
 #elif defined(ARCH_riscv64)
-    asm("\t mov %%t4,%0" : "=r"(idx));
+    asm("\t mv %0,t4" : "=r"(idx));
 #elif defined(ARCH_x86_64)
     asm("\t movq %%r10,%0" : "=r"(idx));
 #else
