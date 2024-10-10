@@ -38,6 +38,8 @@ __attribute__((always_inline)) inline uintptr_t get_forward_name_idx() {
     asm("\t mov %%t4,%0" : "=r"(idx));
 #elif defined(ARCH_x86_64)
     asm("\t movq %%r10,%0" : "=r"(idx));
+#elif defined(ARCH_loongarch64)
+    asm("\t move %0, $t8" : "=r"(idx)); 
 #else
 #error "Unrecognized ARCH for `get_forward_name_idx()`"
 #endif
