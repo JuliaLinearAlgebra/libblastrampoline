@@ -97,20 +97,20 @@
 @bfcblasobjs = (cblas_sbgemm, cblas_sbgemv, cblas_sbdot, cblas_sbstobf16, cblas_sbdtobf16, cblas_sbf16tos, cblas_dbf16tod);
 
 @exblasobjs = (
-    qamax,qamin,qasum,qaxpy,qcabs1,qcopy,qdot,qgbmv,qgemm,
+    qamax,qamin,qasum,qaxpy,qcabs1,qcopy,qdot,qgbmv,qgemm,qgemmt,qgemmtr,
     qgemv,qger,qmax,qmin,
     qnrm2,
     qsbmv,qscal,qspmv,qspr2,
     qspr,qswap,qsymm,qsymv,qsyr2,qsyr2k,qsyr,qsyrk,qtbmv,qtbsv,
     qtpmv,qtpsv,qtrmm,qtrmv,qtrsm,qtrsv,
     qxamax,qxamin,qxasum,qxnrm2,
+    qrot,qrotg,qrotm,qrotmg,
     xaxpy,xcopy,xdotc,xdotu,
-    xqscal,xgbmv,xgemm,xgemv,xgerc,xgeru,
+    xqscal,xgbmv,xgemm,xgemmt,xgemmtr,xgemv,xgerc,xgeru,
     xhbmv,xhemm,xhemv,xher2,xher2k,xher,xherk,xhpmv,xhpr2,
     xhpr,xscal,xswap,xsymm,xsyr2k,xsyrk,xtbmv,
     xtbsv,xtpmv,xtpsv,xtrmm,xtrmv,xtrsm,xtrsv,
-#	     qrot,qrotg,qrotm,qrotmg,
-#	     xdrot,xrotg,
+    xrot,xrotg,xrotm,xrotmg,
 );
 
     @gemm3mobjs=();
@@ -121,14 +121,14 @@
     cgemm3m,
 );
 @gemm3mobjsz = (    
-    zgemm3m
+    zgemm3m,
 );
 
 @cblasgemm3mobjsc = (
-    cblas_cgemm3m
+    cblas_cgemm3m,
 );
 @cblasgemm3mobjsz = (
-    cblas_zgemm3m
+    cblas_zgemm3m,
 );
 
 
@@ -212,6 +212,20 @@ ztrtri,
 zpotri,
 );
 
+@exlapackobjs = (
+ qgesv,
+ qgetf2,
+ qgetrf,
+ qlaswp,
+ qgetrs,
+ qlauu2,
+ qlauum,
+ qpotf2,
+ qpotrf,
+ qtrti2,
+ qtrtri,
+ qpotri,
+);
 
 @lapackobjs2 = (
     # These routines are provided by LAPACK (reference implementation).
@@ -491,6 +505,7 @@ zpotri,
     dgeqrt, dgeqrt2, dgeqrt3, dgemqrt,
     dtpqrt, dtpqrt2, dtpmqrt, dtprfb,
 );
+
 @lapackobjs2z = (
     # ZLASRC  -- Double precision complex LAPACK routines
     # already provided by @blasobjs:
@@ -565,6 +580,69 @@ zpotri,
     zunbdb5, zunbdb6, zuncsd, zuncsd2by1,
     zgeqrt, zgeqrt2, zgeqrt3, zgemqrt,
     ztpqrt, ztpqrt2, ztpmqrt, ztprfb,
+);
+
+@exlapackobjs2 = (
+    qgbbrd, qgbcon, qgbequ, qgbrfs, qgbsv,
+    qgbsvx, qgbtf2, qgbtrf, qgbtrs, qgebak, qgebal, qgebd2,
+    qgebrd, qgecon, qgeequ, qgees, qgeesx, qgeev, qgeevx,
+    qgehd2, qgehrd, qgelq2, qgelqf,
+    qgels, qgelsd, qgelss, qgelsy, qgeql2, qgeqlf,
+    qgeqp3, qgeqr2, qgeqr2p, qgeqrf, qgeqrfp, qgerfs,
+    qgerq2, qgerqf, qgesc2, qgesdd, qgesvd, qgesvx,
+    qgetc2, qgetri,
+    qggbak, qggbal, qgges, qggesx, qggev, qggevx,
+    qggglm, qgghrd, qgglse, qggqrf,
+    qggrqf, qgtcon, qgtrfs, qgtsv,
+    qgtsvx, qgttrf, qgttrs, qgtts2, qhgeqz,
+    qhsein, qhseqr, qlabrd, qlacon, qlacn2,
+    qlaein, qlaexc, qlag2, qlags2, qlagtm, qlagv2, qlahqr,
+    qlahr2, qlaic1, qlaln2, qlals0, qlalsa, qlalsd,
+    qlangb, qlange, qlangt, qlanhs, qlansb, qlansp,
+    qlansy, qlantb, qlantp, qlantr, qlanv2,
+    qlapll, qlapmt,
+    qlaqgb, qlaqge, qlaqp2, qlaqps, qlaqsb, qlaqsp, qlaqsy,
+    qlaqr0, qlaqr1, qlaqr2, qlaqr3, qlaqr4, qlaqr5,
+    qlaqtr, qlar1v, qlar2v,
+    qlarf, qlarfb, qlarfg, qlarfgp, qlarft, qlarfx,
+    qlargv, qlarrv, qlartv,
+    qlarz, qlarzb, qlarzt, qlasy2, qlasyf,
+    qlatbs, qlatdf, qlatps, qlatrd, qlatrs, qlatrz,
+    qopgtr, qopmtr, qorg2l, qorg2r,
+    qorgbr, qorghr, qorgl2, qorglq, qorgql, qorgqr, qorgr2,
+    qorgrq, qorgtr, qorm2l, qorm2r,
+    qormbr, qormhr, qorml2, qormlq, qormql, qormqr, qormr2,
+    qormr3, qormrq, qormrz, qormtr, qpbcon, qpbequ, qpbrfs,
+    qpbstf, qpbsv, qpbsvx,
+    qpbtf2, qpbtrf, qpbtrs, qpocon, qpoequ, qporfs, qposv,
+    qposvx, qpotrs, qpstrf, qpstf2,
+    qppcon, qppequ,
+    qpprfs, qppsv, qppsvx, qpptrf, qpptri, qpptrs, qptcon,
+    qpteqr, qptrfs, qptsv, qptsvx, qpttrs, qptts2, qrscl,
+    qsbev, qsbevd, qsbevx, qsbgst, qsbgv, qsbgvd, qsbgvx,
+    qsbtrd, qspcon, qspev, qspevd, qspevx, qspgst,
+    qspgv, qspgvd, qspgvx, qsprfs, qspsv, qspsvx, qsptrd,
+    qsptrf, qsptri, qsptrs, qstegr, qstein, qstev, qstevd, qstevr,
+    qstevx,
+    qsycon, qsyev, qsyevd, qsyevr,
+    qsyevx, qsygs2, qsygst, qsygv, qsygvd, qsygvx, qsyrfs,
+    qsysv, qsysvx,
+    qsytd2, qsytf2, qsytrd, qsytrf, qsytri, qsytri2, qsytri2x,
+    qsyswapr, qsytrs, qsytrs2, qsyconv,
+    qtbcon, qtbrfs, qtbtrs, qtgevc, qtgex2, qtgexc, qtgsen,
+    qtgsja, qtgsna, qtgsy2, qtgsyl, qtpcon, qtprfs, qtptri,
+    qtptrs,
+    qtrcon, qtrevc, qtrexc, qtrrfs, qtrsen, qtrsna, qtrsyl,
+    qtrtrs, qtzrzf, qstemr,
+    qsgesv, qsposv, qlag2s, qlag2d, qlat2s,
+    qlansf, qpftrf, qpftri, qpftrs, qsfrk, qtfsm, qtftri, qtfttp,
+    qtfttr, qtpttf, qtpttr, qtrttf, qtrttp,
+    qgejsv, qgesvj, qgsvj0, qgsvj1,
+    qgeequb, qsyequb, qpoequb, qgbequb,
+    qbbcsd, qlapmr, qorbdb, qorbdb1, qorbdb2, qorbdb3, qorbdb4,
+    qorbdb5, qorbdb6, qorcsd, qorcsd2by1,
+    qgeqrt, qgeqrt2, qgeqrt3, qgemqrt,
+    qtpqrt, qtpqrt2, qtpmqrt, qtprfb,
 );
     # functions added for lapack-3.6.0
 
@@ -3868,7 +3946,7 @@ if ($ARGV[8] == 1) {
 }
 
 if ($ARGV[3] == 1) {
-    @underscore_objs = (@underscore_objs, @exblasobjs);
+    @underscore_objs = (@underscore_objs, @exblasobjs, @exlapackobjs, @exlapackobjs2);
 };
 
 if ($ARGV[1] eq "x86_64") { @underscore_objs = (@underscore_objs, @gemm3mobjs); };
