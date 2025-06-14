@@ -2,7 +2,7 @@ task:
   matrix:
     - name: FreeBSD
       freebsd_instance:
-        image: freebsd-14-2-release-amd64
+        image: freebsd-14-2
       env:
         matrix:
           - JULIA_VERSION: 1
