@@ -894,6 +894,23 @@ zpotri,
     ztrsyl3,
     zrscl,
     );
+    #functions added for lapack-3.12.1
+@lapackobjs2c = (@lapackobjs2c,
+    clarf1f,
+    clarf1l,
+    );
+@lapackobjs2d = (@lapackobjs2d,
+    dlarf1f,
+    dlarf1l,
+    );
+@lapackobjs2s = (@lapackobjs2s,
+    slarf1f,
+    slarf1l,
+    );
+@lapackobjs2z = (@lapackobjs2z,
+    zlarf1f,
+    zlarf1l,
+    );
 
 @lapack_extendedprecision_objs = (
     zposvxx, clagge, clatms, chesvxx, cposvxx, cgesvxx, ssyrfssx, csyrfsx,
