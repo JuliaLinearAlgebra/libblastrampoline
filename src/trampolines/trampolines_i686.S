@@ -4,8 +4,8 @@
 #define XX(name, idx) \
 DEBUGINFO(name); \
 .global MANGLE(UNDERSCORE(name)); \
-.cfi_startproc; \
 MANGLE(UNDERSCORE(name))##:; \
+.cfi_startproc; \
     CET_START(); \
     mov $SYMBOL_IDX(idx),%eax; \
     jmpl *(NAMEADDR(name)); \

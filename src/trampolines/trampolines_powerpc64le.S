@@ -10,8 +10,8 @@
 #define XX(name, idx) \
 .global MANGLE(UNDERSCORE(name)); \
 .type MANGLE(UNDERSCORE(name))##, @function; \
-.cfi_startproc; \
 MANGLE(UNDERSCORE(name))##: ; \
+.cfi_startproc; \
     addis 2, 12, .TOC.-MANGLE(UNDERSCORE(name))##@ha; \
     addi 2, 2, .TOC.-MANGLE(UNDERSCORE(name))##@l; \
     .localentry MANGLE(UNDERSCORE(name))##,.-MANGLE(UNDERSCORE(name))##; \
