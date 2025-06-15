@@ -12,7 +12,7 @@ steps:
       for JULIA_VERSION in 1.10 nightly; do
         # First, linux
         OS="linux"
-        
+
         ARCH="x86_64"
         AGENT_ARCH="x86_64"
         ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.x86_64.tar.gz"
@@ -32,13 +32,6 @@ steps:
         ROOTFS_HASH="c4223131e1c45aa676d5feca888668477d6e69a4"
         upload_pipeline
 
-        ARCH="powerpc64le"
-        AGENT_ARCH="powerpc64le"
-        ROOTFS_URL="https://github.com/JuliaCI/rootfs-images/releases/download/v7.5/package_linux.powerpc64le.tar.gz"
-        ROOTFS_HASH="34e09e7c13821ce690c86a7e92307171965a9eb8"
-        upload_pipeline
-
-
         # Next, windows
         OS="windows"
         ARCH="x86_64"
@@ -52,12 +45,12 @@ steps:
         AGENT_ARCH="x86_64"
         DOCKER_IMAGE="juliapackaging/package-windows-i686:v7.5"
         upload_pipeline
-        
+
 
 
         # Finally, macOS
         OS="macos"
-        for ARCH in x86_64; do
+        for ARCH in x86_64 aarch64; do
           AGENT_ARCH="$${ARCH}"
           upload_pipeline
         done
