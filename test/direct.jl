@@ -288,7 +288,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         libs = unpack_loaded_libraries(config)
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
-        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].cblas ∈ (LBT_CBLAS_DIVERGENT, LBT_CBLAS_CONFORMANT)
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_zdotc_sub, asserting that it does not try to call a forwardless-symbol
@@ -318,7 +318,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         libs = unpack_loaded_libraries(config)
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
-        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].cblas ∈ (LBT_CBLAS_DIVERGENT, LBT_CBLAS_CONFORMANT)
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_cdotc_sub64_ to test the full CBLAS workaround -> complex return style handling chain
@@ -330,5 +330,17 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         ccall(cdotc_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
         @test result[1] ≈ ComplexF32(1.47 + 3.83im)
         @test isempty(stacktraces)
+    end
+
+    @testset "MKL threading domains" begin
+        nthreads = lbt_get_num_threads(lbt_handle)
+        if nthreads <= 1
+            nthreads = 2
+        else
+            nthreads = div(nthreads, 2)
+        end
+        lbt_set_num_threads(lbt_handle, nthreads)
+        @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 1) == nthreads
+        @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 2) != nthreads
     end
 end

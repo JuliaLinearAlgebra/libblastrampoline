@@ -35,7 +35,7 @@ __attribute__((always_inline)) inline uintptr_t get_forward_name_idx() {
 #elif defined(ARCH_powerpc64le)
     asm("\t addi %0,11,0" : "=r"(idx));
 #elif defined(ARCH_riscv64)
-    asm("\t mov %%t4,%0" : "=r"(idx));
+    asm("\t mv %0,t4" : "=r"(idx));
 #elif defined(ARCH_x86_64)
     asm("\t movq %%r10,%0" : "=r"(idx));
 #else
@@ -237,6 +237,8 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     if (verbose) {
         printf(" -> Autodetected symbol suffix \"%s\"\n", lib_suffix);
     }
+    char extra_underscore_suffix[MAX_SYMBOL_LEN];
+    snprintf(extra_underscore_suffix, MAX_SYMBOL_LEN, "_%s", lib_suffix);
 
     // Next, we need to figure out if it's a 32-bit or 64-bit BLAS library;
     // we'll do that by calling `autodetect_interface()`:
@@ -392,6 +394,15 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         void *addr = lookup_symbol(handle, symbol_name);
         void *self_symbol_addr = interface == LBT_INTERFACE_ILP64 ? exported_func64[symbol_idx] \
                                                                   : exported_func32[symbol_idx];
+        if (addr == NULL ) {
+            // MKL (and other libraries too in the fullness of time, I have no doubt) doesn't like
+            // to slap `64` directly onto the end of their symbol names; they insert an extra `_`
+            // if the symbol is not a FORTRAN symbol (which would already have a `_` at the end)
+            // We catch this case here, as a fallback check:
+            build_symbol_name(symbol_name, exported_func_names[symbol_idx], extra_underscore_suffix);
+            addr = lookup_symbol(handle, symbol_name);
+        }
+
         if (addr != NULL && addr != self_symbol_addr) {
             lbt_set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
             BITFIELD_SET(forwards, symbol_idx);
@@ -404,8 +415,8 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     // the FORTRAN equivalents.
     if (cblas == LBT_CBLAS_DIVERGENT) {
         int32_t cblas_symbol_idx = 0;
-        for (cblas_symbol_idx = 0; cblas_func_idxs[cblas_symbol_idx] != -1; cblas_symbol_idx += 1) {
-            int32_t symbol_idx = cblas_func_idxs[cblas_symbol_idx];
+        for (cblas_symbol_idx = 0; cblas_workaround_func_idxs[cblas_symbol_idx] != -1; cblas_symbol_idx += 1) {
+            int32_t symbol_idx = cblas_workaround_func_idxs[cblas_symbol_idx];
 
             // Report to the user that we're cblas-wrapping this one
             if (verbose) {
@@ -415,9 +426,9 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
 
             if (interface == LBT_INTERFACE_LP64) {
-                (*exported_func32_addrs[symbol_idx]) = cblas32_func_wrappers[cblas_symbol_idx];
+                (*exported_func32_addrs[symbol_idx]) = cblas32_workaround_func_wrappers[cblas_symbol_idx];
             } else {
-                (*exported_func64_addrs[symbol_idx]) = cblas64_func_wrappers[cblas_symbol_idx];
+                (*exported_func64_addrs[symbol_idx]) = cblas64_workaround_func_wrappers[cblas_symbol_idx];
             }
         }
     }
