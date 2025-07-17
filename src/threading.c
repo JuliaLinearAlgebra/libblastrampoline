@@ -15,10 +15,18 @@
  * libblastrampoline will propagate the call through to its loaded libraries as long as the
  * library exposes a getter/setter method named in one of these arrays, and its signature
  * matches the common theme here.
+ *
+ * For the getters, the function signature should match:
+ *     int get_num_threads()
+ * For the setters, the function signature should match:
+ *     void set_num_threads(int numThreads)
  */
 static char * getter_names[MAX_THREADING_NAMES] = {
     "openblas_get_num_threads",
     "bli_thread_get_num_threads",
+    // There isn't a non-max NVPL function for this
+    "nvpl_blas_get_max_threads",
+    "nvpl_lapack_get_max_threads",
     // We special-case MKL in the lookup loop below
     //"MKL_Domain_Get_Max_Threads",
     NULL
@@ -27,6 +35,8 @@ static char * getter_names[MAX_THREADING_NAMES] = {
 static char * setter_names[MAX_THREADING_NAMES] = {
     "openblas_set_num_threads",
     "bli_thread_set_num_threads",
+    "nvpl_blas_set_num_threads",
+    "nvpl_lapack_set_num_threads",
     // We special-case MKL in the lookup loop below
     //"MKL_Domain_Set_Num_Threads",
     NULL
