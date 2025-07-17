@@ -68,13 +68,13 @@ install: $(TARGET_LIBRARIES)
 	@mkdir -p $(DESTDIR)$(includedir)/libblastrampoline
 	-@cp -Ra $(LBT_ROOT)/include/* $(DESTDIR)$(includedir)/libblastrampoline
 	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(DESTDIR)$(includedir)/
-	@mkdir -p $(DESTDIR)$(libdir)
+	@mkdir -p $(DESTDIR)$(shlibdir)
 	@for lib in $(TARGET_LIBRARIES); do \
-		cp -a $${lib} $(DESTDIR)$(libdir)/; \
+		cp -a $${lib} $(DESTDIR)$(shlibdir)/; \
 	done
 ifeq ($(OS),WINNT)
-	@mkdir -p $(DESTDIR)$(prefix)/lib
-	@cp -a $(builddir)/$(LIB_MAJOR_VERSION).a $(DESTDIR)$(prefix)/lib
+	@mkdir -p $(DESTDIR)$(libdir)
+	@cp -a $(builddir)/$(LIB_MAJOR_VERSION).a $(DESTDIR)$(libdir)
 endif
 
 clean:
