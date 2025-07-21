@@ -6,9 +6,30 @@
 #define max(x, y)  ((x) > (y) ? (x) : (y))
 #endif
 
-// We need to ask MKL to get/set threads for only the BLAS domain, we therefore pass in
-// this constant to the relevant threading functions to limit our thread setting.
-#define MKL_DOMAIN_BLAS 1 /* From mkl_types.h */
+/* We need to ask MKL to get/set threads for only the BLAS & LAPACK domains, we
+ * therefore pass in this constant to the relevant threading functions to limit
+ * our thread setting.
+ *
+ * The LAPACK threading domain was added in 2025.2, so we need to ask for the MKL
+ * version in order to properly handle that.
+ *
+ * These are from mkl_types.h
+ */
+#define MKL_DOMAIN_BLAS   1
+#define MKL_DOMAIN_LAPACK 5
+
+ typedef
+ struct {
+     int    MajorVersion;
+     int    MinorVersion;
+     int    UpdateVersion;
+     int    PatchVersion;
+     char * ProductStatus;
+     char * Build;
+     char * Processor;
+     char * Platform;
+ } MKLVersion;
+
 
 /*
  * We provide a flexible thread getter/setter interface here; by calling `lbt_set_num_threads()`
@@ -76,11 +97,27 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
             }
         }
 
-        // Special-case MKL, as we need to specifically ask for the "BLAS" domain
+        // Special-case MKL, as we need to specifically ask for the BLAS & LAPACK domains
         int (*fptr)(int) = lookup_symbol(lib->handle, "MKL_Domain_Get_Max_Threads");
         if (fptr != NULL) {
-            int new_threads = fptr(MKL_DOMAIN_BLAS);
-            max_threads = max(max_threads, new_threads);
+            // The BLAS domain (always available)
+            int new_threads_blas = fptr(MKL_DOMAIN_BLAS);
+            max_threads = max(max_threads, new_threads_blas);
+
+            // The LAPACK threading domain was only added in oneMKL 2025.2
+            // Gate reading the threads based on this version, because before 2025.2 it
+            // will return the default, which wouldn't be useful because we max everything.
+            void (*fverptr)(MKLVersion*) = lookup_symbol(lib->handle, "mkl_get_version");
+            if (fverptr != NULL) {
+                MKLVersion ver;
+                fverptr(&ver);
+
+                // MKL considers 2025.2 to be a major of 2025 and an update of 2 (not a minor)
+                if(ver.MajorVersion >= 2025 && ver.UpdateVersion >= 2) {
+                    int new_threads_lapack = fptr(MKL_DOMAIN_LAPACK);
+                    max_threads = max(max_threads, new_threads_lapack);
+                }
+            }
         }
     }
     return max_threads;
@@ -104,10 +141,11 @@ LBT_DLLEXPORT void lbt_set_num_threads(int32_t nthreads) {
             }
         }
 
-        // Special-case MKL, as we need to specifically ask for the "BLAS" domain
+        // Special-case MKL, as we need to specifically ask for the BLAS & LAPACK domains
         int (*fptr)(int, int) = lookup_symbol(lib->handle, "MKL_Domain_Set_Num_Threads");
         if (fptr != NULL) {
             fptr(nthreads, MKL_DOMAIN_BLAS);
+            fptr(nthreads, MKL_DOMAIN_LAPACK);
         }
     }
 }
