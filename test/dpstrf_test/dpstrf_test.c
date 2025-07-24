@@ -41,7 +41,11 @@ int main()
     //  return value
     MANGLE(dpstrf_)("U", &order, &A[0][0], &lda, &pivot[0], &rank, &tol, &work[0], &info);
     if (info != 0) {
-        printf("ERROR: info == %ld!\n", info);
+        #ifdef ILP64
+            printf("ERROR: info == %ld!\n", info);
+        #else
+            printf("ERROR: info == %d!\n", info);
+        #endif
         return 1;
     }
 
