@@ -76,6 +76,9 @@ void * lookup_self_symbol(const char * symbol_name);
 const char * lookup_self_path();
 void close_library(void * handle);
 
+// Functions for lazy initialization
+void ensure_self_symbols_initialized();
+
 // Functions in `env_utils.c`
 uint8_t env_lowercase_match(const char * env_name, const char * value);
 uint8_t env_lowercase_match_any(const char * env_name, uint32_t num_values, ...);

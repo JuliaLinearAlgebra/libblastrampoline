@@ -377,6 +377,9 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         clear_loaded_libraries();
     }
 
+    // Ensure self-symbols are initialized before we compare against them
+    ensure_self_symbols_initialized();
+
     // Finally, re-export its symbols:
     int32_t nforwards = 0;
     int32_t symbol_idx = 0;
@@ -484,19 +487,14 @@ __attribute__((constructor)) void init(void) {
         // We can't directly use the symbol name here, since the protected visibility
         // on Linux causes a linker error with certain versions of GCC and ld:
         // https://lists.gnu.org/archive/html/bug-binutils/2016-02/msg00191.html
+        // Note: This single lookup is safe during initialization since it's just
+        // looking up our own function symbol, not the full symbol table
         default_func = lookup_self_symbol("lbt_default_func_print_error_and_exit");
     }
 
-    // Build our lists of self-symbol addresses
-    int32_t symbol_idx;
-    char symbol_name[MAX_SYMBOL_LEN];
-    for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
-        exported_func32[symbol_idx] = lookup_self_symbol(exported_func_names[symbol_idx]);
-
-        // Look up this symbol in the given library, if it is a valid symbol, set it!
-        build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
-        exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
-    }
+    // Note: On Windows, we can't safely call GetProcAddress (used by lookup_self_symbol)
+    // during DllMain as it can cause deadlocks. The self-symbol lookup is now done lazily
+    // when first needed in ensure_self_symbols_initialized().
 
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries.
     // Each library can have a `!suffix` tacked onto the end of it, providing a library-specific
@@ -554,4 +552,28 @@ __attribute__((constructor)) void init(void) {
 #ifdef _OS_WINDOWS_
     return TRUE;
 #endif
+}
+
+// Static flag to track if self-symbols have been initialized
+static uint8_t self_symbols_initialized = 0;
+
+// Lazy initialization of self-symbol addresses
+// This is called outside of DllMain to avoid GetProcAddress deadlocks on Windows
+void ensure_self_symbols_initialized() {
+    if (self_symbols_initialized) {
+        return;
+    }
+    
+    // Build our lists of self-symbol addresses
+    int32_t symbol_idx;
+    char symbol_name[MAX_SYMBOL_LEN];
+    for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
+        exported_func32[symbol_idx] = lookup_self_symbol(exported_func_names[symbol_idx]);
+
+        // Look up this symbol in the given library, if it is a valid symbol, set it!
+        build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
+        exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
+    }
+    
+    self_symbols_initialized = 1;
 }
