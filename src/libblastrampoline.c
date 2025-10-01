@@ -4,6 +4,10 @@
 #include "libblastrampoline_f2cdata.h"
 #include "libblastrampoline_cblasdata.h"
 
+#ifndef _OS_WINDOWS_
+#include <pthread.h>
+#endif
+
 // Sentinel to tell us if we've got a deepbindless workaround active or not
 #define DEEPBINDLESS_INTERFACE_LP64_LOADED    0x01
 #define DEEPBINDLESS_INTERFACE_ILP64_LOADED   0x02
@@ -554,16 +558,12 @@ __attribute__((constructor)) void init(void) {
 #endif
 }
 
-// Static flag to track if self-symbols have been initialized
-static uint8_t self_symbols_initialized = 0;
-
-// Lazy initialization of self-symbol addresses
+// Thread-safe lazy initialization of self-symbol addresses
 // This is called outside of DllMain to avoid GetProcAddress deadlocks on Windows
-void ensure_self_symbols_initialized() {
-    if (self_symbols_initialized) {
-        return;
-    }
-    
+#ifdef _OS_WINDOWS_
+static INIT_ONCE self_symbols_init_once = INIT_ONCE_STATIC_INIT;
+
+static BOOL CALLBACK init_self_symbols_impl(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *Context) {
     // Build our lists of self-symbol addresses
     int32_t symbol_idx;
     char symbol_name[MAX_SYMBOL_LEN];
@@ -574,6 +574,29 @@ void ensure_self_symbols_initialized() {
         build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
         exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
     }
-    
-    self_symbols_initialized = 1;
+    return TRUE;
 }
+
+void ensure_self_symbols_initialized() {
+    InitOnceExecuteOnce(&self_symbols_init_once, init_self_symbols_impl, NULL, NULL);
+}
+#else
+static pthread_once_t self_symbols_init_once = PTHREAD_ONCE_INIT;
+
+static void init_self_symbols_impl(void) {
+    // Build our lists of self-symbol addresses
+    int32_t symbol_idx;
+    char symbol_name[MAX_SYMBOL_LEN];
+    for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
+        exported_func32[symbol_idx] = lookup_self_symbol(exported_func_names[symbol_idx]);
+
+        // Look up this symbol in the given library, if it is a valid symbol, set it!
+        build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
+        exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
+    }
+}
+
+void ensure_self_symbols_initialized() {
+    pthread_once(&self_symbols_init_once, init_self_symbols_impl);
+}
+#endif

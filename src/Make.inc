@@ -58,8 +58,14 @@ LBT_LDFLAGS := $(LDFLAGS)
 
 ifeq ($(OS),Linux)
 # On linux, we need to link `libdl` to get `dlopen`
+# and `libpthread` for pthread_once (used in lazy initialization)
 # and linker doesn't detect automatically executable stack isn't needed
-LBT_LDFLAGS += -ldl -Wl,-z,noexecstack
+LBT_LDFLAGS += -ldl -lpthread -Wl,-z,noexecstack
+endif
+
+ifneq (,$(filter $(OS),FreeBSD OpenBSD))
+# On BSD systems, we need to link `libpthread` for pthread_once
+LBT_LDFLAGS += -lpthread
 endif
 
 ifeq ($(OS),WINNT)
