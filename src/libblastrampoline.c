@@ -209,6 +209,9 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
     if (symbol_idx == -1)
         return -1;
 
+    // Ensure self-symbols are initialized before we call set_forward_by_index
+    ensure_self_symbols_initialized();
+
     int32_t ret = lbt_set_forward_by_index(symbol_idx, addr, interface, complex_retstyle, f2c, verbose);
     if (ret == 0) {
         // Un-mark this symbol as being provided by any of our libraries;
@@ -499,7 +502,11 @@ __attribute__((constructor)) void init(void) {
     // Note: On Windows, we can't safely call GetProcAddress (used by lookup_self_symbol)
     // during DllMain as it can cause deadlocks. The self-symbol lookup is now done lazily
     // when first needed in ensure_self_symbols_initialized().
+    // Additionally, on Windows we cannot use LBT_DEFAULT_LIBS or LBT_FALLBACK_LIBS during
+    // DllMain because lbt_forward() requires the self-symbol initialization. Users must
+    // call lbt_forward() explicitly from their code instead.
 
+#ifndef _OS_WINDOWS_
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries.
     // Each library can have a `!suffix` tacked onto the end of it, providing a library-specific
     // suffix_hint.  Example:
@@ -552,6 +559,7 @@ __attribute__((constructor)) void init(void) {
             clear = 0;
         }
     }
+#endif // _OS_WINDOWS_
 
 #ifdef _OS_WINDOWS_
     return TRUE;
@@ -564,26 +572,11 @@ __attribute__((constructor)) void init(void) {
 static INIT_ONCE self_symbols_init_once = INIT_ONCE_STATIC_INIT;
 
 static BOOL CALLBACK init_self_symbols_impl(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *Context) {
-    // Build our lists of self-symbol addresses
-    int32_t symbol_idx;
-    char symbol_name[MAX_SYMBOL_LEN];
-    for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
-        exported_func32[symbol_idx] = lookup_self_symbol(exported_func_names[symbol_idx]);
-
-        // Look up this symbol in the given library, if it is a valid symbol, set it!
-        build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
-        exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
-    }
-    return TRUE;
-}
-
-void ensure_self_symbols_initialized() {
-    InitOnceExecuteOnce(&self_symbols_init_once, init_self_symbols_impl, NULL, NULL);
-}
 #else
 static pthread_once_t self_symbols_init_once = PTHREAD_ONCE_INIT;
 
 static void init_self_symbols_impl(void) {
+#endif
     // Build our lists of self-symbol addresses
     int32_t symbol_idx;
     char symbol_name[MAX_SYMBOL_LEN];
@@ -594,9 +587,15 @@ static void init_self_symbols_impl(void) {
         build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
         exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
     }
+#ifdef _OS_WINDOWS_
+    return TRUE;
+#endif
 }
 
 void ensure_self_symbols_initialized() {
+#ifdef _OS_WINDOWS_
+    InitOnceExecuteOnce(&self_symbols_init_once, init_self_symbols_impl, NULL, NULL);
+#else
     pthread_once(&self_symbols_init_once, init_self_symbols_impl);
-}
 #endif
+}
