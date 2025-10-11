@@ -16,7 +16,7 @@ all: $(maintarget)
 
 # Objects we'll build
 MAIN_OBJS := libblastrampoline.o dl_utils.o env_utils.o config.o \
-			 autodetection.o \
+			 autodetection.o lib_version.o \
 			 threading.o deepbindless.o trampolines/trampolines_$(ARCH).o
 
 # Include win_utils.c on windws
