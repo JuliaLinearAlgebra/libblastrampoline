@@ -168,6 +168,14 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         return info;
     }
 
+    // Apple Accelerate
+    // Look for a special Apple-only symbol to detect the Accelerate library
+    void (*fptr_appaccel)() = lookup_symbol(library->handle, "appleblas_sgeadd");
+    if (fptr_appaccel != NULL) {
+        snprintf(info, len_info, "Apple Accelerate%s", lapack_ver);
+        return info;
+    }
+
 
     return "Unknown library";
 }
