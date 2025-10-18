@@ -31,6 +31,15 @@
  } MKLVersion;
 
 
+/* Apple Accelerate doesn't allow setting the number of threads directly, it only has an
+ * option to do single-threaded or multi-threaded. That is controlled via the BLASSetThreading
+ * API introduced in macOS 15.
+ *
+ * These constants are from the vecLib.framework/Headers/thread_api.h file
+ */
+#define ACCELERATE_BLAS_THREADING_MULTI_THREADED    0
+#define ACCELERATE_BLAS_THREADING_SINGLE_THREADED   1
+
 /*
  * We provide a flexible thread getter/setter interface here; by calling `lbt_set_num_threads()`
  * libblastrampoline will propagate the call through to its loaded libraries as long as the
@@ -50,6 +59,7 @@ static char * getter_names[MAX_THREADING_NAMES] = {
     "nvpl_lapack_get_max_threads",
     // We special-case MKL in the lookup loop below
     //"MKL_Domain_Get_Max_Threads",
+    // We special-case Apple Accelerate below
     NULL
 };
 
@@ -60,6 +70,7 @@ static char * setter_names[MAX_THREADING_NAMES] = {
     "nvpl_lapack_set_num_threads",
     // We special-case MKL in the lookup loop below
     //"MKL_Domain_Set_Num_Threads",
+    // We special-case Apple Accelerate below
     NULL
 };
 
@@ -129,6 +140,22 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
                 }
             }
         }
+
+        // Special case Apple Accelerate because we have to determine if we are single-threaded or multi-threaded
+        // This API only exists on macOS 15+.
+        int (*fptr_acc)(void) = lookup_symbol(lib->handle, "BLASGetThreading");
+        if (fptr_acc != NULL) {
+            int nthreads = fptr_acc();
+
+            if(nthreads == ACCELERATE_BLAS_THREADING_MULTI_THREADED) {
+                // This number is arbitrary right now, but greater than 1 to mean multi-threaded.
+                // TODO: Can we guestimate the number of threads from the APPLE_NTHREADS symbol in accelerate?
+                max_threads = 2;
+            } else {
+                // Single-threaded
+                max_threads = max(max_threads, 1);
+            }
+        }
     }
     return max_threads;
 }
@@ -156,6 +183,17 @@ LBT_DLLEXPORT void lbt_set_num_threads(int32_t nthreads) {
         if (fptr != NULL) {
             fptr(nthreads, MKL_DOMAIN_BLAS);
             fptr(nthreads, MKL_DOMAIN_LAPACK);
+        }
+
+        // Special case Apple Accelerate because we have to determine if we must set multi-threaded or single-threaded
+        // This API only exists on macOS 15+.
+        int (*fptr_acc)(int) = lookup_symbol(lib->handle, "BLASSetThreading");
+        if (fptr_acc != NULL) {
+            if(nthreads > 1) {
+                fptr_acc(ACCELERATE_BLAS_THREADING_MULTI_THREADED);
+            } else {
+                fptr_acc(ACCELERATE_BLAS_THREADING_SINGLE_THREADED);
+            }
         }
     }
 }
