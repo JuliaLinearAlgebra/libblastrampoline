@@ -1,5 +1,7 @@
 #include "libblastrampoline_internal.h"
 
+#include <ctype.h>
+
 /* We need to ask MKL for information about itself to get better information for the config.
  *
  * These are from mkl_types.h
@@ -16,16 +18,41 @@ typedef struct {
 } MKLVersion;
 
 
+// These are the addresses of the LBT functions for ilaver we export
+extern void ** ilaver_;
+extern void ** ilaver_64_;
+
 // Every library implements their version string handling differently, so this is a ratsnest
 // of conditions for the various libraries to try and get information that is useful to us...
 char* lbt_get_library_info(lbt_library_info_t* library)
 {
     // Keep the string as a static lifetime so that it never gets deleted
-    int len_info = 255;
-    static char info[255];
+    int len_info = 512;
+    static char info[512];
 
     // Remove stale information from info
     info[0] = '\0';
+
+    // Get LAPACK information, which will say the LAPACK API the library uses
+    int len_lapack_ver = 25;
+    char lapack_ver[25];
+    char symbol_name_ilaver[MAX_SYMBOL_LEN];
+    build_symbol_name(symbol_name_ilaver, "ilaver_", library->suffix);
+    void* (*fptr_ilaver)(int*, int*, int*) = lookup_symbol(library->handle, symbol_name_ilaver);
+
+    // Make sure we don't accidentally call our own version of ilaver
+    if ((fptr_ilaver != NULL) && ((void*)fptr_ilaver != &ilaver_) && ((void*)fptr_ilaver != &ilaver_64_)) {
+        int lapack_major = 0;
+        int lapack_minor = 0;
+        int lapack_patch = 0;
+
+        fptr_ilaver(&lapack_major, &lapack_minor, &lapack_patch);
+        snprintf(lapack_ver, len_lapack_ver, ", LAPACK v%d.%d.%d", lapack_major, lapack_minor, lapack_patch);
+    } else {
+        // Clear the version string if we can't compute one
+        lapack_ver[0] = '\0';
+    }
+
 
     // OpenBLAS, config will have same suffix as the other functions
     char symbol_name[MAX_SYMBOL_LEN];
@@ -33,14 +60,26 @@ char* lbt_get_library_info(lbt_library_info_t* library)
     char* (*fptr_openblas)() = lookup_symbol(library->handle, symbol_name);
     if (fptr_openblas != NULL) {
         char* tmp_info = fptr_openblas();
-        strcpy(info, tmp_info);
+
+        snprintf(info, len_info, "%s%s", tmp_info, lapack_ver);
         return info;
     }
 
     // MKL
     char* (*fptr_mkl)(char*, int) = lookup_symbol(library->handle, "mkl_get_version_string");
     if (fptr_mkl != NULL) {
-        fptr_mkl(info, len_info);
+        int len_mkl_info = 300;
+        char mkl_info[300];
+        memset(mkl_info, 0, len_mkl_info);
+
+        fptr_mkl(mkl_info, len_mkl_info);
+
+        // MKL pads the output with spaces, so trim it to only the needed parts
+        char* back = mkl_info + strlen(mkl_info);
+        while(isspace(*--back));
+        *(back+1) = '\0';
+
+        snprintf(info, len_info, "%s%s", mkl_info, lapack_ver);
         return info;
     }
 
@@ -55,7 +94,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         int minor = (version - (major*10000)) / 100;
         int patch = (version - (major*10000) - (minor*100));
 
-        snprintf(info, len_info, "NVPL %d.%d.%d", major, minor, patch);
+        snprintf(info, len_info, "NVPL %d.%d.%d%s", major, minor, patch, lapack_ver);
         return info;
     }
 
@@ -66,7 +105,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         char* tag = NULL;
         fptr_armpl(&major, &minor, &patch, &tag);
 
-        snprintf(info, len_info, "ARMPL %d.%d.%d.%s", major, minor, patch, tag);
+        snprintf(info, len_info, "ARMPL %d.%d.%d.%s%s", major, minor, patch, tag, lapack_ver);
         return info;
     }
 
@@ -102,11 +141,12 @@ char* lbt_get_library_info(lbt_library_info_t* library)
             aocl_detected = 1;
         }
 
-        snprintf(info, len_info, "%s %s, %d-bit integer, %s",
+        snprintf(info, len_info, "%s %s, %d-bit integer, %s%s",
                  aocl_detected == 1 ? "AOCL" : "BLIS",
                  ver_str,
                  int_size,
-                 config);
+                 config,
+                 lapack_ver);
 
         return info;
     }
@@ -124,7 +164,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
             fptr_flexi_backend(backend, 128);
         }
 
-        snprintf(info, len_info, "FlexiBLAS %d.%d.%d, backend: %s", major, minor, patch, backend);
+        snprintf(info, len_info, "FlexiBLAS %d.%d.%d, backend: %s%s", major, minor, patch, backend, lapack_ver);
         return info;
     }
 
