@@ -148,9 +148,24 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
             int nthreads = fptr_acc();
 
             if(nthreads == ACCELERATE_BLAS_THREADING_MULTI_THREADED) {
-                // This number is arbitrary right now, but greater than 1 to mean multi-threaded.
-                // TODO: Can we guestimate the number of threads from the APPLE_NTHREADS symbol in accelerate?
-                max_threads = 2;
+                int (*fptr_acc_nthreads)(void) = lookup_symbol(lib->handle, "APPLE_NTHREADS");
+                if (fptr_acc != NULL) {
+                    // In Accelerate, there is a symbol called APPLE_NTHREADS, which appears to be a function we
+                    // can call to get an integer saying the number of CPU threads. There is no documentation for this
+                    // anywhere accessible online, but testing two different CPUs seem to suggest it is CPU cores.
+                    //
+                    // Doing this:
+                    //     julia> @ccall AppleAccelerate.libacc.APPLE_NTHREADS()::Int
+                    //
+                    // The M2 Max returned 12, M4 Max returned 16, which is the total number of cores (both big and little)
+                    // in each processor.
+                    int nthreads = fptr_acc_nthreads();
+                    max_threads = max(max_threads, nthreads);
+                } else {
+                    // This number is arbitrary because we have no idea how many threads are actually in use,
+                    // but greater than 1 to mean multi-threaded.
+                    max_threads = max(max_threads, 2);
+                }
             } else {
                 // Single-threaded
                 max_threads = max(max_threads, 1);
