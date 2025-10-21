@@ -255,3 +255,8 @@ end
 
 # Run our "direct" tests within Julia
 include("direct.jl")
+
+# Run some Apple Accelerate tests, but only on Apple
+@static if Sys.isapple()
+    include("accelerate.jl")
+end
