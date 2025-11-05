@@ -22,20 +22,22 @@ typedef struct {
 extern void ** ilaver_;
 extern void ** ilaver_64_;
 
+#define LEN_INFO_STR    512     //< Length of the entire string used to hold the library info
+#define LEN_SHORT_INFO  300     //< Length of the string used to get information from individual libraries
+#define LEN_LAPACK_INFO 25      //< Length of the string containing the LAPACK version info
+
 // Every library implements their version string handling differently, so this is a ratsnest
 // of conditions for the various libraries to try and get information that is useful to us...
 char* lbt_get_library_info(lbt_library_info_t* library)
 {
     // Keep the string as a static lifetime so that it never gets deleted
-    int len_info = 512;
-    static char info[512];
+    static char info[LEN_INFO_STR];
 
     // Remove stale information from info
     info[0] = '\0';
 
     // Get LAPACK information, which will say the LAPACK API the library uses
-    int len_lapack_ver = 25;
-    char lapack_ver[25];
+    char lapack_ver[LEN_LAPACK_INFO];
     char symbol_name_ilaver[MAX_SYMBOL_LEN];
     build_symbol_name(symbol_name_ilaver, "ilaver_", library->suffix);
     void* (*fptr_ilaver)(int*, int*, int*) = lookup_symbol(library->handle, symbol_name_ilaver);
@@ -47,7 +49,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         int lapack_patch = 0;
 
         fptr_ilaver(&lapack_major, &lapack_minor, &lapack_patch);
-        snprintf(lapack_ver, len_lapack_ver, ", LAPACK v%d.%d.%d", lapack_major, lapack_minor, lapack_patch);
+        snprintf(lapack_ver, LEN_LAPACK_INFO, ", LAPACK v%d.%d.%d", lapack_major, lapack_minor, lapack_patch);
     } else {
         // Clear the version string if we can't compute one
         lapack_ver[0] = '\0';
@@ -61,25 +63,24 @@ char* lbt_get_library_info(lbt_library_info_t* library)
     if (fptr_openblas != NULL) {
         char* tmp_info = fptr_openblas();
 
-        snprintf(info, len_info, "%s%s", tmp_info, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "%s%s", tmp_info, lapack_ver);
         return info;
     }
 
     // MKL
     char* (*fptr_mkl)(char*, int) = lookup_symbol(library->handle, "mkl_get_version_string");
     if (fptr_mkl != NULL) {
-        int len_mkl_info = 300;
-        char mkl_info[300];
-        memset(mkl_info, 0, len_mkl_info);
+        char mkl_info[LEN_SHORT_INFO];
+        memset(mkl_info, 0, LEN_SHORT_INFO);
 
-        fptr_mkl(mkl_info, len_mkl_info);
+        fptr_mkl(mkl_info, LEN_SHORT_INFO);
 
         // MKL pads the output with spaces, so trim it to only the needed parts
         char* back = mkl_info + strlen(mkl_info);
         while(isspace(*--back));
         *(back+1) = '\0';
 
-        snprintf(info, len_info, "%s%s", mkl_info, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "%s%s", mkl_info, lapack_ver);
         return info;
     }
 
@@ -94,7 +95,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         int minor = (version - (major*10000)) / 100;
         int patch = (version - (major*10000) - (minor*100));
 
-        snprintf(info, len_info, "NVPL %d.%d.%d%s", major, minor, patch, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "NVPL %d.%d.%d%s", major, minor, patch, lapack_ver);
         return info;
     }
 
@@ -105,7 +106,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         char* tag = NULL;
         fptr_armpl(&major, &minor, &patch, &tag);
 
-        snprintf(info, len_info, "ARMPL %d.%d.%d.%s%s", major, minor, patch, tag, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "ARMPL %d.%d.%d.%s%s", major, minor, patch, tag, lapack_ver);
         return info;
     }
 
@@ -141,7 +142,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
             aocl_detected = 1;
         }
 
-        snprintf(info, len_info, "%s %s, %d-bit integer, %s%s",
+        snprintf(info, LEN_INFO_STR, "%s %s, %d-bit integer, %s%s",
                  aocl_detected == 1 ? "AMD" : "BLIS",      // AOCL includes it's name in the string, BLIS does not
                  ver_str,
                  int_size,
@@ -155,16 +156,16 @@ char* lbt_get_library_info(lbt_library_info_t* library)
     void (*fptr_flexi_ver)(int*, int*, int*) = lookup_symbol(library->handle, "flexiblas_get_version");
     if (fptr_flexi_ver != NULL) {
         int major = 0, minor = 0, patch = 0;
-        char backend[128];
+        char backend[LEN_SHORT_INFO];
 
         fptr_flexi_ver(&major, &minor, &patch);
 
         int(*fptr_flexi_backend)(char*, int) = lookup_symbol(library->handle, "flexiblas_current_backend");
         if (fptr_flexi_backend != NULL) {
-            fptr_flexi_backend(backend, 128);
+            fptr_flexi_backend(backend, LEN_SHORT_INFO);
         }
 
-        snprintf(info, len_info, "FlexiBLAS %d.%d.%d, backend: %s%s", major, minor, patch, backend, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "FlexiBLAS %d.%d.%d, backend: %s%s", major, minor, patch, backend, lapack_ver);
         return info;
     }
 
@@ -172,7 +173,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
     // Look for a special Apple-only symbol to detect the Accelerate library
     void (*fptr_appaccel)() = lookup_symbol(library->handle, "appleblas_sgeadd");
     if (fptr_appaccel != NULL) {
-        snprintf(info, len_info, "Apple Accelerate%s", lapack_ver);
+        snprintf(info, LEN_INFO_STR, "Apple Accelerate%s", lapack_ver);
         return info;
     }
 
