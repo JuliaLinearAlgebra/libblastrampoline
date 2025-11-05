@@ -197,3 +197,7 @@ end
 function lbt_get_default_func(handle)
     return ccall(dlsym(handle, :lbt_get_default_func), Ptr{Cvoid}, ())
 end
+
+function lbt_get_library_info(handle, lib)
+    return strip(unsafe_string(ccall(dlsym(handle, :lbt_get_library_info), Ptr{UInt8}, (Ptr{Cvoid},), lib)))
+end
