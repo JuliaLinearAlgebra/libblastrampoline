@@ -142,7 +142,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         }
 
         snprintf(info, len_info, "%s %s, %d-bit integer, %s%s",
-                 aocl_detected == 1 ? "AOCL" : "BLIS",
+                 aocl_detected == 1 ? "AMD" : "BLIS",      // AOCL includes it's name in the string, BLIS does not
                  ver_str,
                  int_size,
                  config,
