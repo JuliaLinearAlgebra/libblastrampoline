@@ -24,7 +24,7 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
 endif
 
 LBT_SOVERSION_MAJOR := 5
-LBT_SOVERSION_MINOR := 13
+LBT_SOVERSION_MINOR := 15
 LBT_SOVERSION_PATCH := 0
 
 ifeq ($(OS), WINNT)
@@ -118,7 +118,8 @@ endif
 prefix ?= prefix
 builddir ?= build
 
-libdir := $(prefix)/$(binlib)
+shlibdir := $(prefix)/$(binlib)
+libdir := $(prefix)/lib
 includedir := $(prefix)/include
 
 define newline # a literal \n
