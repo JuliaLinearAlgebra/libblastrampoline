@@ -237,6 +237,18 @@ end
     @test length(self_traces) == 3
 end
 
+@testset "OpenBLAS info" begin
+    lbt_forward(lbt_handle, OpenBLAS_jll.libopenblas_path; clear=true)
+
+    # Get the first loaded library
+    config = lbt_get_config(lbt_handle)
+    lib = unsafe_load(config.loaded_libs, 1)
+
+    info_str = lbt_get_library_info(lbt_handle, lib)
+
+    @test occursin("OpenBLAS", info_str)
+end
+
 if MKL_jll.is_available() && Sys.ARCH == :x86_64
     # Since MKL v2022, we can explicitly link against ILP64-suffixed symbols
     @testset "MKL v2022 ILP64 loading" begin
@@ -342,5 +354,17 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         lbt_set_num_threads(lbt_handle, nthreads)
         @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 1) == nthreads
         @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 2) != nthreads
+    end
+
+    @testset "MKL info" begin
+        lbt_forward(lbt_handle, libmkl_rt; clear=true)
+
+        # Get the first loaded library
+        config = lbt_get_config(lbt_handle)
+        lib = unsafe_load(config.loaded_libs, 1)
+
+        info_str = lbt_get_library_info(lbt_handle, lib)
+
+        @test occursin("oneAPI", info_str)
     end
 end

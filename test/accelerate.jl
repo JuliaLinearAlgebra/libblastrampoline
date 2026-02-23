@@ -91,3 +91,15 @@ end
         @test lbt_get_num_threads(lbt_handle) == 1
     end
 end
+
+@testset "Accelerate info" begin
+    lbt_forward(lbt_handle, libacc; clear=true)
+
+    # Get the first loaded library
+    config = lbt_get_config(lbt_handle)
+    lib = unsafe_load(config.loaded_libs, 1)
+
+    info_str = lbt_get_library_info(lbt_handle, lib)
+
+    @test occursin("Apple", info_str)
+end
