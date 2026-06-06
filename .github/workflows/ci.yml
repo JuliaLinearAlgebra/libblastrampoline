@@ -20,7 +20,7 @@ jobs:
   test:
     name: ${{ matrix.backend }} / ${{ matrix.os }} / julia ${{ matrix.julia-version }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -101,7 +101,7 @@ jobs:
   test-32bit:
     name: ${{ matrix.backend }} / ${{ matrix.os }} (i686) / julia ${{ matrix.julia-version }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
