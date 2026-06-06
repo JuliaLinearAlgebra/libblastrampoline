@@ -53,18 +53,11 @@ This support is only available on the `x86_64` and `i686` architectures, however
 Vendor-specific APIs such as `openblas_get_num_threads()` are not included in header files or exported from the library.
 See the [public header file](src/libblastrampoline.h) for the most up-to-date documentation on the `libblastrampoline` API.
 
-**Note**: by default, all `lbt_*` functions should be considered thread-unsafe.
-Do not attempt to load two BLAS libraries on two different threads at the same time.
+### Threading
 
-If you need the configuration API to be safe against concurrent callers (for example, multiple
-initializers racing at startup), build with `make LBT_THREADSAFE=1`.
-This compiles in a process-global lock around the state-mutating entry points (`lbt_forward()`,
-`lbt_set_forward()` and `lbt_set_forward_by_index()`), using a `pthread` mutex on Unix-like systems
-and a `CRITICAL_SECTION` on Windows.
-The default build leaves this disabled, so there is no locking overhead unless you opt in.
-Note that this guards the mutators only: the read-only accessors (such as `lbt_get_config()` and
-`lbt_get_forward()`) and the BLAS/LAPACK call forwarding itself remain lock-free, so the intended
-model is still "configure under the lock, then use".
+By default, all `lbt_*` functions are thread-unsafe; do not reconfigure forwards from multiple threads at once.
+Building with `make LBT_THREADSAFE=1` adds a process-global lock around the mutating API (`lbt_forward()`, `lbt_set_forward()`, `lbt_set_forward_by_index()`).
+Readers and the BLAS/LAPACK call forwarding itself stay lock-free, so the model remains "configure under the lock, then use".
 
 ### Limitations
 
