@@ -44,13 +44,6 @@ extern "C" {
 #define LBT_BITFIELD_CLEAR(array, idx)  LBT_BF_CHUNK(array, idx) &= ~(LBT_BF_MASK(idx))
 #define LBT_BITFIELD_SET(array, idx)    LBT_BF_CHUNK(array, idx) |=   LBT_BF_MASK(idx)
 
-// Backwards-compatible unprefixed aliases for the documented public macros.
-// Prefer the `LBT_`-prefixed names above; these unprefixed ones are kept so that
-// existing consumers reading the `active_forwards` bitfield do not break.
-#define BITFIELD_GET(array, idx)        LBT_BITFIELD_GET(array, idx)
-#define BITFIELD_CLEAR(array, idx)      LBT_BITFIELD_CLEAR(array, idx)
-#define BITFIELD_SET(array, idx)        LBT_BITFIELD_SET(array, idx)
-
 
 // The metadata stored on each loaded library
 typedef struct {
