@@ -407,7 +407,7 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
 
         if (addr != NULL && addr != self_symbol_addr) {
             lbt_set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
-            BITFIELD_SET(forwards, symbol_idx);
+            LBT_BITFIELD_SET(forwards, symbol_idx);
             nforwards++;
         }
     }

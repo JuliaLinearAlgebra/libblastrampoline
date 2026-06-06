@@ -38,11 +38,18 @@ extern "C" {
 # define LBT_HIDDEN    __attribute__ ((visibility("hidden")))
 #endif
 
-#define BF_CHUNK(array, idx)           (array[((uint32_t)(idx/8))])
-#define BF_MASK(idx)                   ((uint8_t)(0x1 << (idx % 8)))
-#define BITFIELD_GET(array, idx)      ((BF_CHUNK(array, idx) &  BF_MASK(idx)) >> (idx % 8))
-#define BITFIELD_CLEAR(array, idx)      BF_CHUNK(array, idx) &= ~(BF_MASK(idx))
-#define BITFIELD_SET(array, idx)        BF_CHUNK(array, idx) |=   BF_MASK(idx)
+#define LBT_BF_CHUNK(array, idx)       (array[((uint32_t)(idx/8))])
+#define LBT_BF_MASK(idx)               ((uint8_t)(0x1 << (idx % 8)))
+#define LBT_BITFIELD_GET(array, idx)  ((LBT_BF_CHUNK(array, idx) &  LBT_BF_MASK(idx)) >> (idx % 8))
+#define LBT_BITFIELD_CLEAR(array, idx)  LBT_BF_CHUNK(array, idx) &= ~(LBT_BF_MASK(idx))
+#define LBT_BITFIELD_SET(array, idx)    LBT_BF_CHUNK(array, idx) |=   LBT_BF_MASK(idx)
+
+// Backwards-compatible unprefixed aliases for the documented public macros.
+// Prefer the `LBT_`-prefixed names above; these unprefixed ones are kept so that
+// existing consumers reading the `active_forwards` bitfield do not break.
+#define BITFIELD_GET(array, idx)        LBT_BITFIELD_GET(array, idx)
+#define BITFIELD_CLEAR(array, idx)      LBT_BITFIELD_CLEAR(array, idx)
+#define BITFIELD_SET(array, idx)        LBT_BITFIELD_SET(array, idx)
 
 
 // The metadata stored on each loaded library
@@ -55,7 +62,7 @@ typedef struct {
     // Common values are `""` or `"64_"`.
     const char * suffix;
     // bitfield (in uint8_t form) representing the active forwards for this library.
-    // Use the `BITFIELD_{SET,GET}` macros to look at particular indices within this field.
+    // Use the `LBT_BITFIELD_{SET,GET}` macros to look at particular indices within this field.
     // Note that if you use the footgun API (e.g. "lbt_set_forward()") these values will be
     // zeroed out and you must track them manually if you need to.
     uint8_t * active_forwards;
