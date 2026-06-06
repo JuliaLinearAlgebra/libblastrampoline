@@ -32,14 +32,6 @@ MAIN_OBJS += complex_return_style_adapters.o
 # Place the `.o` files into `$(builddir)`
 MAIN_OBJS := $(addprefix $(builddir)/,$(MAIN_OBJS))
 
-ifeq ($(OS),WINNT)
-# On Windows only build the library with the major soversion, all other copies
-# are useless and error prone.
-TARGET_LIBRARIES = $(builddir)/$(LIB_MAJOR_VERSION)
-else
-TARGET_LIBRARIES = $(builddir)/$(LIB_MAJOR_VERSION) $(builddir)/$(LIB_FULL_VERSION) $(builddir)/libblastrampoline.$(SHLIB_EXT)
-endif
-
 $(builddir) $(builddir)/trampolines:
 	@mkdir -p $@
 

@@ -60,7 +60,7 @@ void clear_forwarding_mark(int32_t symbol_idx, int32_t interface) {
             continue;
         }
 
-        BITFIELD_CLEAR(lbt_config.loaded_libs[idx]->active_forwards, symbol_idx);
+        LBT_BITFIELD_CLEAR(lbt_config.loaded_libs[idx]->active_forwards, symbol_idx);
     }
 }
 

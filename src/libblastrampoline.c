@@ -447,7 +447,7 @@ static int32_t lbt_forward_impl(const char * libname, int32_t clear, int32_t ver
 
         if (addr != NULL && addr != self_symbol_addr) {
             set_forward_by_index_impl(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
-            BITFIELD_SET(forwards, symbol_idx);
+            LBT_BITFIELD_SET(forwards, symbol_idx);
             nforwards++;
         }
     }
