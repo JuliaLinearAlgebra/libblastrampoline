@@ -1,0 +1,7 @@
+[deps]
+CompilerSupportLibraries_jll = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+LAPACK32_jll = "17f450c3-bd24-55df-bb84-8c51b4b939e3"
+ReferenceBLAS32_jll = "9e84b91c-71b0-5f24-acdc-49dbe8049396"
+
+# ILP64 reference BLAS/LAPACK (ReferenceBLAS_jll / LAPACK_jll) are not yet usable through
+# LBT's autodetection; see the commented-out ILP64 testset in `runtests.jl`.

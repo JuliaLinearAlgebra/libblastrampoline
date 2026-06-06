@@ -1,0 +1,2 @@
+# Accelerate is a macOS system framework, so this backend has no JLL dependencies.
+[deps]
