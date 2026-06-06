@@ -46,6 +46,13 @@ jobs:
           - {backend: blis, os: windows-latest}
           # Reference BLAS DLLs are not yet resolvable on Windows.
           - {backend: refblas, os: windows-latest}
+          # Only the core `openblas` and `direct` backends run on nightly; every other
+          # backend runs on the 1.10 LTS only.
+          - {backend: mkl, julia-version: 'nightly'}
+          - {backend: refblas, julia-version: 'nightly'}
+          - {backend: blis, julia-version: 'nightly'}
+          - {backend: blas64, julia-version: 'nightly'}
+          - {backend: accelerate, julia-version: 'nightly'}
     steps:
       - uses: actions/checkout@v6
 
@@ -104,6 +111,8 @@ jobs:
         exclude:
           # Reference BLAS DLLs are not yet resolvable on Windows.
           - {backend: refblas, os: windows-latest}
+          # Only the core `openblas` and `direct` backends run on nightly.
+          - {backend: refblas, julia-version: 'nightly'}
     steps:
       - uses: actions/checkout@v6
 
