@@ -9,3 +9,4 @@
 src/build/
 src/prefix/
 test/Manifest.toml
+test/backends/*/Manifest.toml

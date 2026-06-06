@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags: ['*']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  # Cancel in-progress runs for the same PR / branch, but never on `main`.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.backend }} / ${{ matrix.os }} / julia ${{ matrix.julia-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each BLAS/LAPACK backend is tested in its own job (and its own process, with
+        # its own `test/backends/<backend>/Project.toml`) so that only a single set of
+        # BLAS/LAPACK libraries is ever loaded at once.
+        backend: [openblas, mkl, refblas, blis, blas64, accelerate, direct]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-14]
+        julia-version: ['1.10', 'nightly']
+        exclude:
+          # MKL is x86_64-only.
+          - {backend: mkl, os: ubuntu-24.04-arm}
+          - {backend: mkl, os: macos-14}
+          # Accelerate is a macOS-only system framework.
+          - {backend: accelerate, os: ubuntu-latest}
+          - {backend: accelerate, os: ubuntu-24.04-arm}
+          - {backend: accelerate, os: windows-latest}
+          # blas64 uses the Debian `libblas64-dev`/`liblapack64-dev` packages.
+          - {backend: blas64, os: windows-latest}
+          - {backend: blas64, os: macos-13}
+          - {backend: blas64, os: macos-14}
+          # blis_jll has no Windows build we exercise here.
+          - {backend: blis, os: windows-latest}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ (matrix.os == 'ubuntu-24.04-arm' || matrix.os == 'macos-14') && 'aarch64' || 'x64' }}
+
+      - uses: julia-actions/cache@v2
+
+      # The `blas64` backend tests against a system-provided ILP64 reference BLAS/LAPACK.
+      - name: Install system libblas64 / liblapack64 (Debian)
+        if: matrix.backend == 'blas64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libblas64-dev liblapack64-dev
+
+      # Windows needs a MinGW toolchain (gcc + make) to build the C test programs and
+      # libblastrampoline itself.
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        if: runner.os == 'Windows'
+        with:
+          msystem: MINGW64
+          path-type: inherit
+          install: >-
+            make
+            mingw-w64-x86_64-gcc
+      - name: Add MSYS2 tools to PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Add-Content -Path $env:GITHUB_PATH -Value "${{ steps.msys2.outputs.msys2-location }}\mingw64\bin"
+          Add-Content -Path $env:GITHUB_PATH -Value "${{ steps.msys2.outputs.msys2-location }}\usr\bin"
+
+      - name: Instantiate ${{ matrix.backend }} project
+        run: julia --project=test/backends/${{ matrix.backend }} -e 'import Pkg; Pkg.instantiate()'
+
+      - name: Run ${{ matrix.backend }} tests
+        run: julia --project=test/backends/${{ matrix.backend }} test/backends/${{ matrix.backend }}/runtests.jl
+
+  func-list-idempotency:
+    name: func_list idempotency
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regenerate func_list and check for diff
+        run: |
+          cd ext/gensymbol
+          ./generate_func_list.sh
+          git diff --exit-code

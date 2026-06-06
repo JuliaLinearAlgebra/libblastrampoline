@@ -107,6 +107,14 @@ function build_libblastrampoline()
     return link_name, blastrampoline_build_dir
 end
 
+# Build (if necessary) and `dlopen()` libblastrampoline for the in-process tests.
+# We give it a fake linking name in `build_libblastrampoline()` so that we can test
+# from within Julia versions that load LBT natively.
+function open_lbt_handle()
+    lbt_link_name, lbt_prefix = build_libblastrampoline()
+    return dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
+end
+
 
 # Keep these in sync with `src/libblastrampoline_internal.h`
 struct lbt_library_info_t
@@ -196,4 +204,31 @@ end
 
 function lbt_get_default_func(handle)
     return ccall(dlsym(handle, :lbt_get_default_func), Ptr{Cvoid}, ())
+end
+
+# Helpers for inspecting an `lbt_config_t` from the in-process (`direct`/`accelerate`) tests
+function unpack_loaded_libraries(config::lbt_config_t)
+    libs = LBTLibraryInfo[]
+    idx = 1
+    lib_ptr = unsafe_load(config.loaded_libs, idx)
+    while lib_ptr != C_NULL
+        push!(libs, LBTLibraryInfo(unsafe_load(lib_ptr), config.num_exported_symbols))
+
+        idx += 1
+        lib_ptr = unsafe_load(config.loaded_libs, idx)
+    end
+    return libs
+end
+
+function find_symbol_offset(config::lbt_config_t, symbol::String)
+    for sym_idx in 1:config.num_exported_symbols
+        if unsafe_string(unsafe_load(config.exported_symbols, sym_idx)) == symbol
+            return UInt32(sym_idx - 1)
+        end
+    end
+    return nothing
+end
+
+function bitfield_get(field::Vector{UInt8}, symbol_idx::UInt32)
+    return field[div(symbol_idx,8)+1] & (UInt8(0x01) << (symbol_idx%8))
 end
