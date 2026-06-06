@@ -26,74 +26,26 @@ jobs:
       matrix:
         # Each BLAS/LAPACK backend is tested in its own job (and its own process, with
         # its own `test/backends/<backend>/Project.toml`) so that only a single set of
-        # BLAS/LAPACK libraries is ever loaded at once.  We enumerate the exact
-        # backend × OS × julia combinations as `include` entries so that each combo is
-        # opt-in (no accidental jobs on platforms a backend can't run on).
-        #
-        # Platform notes:
-        #   - mkl:        x86_64 only (no ARM build).
-        #   - accelerate: macOS only (system framework).
-        #   - blas64:     Linux only (Debian libblas64-dev / liblapack64-dev).
-        #   - blis:       Linux + macOS (no Windows build exercised here).
-        #   - refblas:    omitted on Windows (reference BLAS DLLs not yet resolvable there).
-        include:
-          # openblas — everywhere
-          - {backend: openblas, os: ubuntu-latest,    julia-version: '1.10'}
-          - {backend: openblas, os: ubuntu-latest,    julia-version: 'nightly'}
-          - {backend: openblas, os: ubuntu-24.04-arm, julia-version: '1.10'}
-          - {backend: openblas, os: ubuntu-24.04-arm, julia-version: 'nightly'}
-          - {backend: openblas, os: windows-latest,   julia-version: '1.10'}
-          - {backend: openblas, os: windows-latest,   julia-version: 'nightly'}
-          - {backend: openblas, os: macos-latest,     julia-version: '1.10'}
-          - {backend: openblas, os: macos-latest,     julia-version: 'nightly'}
-          - {backend: openblas, os: macos-15-intel,   julia-version: '1.10'}
-          - {backend: openblas, os: macos-15-intel,   julia-version: 'nightly'}
-          # mkl — x86_64 only
-          - {backend: mkl, os: ubuntu-latest,  julia-version: '1.10'}
-          - {backend: mkl, os: ubuntu-latest,  julia-version: 'nightly'}
-          - {backend: mkl, os: windows-latest, julia-version: '1.10'}
-          - {backend: mkl, os: windows-latest, julia-version: 'nightly'}
-          - {backend: mkl, os: macos-15-intel, julia-version: '1.10'}
-          - {backend: mkl, os: macos-15-intel, julia-version: 'nightly'}
-          # refblas — LP64 reference BLAS/LAPACK (no Windows for now)
-          - {backend: refblas, os: ubuntu-latest,    julia-version: '1.10'}
-          - {backend: refblas, os: ubuntu-latest,    julia-version: 'nightly'}
-          - {backend: refblas, os: ubuntu-24.04-arm, julia-version: '1.10'}
-          - {backend: refblas, os: ubuntu-24.04-arm, julia-version: 'nightly'}
-          - {backend: refblas, os: macos-latest,     julia-version: '1.10'}
-          - {backend: refblas, os: macos-latest,     julia-version: 'nightly'}
-          - {backend: refblas, os: macos-15-intel,   julia-version: '1.10'}
-          - {backend: refblas, os: macos-15-intel,   julia-version: 'nightly'}
-          # blis — Linux + macOS
-          - {backend: blis, os: ubuntu-latest,    julia-version: '1.10'}
-          - {backend: blis, os: ubuntu-latest,    julia-version: 'nightly'}
-          - {backend: blis, os: ubuntu-24.04-arm, julia-version: '1.10'}
-          - {backend: blis, os: ubuntu-24.04-arm, julia-version: 'nightly'}
-          - {backend: blis, os: macos-latest,     julia-version: '1.10'}
-          - {backend: blis, os: macos-latest,     julia-version: 'nightly'}
-          - {backend: blis, os: macos-15-intel,   julia-version: '1.10'}
-          - {backend: blis, os: macos-15-intel,   julia-version: 'nightly'}
-          # blas64 — Linux only (system ILP64 reference BLAS/LAPACK)
-          - {backend: blas64, os: ubuntu-latest,    julia-version: '1.10'}
-          - {backend: blas64, os: ubuntu-latest,    julia-version: 'nightly'}
-          - {backend: blas64, os: ubuntu-24.04-arm, julia-version: '1.10'}
-          - {backend: blas64, os: ubuntu-24.04-arm, julia-version: 'nightly'}
-          # accelerate — macOS only
-          - {backend: accelerate, os: macos-latest,   julia-version: '1.10'}
-          - {backend: accelerate, os: macos-latest,   julia-version: 'nightly'}
-          - {backend: accelerate, os: macos-15-intel, julia-version: '1.10'}
-          - {backend: accelerate, os: macos-15-intel, julia-version: 'nightly'}
-          # direct — in-process LBT API tests, everywhere
-          - {backend: direct, os: ubuntu-latest,    julia-version: '1.10'}
-          - {backend: direct, os: ubuntu-latest,    julia-version: 'nightly'}
-          - {backend: direct, os: ubuntu-24.04-arm, julia-version: '1.10'}
-          - {backend: direct, os: ubuntu-24.04-arm, julia-version: 'nightly'}
-          - {backend: direct, os: windows-latest,   julia-version: '1.10'}
-          - {backend: direct, os: windows-latest,   julia-version: 'nightly'}
-          - {backend: direct, os: macos-latest,     julia-version: '1.10'}
-          - {backend: direct, os: macos-latest,     julia-version: 'nightly'}
-          - {backend: direct, os: macos-15-intel,   julia-version: '1.10'}
-          - {backend: direct, os: macos-15-intel,   julia-version: 'nightly'}
+        # BLAS/LAPACK libraries is ever loaded at once.
+        backend: [openblas, mkl, refblas, blis, blas64, accelerate, direct]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
+        julia-version: ['1.10', 'nightly']
+        exclude:
+          # MKL is x86_64-only.
+          - {backend: mkl, os: ubuntu-24.04-arm}
+          - {backend: mkl, os: macos-latest}
+          # Accelerate is a macOS-only system framework.
+          - {backend: accelerate, os: ubuntu-latest}
+          - {backend: accelerate, os: ubuntu-24.04-arm}
+          - {backend: accelerate, os: windows-latest}
+          # blas64 uses the Debian `libblas64-dev`/`liblapack64-dev` packages.
+          - {backend: blas64, os: windows-latest}
+          - {backend: blas64, os: macos-latest}
+          - {backend: blas64, os: macos-15-intel}
+          # blis_jll has no Windows build we exercise here.
+          - {backend: blis, os: windows-latest}
+          # Reference BLAS DLLs are not yet resolvable on Windows.
+          - {backend: refblas, os: windows-latest}
     steps:
       - uses: actions/checkout@v4
 
