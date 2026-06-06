@@ -3,13 +3,14 @@
 
 #define SEP ;
 
-#define XX(name) \
+#define XX(name, idx) \
 .global MANGLE(UNDERSCORE(name)) SEP \
 .cfi_startproc SEP \
+MANGLE(UNDERSCORE(name))##: SEP \
 .p2align    2 SEP \
- MANGLE(UNDERSCORE(name))##: SEP \
-    auipc t3, %pcrel_hi(NAMEADDR(name)) SEP \
-    ld t3, %pcrel_lo(MANGLE(UNDERSCORE(name)))(t3) SEP \
+    li t4, SYMBOL_IDX(idx) SEP \
+    la t3, NAMEADDR(name) SEP \
+    ld t3, 0(t3) SEP \
     jr t3 SEP \
 .cfi_endproc SEP \
 

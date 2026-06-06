@@ -73,8 +73,8 @@ void lbt_cblas_cdotc_sub(const int32_t N,
 }
 
 extern float complex cdotc_64_(const int64_t *,
-                                const float complex *, const int64_t *,
-                                const float complex *, const int64_t *);
+                               const float complex *, const int64_t *,
+                               const float complex *, const int64_t *);
 void lbt_cblas_cdotc_sub64_(const int64_t N,
                             const float complex *X, const int64_t incX,
                             const float complex *Y, const int64_t incY,

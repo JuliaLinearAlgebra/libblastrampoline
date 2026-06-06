@@ -1,5 +1,3 @@
-[![Drone Build Status](https://cloud.drone.io/api/badges/staticfloat/libblastrampoline/status.svg)](https://cloud.drone.io/staticfloat/libblastrampoline)
-
 # libblastrampoline
 
 > All problems in computer science can be solved by another level of indirection
@@ -7,19 +5,15 @@
 Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to provide a BLAS and LAPACK demuxing library. Watch a detailed [JuliaCon 2021 talk on libblastrampoline](https://www.youtube.com/watch?v=t6hptekOR7s).
 
 These BLAS libraries are known to work with libblastrampoline (successfully tested in Julia):
-1. OpenBLAS
-2. Intel MKL
-3. Apple Accelerate
-4. BLIS
-5. Fujitsu BLAS
 
-Julia Packages that utilize libblastrampline to provide easy access to BLAS libraries are
-
-* [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)
-* [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl)
-* [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl)
-* [AppleAccelerateLinAlgWrapper.jl](https://github.com/chriselrod/AppleAccelerateLinAlgWrapper.jl)
-* [OpenBLASHighCoreCount.jl](https://github.com/giordano/OpenBLASHighCoreCount.jl)
+1. [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) (supported by default in Julia)
+2. [Reference BLAS and LAPACK](https://github.com/Reference-LAPACK/lapack) (use in Julia through [ReferenceBLAS_jll](https://github.com/JuliaBinaryWrappers/ReferenceBLAS_jll.jl) and [LAPACK_jll](https://github.com/JuliaBinaryWrappers/LAPACK_jll.jl))
+3. [Intel oneMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html) (use in Julia through [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl))
+4. [Apple Accelerate](https://developer.apple.com/documentation/accelerate/blas) (use in Julia through [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl))
+5. [BLIS](https://github.com/flame/blis/) (use in Julia through [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl))
+6. Fujitsu BLAS (use in Julia through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl))
+7. [ARMPL BLAS](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries)
+8. [NVPL BLAS](https://docs.nvidia.com/nvpl/_static/blas/)
 
 ## Basic usage
 

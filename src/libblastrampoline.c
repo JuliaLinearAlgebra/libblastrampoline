@@ -1,15 +1,8 @@
 #include "libblastrampoline_internal.h"
 #include "libblastrampoline_trampdata.h"
-
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 #include "libblastrampoline_complex_retdata.h"
-#endif
-#ifdef F2C_AUTODETECTION
 #include "libblastrampoline_f2cdata.h"
-#endif
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
 #include "libblastrampoline_cblasdata.h"
-#endif
 
 // Sentinel to tell us if we've got a deepbindless workaround active or not
 #define DEEPBINDLESS_INTERFACE_LP64_LOADED    0x01
@@ -26,9 +19,52 @@ int32_t find_symbol_idx(const char * name) {
     return -1;
 }
 
+// This function un-smuggles our name index from the scratch register it was placed
+// into by the trampoline; We really need this to be the first thing `lbt_default_func_print_error()`
+// calls, so that our temporary register doesn't get clobbered by other code.
+__attribute__((always_inline)) inline uintptr_t get_forward_name_idx() {
+    uintptr_t idx;
+#if defined(ARCH_aarch64)
+    asm("\t mov %0,x17" : "=r"(idx));
+#elif defined(ARCH_arm)
+    // armv7l only has a single volatile register for use, which is already in use
+    // to calculate the jump target, so we can't smuggle the information out. :(
+    return ((uintptr_t)-1);
+#elif defined(ARCH_i686)
+    asm("\t mov %%eax,%0" : "=r"(idx));
+#elif defined(ARCH_powerpc64le)
+    asm("\t addi %0,11,0" : "=r"(idx));
+#elif defined(ARCH_riscv64)
+    asm("\t mv %0,t4" : "=r"(idx));
+#elif defined(ARCH_x86_64)
+    asm("\t movq %%r10,%0" : "=r"(idx));
+#elif defined(ARCH_loongarch64)
+    asm("\t move %0, $t8" : "=r"(idx));
+#else
+#error "Unrecognized ARCH for `get_forward_name_idx()`"
+#endif
+    return idx;
+}
+
 
 LBT_DLLEXPORT void lbt_default_func_print_error() {
-    fprintf(stderr, "Error: no BLAS/LAPACK library loaded!\n");
+    // We mark as `volatile` to discourage the compiler from moving us around too much
+    volatile uint64_t name_idx = get_forward_name_idx();
+    const char * suffix = "";
+
+    // We encode `64_` by just shifting the name index up a bunch
+    if (name_idx >= NUM_EXPORTED_FUNCS) {
+        suffix = "64_";
+        name_idx -= NUM_EXPORTED_FUNCS;
+    }
+
+    // If we're still off the end of our list of names, some corruption has occured,
+    // and we should not try to index into `exported_func_names`.
+    if (name_idx >= NUM_EXPORTED_FUNCS) {
+        fprintf(stderr, "Error: no BLAS/LAPACK library loaded for (unknown function)\n");
+    } else {
+        fprintf(stderr, "Error: no BLAS/LAPACK library loaded for %s%s()\n", exported_func_names[name_idx], suffix);
+    }
 }
 void lbt_default_func_print_error_and_exit() {
     lbt_default_func_print_error();
@@ -46,7 +82,7 @@ LBT_DLLEXPORT void lbt_set_default_func(const void * addr) {
 /*
  * Force a forward to a particular value.
  */
-int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t verbose) {
+LBT_DLLEXPORT int32_t lbt_set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t verbose) {
     // Quit out immediately if this is not a interface setting
     if (interface != LBT_INTERFACE_LP64 && interface != LBT_INTERFACE_ILP64) {
         return -1;
@@ -69,31 +105,32 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
         }
     }
 
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
-    if (complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT) {
-        // Check to see if this symbol is one of the complex-returning functions
-        for (int complex_symbol_idx=0; cmplxret_func_idxs[complex_symbol_idx] != -1; ++complex_symbol_idx) {
-            // Skip any symbols that aren't ours
-            if (cmplxret_func_idxs[complex_symbol_idx] != symbol_idx)
-                continue;
+    for (int array_idx=0; array_idx < sizeof(cmplxret_func_idxs)/sizeof(int *); ++array_idx) {
+        if ((complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT) ||
+           ((complex_retstyle == LBT_COMPLEX_RETSTYLE_FNDA) && array_idx == 1)) {
+            // Check to see if this symbol is one of the complex-returning functions
+            for (int complex_symbol_idx=0; cmplxret_func_idxs[array_idx][complex_symbol_idx] != -1; ++complex_symbol_idx) {
+                // Skip any symbols that aren't ours
+                if (cmplxret_func_idxs[array_idx][complex_symbol_idx] != symbol_idx)
+                    continue;
 
-            // Report to the user that we're cblas-wrapping this one
-            if (verbose) {
-                char exported_name[MAX_SYMBOL_LEN];
-                build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
-                printf(" - [%04d] complex(%s)\n", symbol_idx, exported_name);
-            }
+                // Report to the user that we're cmplxret-wrapping this one
+                if (verbose) {
+                    char exported_name[MAX_SYMBOL_LEN];
+                    build_symbol_name(exported_name, exported_func_names[symbol_idx], interface == LBT_INTERFACE_ILP64 ? "64_" : "");
+                    printf(" - [%04d] complex(%s)\n", symbol_idx, exported_name);
+                }
 
-            if (interface == LBT_INTERFACE_LP64) {
-                (*cmplxret_func32_addrs[complex_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
-                (*exported_func32_addrs[symbol_idx]) = cmplxret32_func_wrappers[complex_symbol_idx];
-            } else {
-                (*cmplxret_func64_addrs[complex_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
-                (*exported_func64_addrs[symbol_idx]) = cmplxret64_func_wrappers[complex_symbol_idx];
+                if (interface == LBT_INTERFACE_LP64) {
+                    (*cmplxret_func32_addrs[array_idx][complex_symbol_idx]) = (*exported_func32_addrs[symbol_idx]);
+                    (*exported_func32_addrs[symbol_idx]) = cmplxret_func32_wrappers[array_idx][complex_symbol_idx];
+                } else {
+                    (*cmplxret_func64_addrs[array_idx][complex_symbol_idx]) = (*exported_func64_addrs[symbol_idx]);
+                    (*exported_func64_addrs[symbol_idx]) = cmplxret_func64_wrappers[array_idx][complex_symbol_idx];
+                }
             }
         }
     }
-#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
 #ifdef F2C_AUTODETECTION
     if (f2c == LBT_F2C_REQUIRED) {
@@ -127,7 +164,7 @@ int32_t set_forward_by_index(int32_t symbol_idx, const void * addr, int32_t inte
 }
 
 LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t interface, int32_t f2c) {
-    // Search symbol list for `symbol_name`, then sub off to `set_forward_by_index()`
+    // Search symbol list for `symbol_name``
     int32_t symbol_idx = find_symbol_idx(symbol_name);
     if (symbol_idx == -1)
         return (const void *)-1;
@@ -170,7 +207,7 @@ LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * add
     if (symbol_idx == -1)
         return -1;
 
-    int32_t ret = set_forward_by_index(symbol_idx, addr, interface, complex_retstyle, f2c, verbose);
+    int32_t ret = lbt_set_forward_by_index(symbol_idx, addr, interface, complex_retstyle, f2c, verbose);
     if (ret == 0) {
         // Un-mark this symbol as being provided by any of our libraries;
         // if you use the footgun API, you can keep track of who is providing what.
@@ -202,6 +239,8 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
     if (verbose) {
         printf(" -> Autodetected symbol suffix \"%s\"\n", lib_suffix);
     }
+    char extra_underscore_suffix[MAX_SYMBOL_LEN];
+    snprintf(extra_underscore_suffix, MAX_SYMBOL_LEN, "_%s", lib_suffix);
 
     // Next, we need to figure out if it's a 32-bit or 64-bit BLAS library;
     // we'll do that by calling `autodetect_interface()`:
@@ -221,11 +260,12 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
 
     // Next, let's figure out what the complex return style is:
     int complex_retstyle = LBT_COMPLEX_RETSTYLE_UNKNOWN;
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
     complex_retstyle = autodetect_complex_return_style(handle, lib_suffix);
     if (complex_retstyle == LBT_COMPLEX_RETSTYLE_UNKNOWN) {
-        fprintf(stderr, "Unable to autodetect complex return style of \"%s\"\n", libname);
-        return 0;
+        #ifdef COMPLEX_RETSTYLE_AUTODETECTION
+            fprintf(stderr, "Unable to autodetect complex return style of \"%s\"\n", libname);
+            return 0;
+        #endif // COMPLEX_RETSTYLE_AUTODETECTION
     }
     if (verbose) {
         if (complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL) {
@@ -235,16 +275,16 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             printf(" -> Autodetected argument-passing complex return style\n");
         }
     }
-#endif // COMPLEX_RETSTYLE_AUTODETECTION
 
     int f2c = LBT_F2C_PLAIN;
-#ifdef F2C_AUTODETECTION
     // Next, we need to probe to see if this is an f2c-style calling convention library
     // The only major example of this that we know of is Accelerate on macOS
     f2c = autodetect_f2c(handle, lib_suffix);
     if (f2c == LBT_F2C_UNKNOWN) {
-        fprintf(stderr, "Unable to autodetect calling convention of \"%s\"\n", libname);
-        return 0;
+        #ifdef F2C_AUTODETECTION
+            fprintf(stderr, "Unable to autodetect f2c calling convention of \"%s\"\n", libname);
+            return 0;
+        #endif // F2C_AUTODETECTION
     }
     if (verbose) {
         if (f2c == LBT_F2C_REQUIRED) {
@@ -254,10 +294,8 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             printf(" -> Autodetected gfortran calling convention\n");
         }
     }
-#endif // F2C_AUTODETECTION
 
     int cblas = LBT_CBLAS_UNKNOWN;
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
     // Next, we need to probe to see if this is MKL v2022 with missing ILP64-suffixed
     // CBLAS symbols, but only if it's an ILP64 library.
     if (interface == LBT_INTERFACE_ILP64) {
@@ -271,7 +309,9 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
                     printf(" -> Autodetected CBLAS-divergent library!\n");
                     break;
                 case LBT_CBLAS_UNKNOWN:
-                    printf(" -> CBLAS not found\n");
+                    #ifdef CBLAS_DIVERGENCE_AUTODETECTION
+                        printf(" -> CBLAS not found/autodetection unavailable\n");
+                    #endif // CBLAS_DIVERGENCE_AUTODETECTION
                     break;
                 default:
                     printf(" -> ERROR: Impossible CBLAS detection result: %d\n", cblas);
@@ -280,7 +320,6 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
         }
     }
-#endif // CBLAS_DIVERGENCE_AUTODETECTION
 
     /*
      * Now, if we are opening a 64-bit library with 32-bit names (e.g. suffix == ""),
@@ -355,23 +394,31 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
         // Look up this symbol in the given library, if it is a valid symbol, set it!
         build_symbol_name(symbol_name, exported_func_names[symbol_idx], lib_suffix);
         void *addr = lookup_symbol(handle, symbol_name);
-        void *self_symbol_addr = interface == LBT_INTERFACE_ILP64 ? exported_func64[symbol_idx] \
-                                                                  : exported_func32[symbol_idx];
+        void *self_symbol_addr = interface == LBT_INTERFACE_ILP64 ? self_func64[symbol_idx] \
+                                                                  : self_func32[symbol_idx];
+        if (addr == NULL ) {
+            // MKL (and other libraries too in the fullness of time, I have no doubt) doesn't like
+            // to slap `64` directly onto the end of their symbol names; they insert an extra `_`
+            // if the symbol is not a FORTRAN symbol (which would already have a `_` at the end)
+            // We catch this case here, as a fallback check:
+            build_symbol_name(symbol_name, exported_func_names[symbol_idx], extra_underscore_suffix);
+            addr = lookup_symbol(handle, symbol_name);
+        }
+
         if (addr != NULL && addr != self_symbol_addr) {
-            set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
+            lbt_set_forward_by_index(symbol_idx,  addr, interface, complex_retstyle, f2c, verbose);
             BITFIELD_SET(forwards, symbol_idx);
             nforwards++;
         }
     }
 
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
     // If we're loading a divergent CBLAS library, we need to scan through all
     // CBLAS symbols, and forward them to wrappers which will convert them to
     // the FORTRAN equivalents.
     if (cblas == LBT_CBLAS_DIVERGENT) {
         int32_t cblas_symbol_idx = 0;
-        for (cblas_symbol_idx = 0; cblas_func_idxs[cblas_symbol_idx] != -1; cblas_symbol_idx += 1) {
-            int32_t symbol_idx = cblas_func_idxs[cblas_symbol_idx];
+        for (cblas_symbol_idx = 0; cblas_workaround_func_idxs[cblas_symbol_idx] != -1; cblas_symbol_idx += 1) {
+            int32_t symbol_idx = cblas_workaround_func_idxs[cblas_symbol_idx];
 
             // Report to the user that we're cblas-wrapping this one
             if (verbose) {
@@ -381,13 +428,12 @@ LBT_DLLEXPORT int32_t lbt_forward(const char * libname, int32_t clear, int32_t v
             }
 
             if (interface == LBT_INTERFACE_LP64) {
-                (*exported_func32_addrs[symbol_idx]) = cblas32_func_wrappers[cblas_symbol_idx];
+                (*exported_func32_addrs[symbol_idx]) = cblas32_workaround_func_wrappers[cblas_symbol_idx];
             } else {
-                (*exported_func64_addrs[symbol_idx]) = cblas64_func_wrappers[cblas_symbol_idx];
+                (*exported_func64_addrs[symbol_idx]) = cblas64_workaround_func_wrappers[cblas_symbol_idx];
             }
         }
     }
-#endif // CBLAS_DIVERGENCE_AUTODETECTION
 
     record_library_load(libname, handle, lib_suffix, &forwards[0], interface, complex_retstyle, f2c, cblas);
     if (verbose) {
@@ -416,29 +462,24 @@ __attribute__((constructor)) void init(void) {
     // Initialize config structures
     init_config();
 
-    // If LBT_VERBOSE == "1", the startup invocation should be verbose
+    // If LBT_VERBOSE is set, the startup invocation should be verbose
     int verbose = 0;
-    const char * verbose_str = getenv("LBT_VERBOSE");
-    if (verbose_str != NULL && strcmp(verbose_str, "1") == 0) {
+    if (env_match_bool("LBT_VERBOSE", 0)) {
         verbose = 1;
         printf("libblastrampoline initializing from %s\n", lookup_self_path());
     }
 
-#if !defined(LBT_DEEPBINDLESS)
     // If LBT_USE_RTLD_DEEPBIND == "0", we avoid using RTLD_DEEPBIND on a
     // deepbind-capable system.  This is mostly useful for sanitizers, which
     // abhor such library loading shenanigans.
-    const char * deepbindless_str = getenv("LBT_USE_RTLD_DEEPBIND");
-    if (deepbindless_str != NULL && strcmp(deepbindless_str, "0") == 0) {
+    if (!env_match_bool("LBT_USE_RTLD_DEEPBIND", 1)) {
         use_deepbind = 0x00;
         if (verbose) {
             printf("LBT_USE_RTLD_DEEPBIND=0 detected; avoiding usage of RTLD_DEEPBIND\n");
         }
     }
-#endif // !defined(LBT_DEEPBINDLESS)
 
-    const char * strict_str = getenv("LBT_STRICT");
-    if (strict_str != NULL && strcmp(strict_str, "1") == 0) {
+    if (env_match_bool("LBT_STRICT", 0)) {
         if (verbose) {
             printf("LBT_STRICT=1 detected; calling missing symbols will print an error, then exit\n");
         }
@@ -446,17 +487,6 @@ __attribute__((constructor)) void init(void) {
         // on Linux causes a linker error with certain versions of GCC and ld:
         // https://lists.gnu.org/archive/html/bug-binutils/2016-02/msg00191.html
         default_func = lookup_self_symbol("lbt_default_func_print_error_and_exit");
-    }
-
-    // Build our lists of self-symbol addresses
-    int32_t symbol_idx;
-    char symbol_name[MAX_SYMBOL_LEN];
-    for (symbol_idx=0; exported_func_names[symbol_idx] != NULL; ++symbol_idx) {
-        exported_func32[symbol_idx] = lookup_self_symbol(exported_func_names[symbol_idx]);
-
-        // Look up this symbol in the given library, if it is a valid symbol, set it!
-        build_symbol_name(symbol_name, exported_func_names[symbol_idx], "64_");
-        exported_func64[symbol_idx] = lookup_self_symbol(symbol_name);
     }
 
     // LBT_DEFAULT_LIBS is a semicolon-separated list of paths that should be loaded as BLAS libraries.

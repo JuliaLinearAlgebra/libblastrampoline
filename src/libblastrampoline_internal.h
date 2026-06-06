@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <unistd.h>
 
 // Load in our publicly-defined functions/types
@@ -75,22 +76,21 @@ void * lookup_self_symbol(const char * symbol_name);
 const char * lookup_self_path();
 void close_library(void * handle);
 
+// Functions in `env_utils.c`
+uint8_t env_lowercase_match(const char * env_name, const char * value);
+uint8_t env_lowercase_match_any(const char * env_name, uint32_t num_values, ...);
+uint8_t env_match_bool(const char * env_name, uint8_t default_value);
+
 // Functions in `autodetection.c`
 void build_symbol_name(char * out, const char *symbol_name, const char *suffix);
 const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint);
 int32_t autodetect_blas_interface(void * isamax_addr);
-int32_t autodetect_lapack_interface(void * dpotrf_addr);
+int32_t autodetect_lapack_interface_dpotrf(void * dpotrf_addr);
+int32_t autodetect_lapack_interface_ilaver(void * ilaver_addr);
 int32_t autodetect_interface(void * handle, const char * suffix);
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 int32_t autodetect_complex_return_style(void * handle, const char * suffix);
-#endif
-
-#ifdef F2C_AUTODETECTION
 int32_t autodetect_f2c(void * handle, const char * suffix);
-#endif
-#ifdef CBLAS_DIVERGENCE_AUTODETECTION
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix);
-#endif
 
 // Functions in deepbindless_surrogates.c
 uint8_t push_fake_lsame();

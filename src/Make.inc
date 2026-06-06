@@ -24,7 +24,7 @@ ifneq (,$(findstring MINGW,$(OS))$(findstring MSYS,$(OS))$(findstring CYGWIN,$(O
 endif
 
 LBT_SOVERSION_MAJOR := 5
-LBT_SOVERSION_MINOR := 4
+LBT_SOVERSION_MINOR := 15
 LBT_SOVERSION_PATCH := 0
 
 ifeq ($(OS), WINNT)
@@ -53,7 +53,7 @@ else
   SONAME_FLAG := -Wl,-soname=$(LIB_MAJOR_VERSION)
 endif
 
-LBT_CFLAGS := -g -O2 -std=c99 $(FPIC) -DLIBRARY_EXPORTS -D_GNU_SOURCE $(CFLAGS)
+LBT_CFLAGS := -g -O2 -std=gnu99 $(FPIC) -DLIBRARY_EXPORTS -D_GNU_SOURCE -DARCH_$(ARCH) $(CFLAGS)
 LBT_LDFLAGS := $(LDFLAGS)
 
 ifeq ($(OS),Linux)
@@ -117,6 +117,10 @@ endif
 # Default installation location; we expect you to be overriding this
 prefix ?= prefix
 builddir ?= build
+
+shlibdir := $(prefix)/$(binlib)
+libdir := $(prefix)/lib
+includedir := $(prefix)/include
 
 define newline # a literal \n
 

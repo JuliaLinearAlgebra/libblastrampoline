@@ -1,35 +1,15 @@
-using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
+include(joinpath(@__DIR__, "..", "..", "common.jl"))
+using OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
 
-include("utils.jl")
-
-function unpack_loaded_libraries(config::lbt_config_t)
-    libs = LBTLibraryInfo[]
-    idx = 1
-    lib_ptr = unsafe_load(config.loaded_libs, idx)
-    while lib_ptr != C_NULL
-        push!(libs, LBTLibraryInfo(unsafe_load(lib_ptr), config.num_exported_symbols))
-
-        idx += 1
-        lib_ptr = unsafe_load(config.loaded_libs, idx)
+if isdefined(Base, :pkgversion)
+    openblas32_version = pkgversion(OpenBLAS32_jll)
+    openblas32_version = VersionNumber(openblas32_version.major, openblas32_version.minor, openblas32_version.patch)
+    if openblas32_version != v"0.3.10"
+        throw(ArgumentError("Wrong version of OpenBLAS32_jll ($(pkgversion(OpenBLAS32_jll))); this test suite requires an old OpenBLAS32_jll!"))
     end
-    return libs
 end
 
-function find_symbol_offset(config::lbt_config_t, symbol::String)
-    for sym_idx in 1:config.num_exported_symbols
-        if unsafe_string(unsafe_load(config.exported_symbols, sym_idx)) == symbol
-            return UInt32(sym_idx - 1)
-        end
-    end
-    return nothing
-end
-
-function bitfield_get(field::Vector{UInt8}, symbol_idx::UInt32)
-    return field[div(symbol_idx,8)+1] & (UInt8(0x01) << (symbol_idx%8))
-end
-
-lbt_link_name, lbt_prefix = build_libblastrampoline()
-lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
+lbt_handle = open_lbt_handle()
 
 @testset "Config" begin
     @test lbt_handle != C_NULL
@@ -68,10 +48,14 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
         @test libs[1].suffix == ""
         @test libs[1].interface == LBT_INTERFACE_LP64
     end
-    @test libs[1].f2c == LBT_F2C_PLAIN
+    if (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
+        @test libs[1].f2c == LBT_F2C_PLAIN
+    else
+        @test libs[1].f2c == LBT_F2C_UNKNOWN
+    end
     if Sys.ARCH ∈ (:x86_64, :aarch64)
         if Sys.iswindows()
-            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
+            @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_FNDA
         else
             @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_NORMAL
         end
@@ -91,7 +75,11 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[2].libname == OpenBLAS32_jll.libopenblas_path
     @test libs[2].suffix == ""
     @test libs[2].interface == LBT_INTERFACE_LP64
-    @test libs[2].f2c == LBT_F2C_PLAIN
+    if (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
+        @test libs[2].f2c == LBT_F2C_PLAIN
+    else
+        @test libs[2].f2c == LBT_F2C_UNKNOWN
+    end
 
     # If OpenBLAS32 and OpenBLAS are the same interface (e.g. i686)
     # then libs[2].active_forwards should be all zero!
@@ -109,7 +97,11 @@ lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", 
     @test libs[1].libname == OpenBLAS32_jll.libopenblas_path
     @test libs[1].suffix == ""
     @test libs[1].interface == LBT_INTERFACE_LP64
-    @test libs[1].f2c == LBT_F2C_PLAIN
+    if (config.build_flags & LBT_BUILDFLAGS_F2C_CAPABLE) != 0
+        @test libs[1].f2c == LBT_F2C_PLAIN
+    else
+        @test libs[1].f2c == LBT_F2C_UNKNOWN
+    end
 end
 
 @testset "get/set threads" begin
@@ -178,7 +170,9 @@ end
     # Now, test that we can muck this up
     my_slamch = @cfunction(record_slamch_args, Float32, (Cstring,))
     @test lbt_set_forward(lbt_handle, "slamch_", my_slamch, LBT_INTERFACE_LP64) == 0
+    @test lbt_set_forward_by_index(lbt_handle, slamch_idx, my_slamch, LBT_INTERFACE_ILP64) == 0
     @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_LP64) == my_slamch
+    @test lbt_get_forward(lbt_handle, "slamch_", LBT_INTERFACE_ILP64) == my_slamch
 
     config = lbt_get_config(lbt_handle)
     libs = unpack_loaded_libraries(config)
@@ -187,6 +181,20 @@ end
     # Ensure that we actually overrode the symbol
     @test ccall(dlsym(lbt_handle, "slamch_"), Float32, (Cstring,), "test") == 13.37f0
     @test slamch_args == ["test"]
+
+    # OpenBLAS32_jll v0.3.10 is known to not have this cblas symbol, so we can test the default function behavior:
+    io = Pipe()
+    Base.redirect_stdio(;stderr=io) do
+        ccall(dlsym(lbt_handle, "cblas_sbstobf16"), Cvoid, ())
+        ccall(dlsym(lbt_handle, "cblas_sbstobf1664_"), Cvoid, ())
+        Base.Libc.flush_cstdio();
+    end
+    close(io.in)
+    if Sys.ARCH != :arm
+        @test chomp(String(read(io))) == "Error: no BLAS/LAPACK library loaded for cblas_sbstobf16()\nError: no BLAS/LAPACK library loaded for cblas_sbstobf1664_()"
+    else
+        @test chomp(String(read(io))) == "Error: no BLAS/LAPACK library loaded for (unknown function)\nError: no BLAS/LAPACK library loaded for (unknown function)"
+    end
 
     # Override the default function to keep track of people who try to call uninitialized BLAS functions
     @test lbt_get_default_func(lbt_handle) != C_NULL
@@ -253,7 +261,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         libs = unpack_loaded_libraries(config)
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
-        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].cblas ∈ (LBT_CBLAS_DIVERGENT, LBT_CBLAS_CONFORMANT)
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_zdotc_sub, asserting that it does not try to call a forwardless-symbol
@@ -283,7 +291,7 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         libs = unpack_loaded_libraries(config)
         @test length(libs) == 1
         @test libs[1].interface == LBT_INTERFACE_ILP64
-        @test libs[1].cblas == LBT_CBLAS_DIVERGENT
+        @test libs[1].cblas ∈ (LBT_CBLAS_DIVERGENT, LBT_CBLAS_CONFORMANT)
         @test libs[1].complex_retstyle == LBT_COMPLEX_RETSTYLE_ARGUMENT
 
         # Call cblas_cdotc_sub64_ to test the full CBLAS workaround -> complex return style handling chain
@@ -295,5 +303,17 @@ if MKL_jll.is_available() && Sys.ARCH == :x86_64
         ccall(cdotc_fptr, Cvoid, (Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}, Int64, Ptr{ComplexF64}), 2, A, 1, B, 1, result)
         @test result[1] ≈ ComplexF32(1.47 + 3.83im)
         @test isempty(stacktraces)
+    end
+
+    @testset "MKL threading domains" begin
+        nthreads = lbt_get_num_threads(lbt_handle)
+        if nthreads <= 1
+            nthreads = 2
+        else
+            nthreads = div(nthreads, 2)
+        end
+        lbt_set_num_threads(lbt_handle, nthreads)
+        @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 1) == nthreads
+        @test ccall((:MKL_Domain_Get_Max_Threads, libmkl_rt), Cint, (Cint,), 2) != nthreads
     end
 end

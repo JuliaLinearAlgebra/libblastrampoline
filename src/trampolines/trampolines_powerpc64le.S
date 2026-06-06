@@ -7,16 +7,17 @@
 //             the TOC pointer, and a global entry point that sets r2.
 // See 64-Bit ELF V2 ABI Specification: Power Architecture v1.4
 
-#define XX(name) \
+#define XX(name, idx) \
 .global MANGLE(UNDERSCORE(name)); \
 .type MANGLE(UNDERSCORE(name))##, @function; \
-.cfi_startproc; \
 MANGLE(UNDERSCORE(name))##: ; \
+.cfi_startproc; \
     addis 2, 12, .TOC.-MANGLE(UNDERSCORE(name))##@ha; \
     addi 2, 2, .TOC.-MANGLE(UNDERSCORE(name))##@l; \
     .localentry MANGLE(UNDERSCORE(name))##,.-MANGLE(UNDERSCORE(name))##; \
     addis 12,2,NAMEADDR(name)##@toc@ha; \
     ld 12,NAMEADDR(name)##@toc@l(12); \
+    li 11,SYMBOL_IDX(idx); \
     mtctr 12; \
     bctr; \
 .cfi_endproc; \

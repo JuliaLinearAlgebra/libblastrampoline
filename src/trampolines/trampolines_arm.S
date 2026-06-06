@@ -1,10 +1,10 @@
 #include "common.h"
 #include "../exported_funcs.inc"
 
-#define XX(name) \
+#define XX(name, idx) \
 .global MANGLE(UNDERSCORE(name)); \
-.cfi_startproc; \
 MANGLE(UNDERSCORE(name))##:; \
+.cfi_startproc; \
     ldr ip, CONCAT(.L,NAMEADDR(name)); \
 CONCAT(.L,MANGLE(UNDERSCORE(name))): ;\
     add ip, pc, ip; \

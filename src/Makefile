@@ -15,7 +15,7 @@ maintarget=$(word 1,$(TARGET_LIBRARIES))
 all: $(maintarget)
 
 # Objects we'll build
-MAIN_OBJS := libblastrampoline.o dl_utils.o config.o \
+MAIN_OBJS := libblastrampoline.o dl_utils.o env_utils.o config.o \
 			 autodetection.o \
 			 threading.o deepbindless.o trampolines/trampolines_$(ARCH).o
 
@@ -25,17 +25,9 @@ MAIN_OBJS += win_utils.o
 endif
 
 # If we're on an architecture that supports f2c autodetection, compile that in!
-ifeq ($(F2C_AUTODETECTION),1)
 MAIN_OBJS += f2c_adapters.o
-endif
-
-ifeq ($(CBLAS_DIVERGENCE_AUTODETECTION),1)
 MAIN_OBJS += cblas_adapters.o
-endif
-
-ifeq ($(COMPLEX_RETSTYLE_AUTODETECTION),1)
 MAIN_OBJS += complex_return_style_adapters.o
-endif
 
 # Place the `.o` files into `$(builddir)`
 MAIN_OBJS := $(addprefix $(builddir)/,$(MAIN_OBJS))
@@ -73,16 +65,16 @@ endif
 
 # Install both libraries and our headers
 install: $(TARGET_LIBRARIES)
-	@mkdir -p $(DESTDIR)$(prefix)/include/libblastrampoline
-	-@cp -Ra $(LBT_ROOT)/include/* $(DESTDIR)$(prefix)/include/libblastrampoline
-	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(DESTDIR)$(prefix)/include/
-	@mkdir -p $(DESTDIR)$(prefix)/$(binlib)
+	@mkdir -p $(DESTDIR)$(includedir)/libblastrampoline
+	-@cp -Ra $(LBT_ROOT)/include/* $(DESTDIR)$(includedir)/libblastrampoline
+	@cp -a $(LBT_ROOT)/src/libblastrampoline.h $(DESTDIR)$(includedir)/
+	@mkdir -p $(DESTDIR)$(shlibdir)
 	@for lib in $(TARGET_LIBRARIES); do \
-		cp -a $${lib} $(DESTDIR)$(prefix)/$(binlib)/; \
+		cp -a $${lib} $(DESTDIR)$(shlibdir)/; \
 	done
 ifeq ($(OS),WINNT)
-	@mkdir -p $(DESTDIR)$(prefix)/lib
-	@cp -a $(builddir)/$(LIB_MAJOR_VERSION).a $(DESTDIR)$(prefix)/lib
+	@mkdir -p $(DESTDIR)$(libdir)
+	@cp -a $(builddir)/$(LIB_MAJOR_VERSION).a $(DESTDIR)$(libdir)
 endif
 
 clean:

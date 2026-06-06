@@ -85,8 +85,13 @@ typedef struct {
 // Possible values for `retstyle` in `lbt_library_info_t`
 // These describe whether a library is using "normal" return value passing (e.g. through
 // the `XMM{0,1}` registers on x86_64, or the `ST{0,1}` floating-point registers on i686)
+// This is further complicated by the fact that on certain platforms (such as Windows x64
+// this is dependent on the size of the value being returned, e.g. a complex64 value will
+// be returned through registers, but a complex128 value will not.  We therefore have a
+// special value that denotes this situation)
 #define LBT_COMPLEX_RETSTYLE_NORMAL     0
 #define LBT_COMPLEX_RETSTYLE_ARGUMENT   1
+#define LBT_COMPLEX_RETSTYLE_FNDA       2 // "Float Normal, Double Argument"
 #define LBT_COMPLEX_RETSTYLE_UNKNOWN   -1
 
 // Possible values for `cblas` in `lbt_library_info_t`

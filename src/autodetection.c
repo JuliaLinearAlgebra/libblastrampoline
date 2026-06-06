@@ -141,13 +141,42 @@ int32_t autodetect_blas_interface(void * isamax_addr) {
     return LBT_INTERFACE_UNKNOWN;
 }
 
+
 /*
- * If this is an LAPACK library, we'll check interface type by invoking `dpotrf` with a
- * purposefully incorrect `lda` to cause it to store an error code that we can inspect
- * and determine if the internal pointer dereferences were 32-bit or 64-bit.
+ * Attempt to figure out the integer size based on the ilaver() LAPACK function.
  */
-int32_t autodetect_lapack_interface(void * dpotrf_addr) {
-    // Typecast to function pointer for easier usage below
+int32_t autodetect_lapack_interface_ilaver(void * ilaver_addr) {
+    // Use the ilaver function to find the integer type since it will not
+    // print an error message or terminate the program when we are testing it.
+    void (*ilaver)(int64_t *, int64_t *, int64_t *) = ilaver_addr;
+
+    // Force all 64 bits to be set to 1
+    int64_t major = -1;
+    int64_t minor = -1;
+    int64_t patch = -1;
+
+    ilaver(&major, &minor, &patch);
+
+    if (major > 0) {
+        // The version number should be positive, so this means that the entire number was overwritten
+        // with the version number, so it stored 64-bits in a 64-bit slot.
+        return LBT_INTERFACE_ILP64;
+    }
+    if (major < 0) {
+        // The version number should be positive, so this means that the upper bits of
+        // the integer weren't written to, leaving it a negative number. So it stored
+        // 32-bits in a 64-bit slot.
+        return LBT_INTERFACE_LP64;
+    }
+
+    // We have no idea what happened
+    return LBT_INTERFACE_UNKNOWN;
+}
+
+/*
+ * Attempt to figure out the integer size based on the dpotrf() LAPACK function.
+ */
+int32_t autodetect_lapack_interface_dpotrf(void * dpotrf_addr) {
     void (*dpotrf)(char *, int64_t *, double *, int64_t *, int64_t *) = dpotrf_addr;
 
     // This `dpotrf` invocation should result in an error code stored into `info`
@@ -167,7 +196,8 @@ int32_t autodetect_lapack_interface(void * dpotrf_addr) {
         // This is what it looks like when a library stores a 32-bit value in a 64-bit slot.
         return LBT_INTERFACE_LP64;
     }
-    // We have no idea what happened; `info` isn't any of the options we thought it would be.
+
+    // We have no idea what happened
     return LBT_INTERFACE_UNKNOWN;
 }
 
@@ -176,7 +206,37 @@ int32_t autodetect_lapack_interface(void * dpotrf_addr) {
  * Returns the values "32", "64" or "0", denoting the bitwidth of the internal index representation.
  */
 int32_t autodetect_interface(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_INTERFACE", "ilp64")) {
+        return LBT_INTERFACE_ILP64;
+    }
+    if (env_lowercase_match("LBT_FORCE_INTERFACE", "lp64")) {
+        return LBT_INTERFACE_LP64;
+    }
+
     char symbol_name[MAX_SYMBOL_LEN];
+
+    /*
+     * The detection logic works as follows:
+     *   1) Invoke the ilaver function with a pointer to a 64-bit integer to see if the internal pointer
+     *      dereferences were 32-bit or 64-bit.
+     *          Requires LAPACK symbol ilaver()
+     *   2) Try giving a potentially-bad input (negative length) to the BLAS isamax() function and see what
+     *      it does.
+     *          Requires BLAS symbol isamax()
+     *   3) Invoke `dpotrf` with a purposefully incorrect `lda` to cause it to
+     *      store an error code that we can inspect and determine if the internal pointer
+     *      dereferences were 32-bit or 64-bit.
+     *          Requires LAPACK symbol dpotrf()
+     */
+
+    // Attempt LAPACK `ilaver()` test
+    // We test this first because this will not rely on possibly bad behavior in the library
+    // (e.g., it won't make an error condition that we then test).
+    build_symbol_name(symbol_name, "ilaver_", suffix);
+    void * ilaver = lookup_symbol(handle, symbol_name);
+    if (ilaver != NULL) {
+        return autodetect_lapack_interface_ilaver(ilaver);
+    }
 
     // Attempt BLAS `isamax()` test
     build_symbol_name(symbol_name, "isamax_", suffix);
@@ -186,18 +246,31 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
     }
 
     // Attempt LAPACK `dpotrf()` test
+    // This is last because some LAPACK libraries have a STOP call in their
+    // error handler, and also will print an error. So we want to avoid triggering
+    // those.
     build_symbol_name(symbol_name, "dpotrf_", suffix);
     void * dpotrf = lookup_symbol(handle, symbol_name);
-    if (dpotrf != NULL) {
-        return autodetect_lapack_interface(dpotrf);
+    if (ilaver != NULL || dpotrf != NULL) {
+        return autodetect_lapack_interface_dpotrf(dpotrf);
     }
 
     // Otherwise, this is probably not an LAPACK or BLAS library?!
     return LBT_INTERFACE_UNKNOWN;
 }
 
-#ifdef COMPLEX_RETSTYLE_AUTODETECTION
 int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_RETSTYLE", "normal")) {
+        return LBT_COMPLEX_RETSTYLE_NORMAL;
+    }
+    if (env_lowercase_match("LBT_FORCE_RETSTYLE", "argument")) {
+        return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+    }
+    if (env_lowercase_match("LBT_FORCE_RETSTYLE", "fnda")) {
+        return LBT_COMPLEX_RETSTYLE_FNDA;
+    }
+
+#ifdef COMPLEX_RETSTYLE_AUTODETECTION
     char symbol_name[MAX_SYMBOL_LEN];
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
@@ -206,43 +279,96 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix) {
         return LBT_COMPLEX_RETSTYLE_UNKNOWN;
     }
 
+    build_symbol_name(symbol_name, "cdotc_", suffix);
+    void * cdotc_addr = lookup_symbol(handle, symbol_name);
+    if (cdotc_addr == NULL) {
+        return LBT_COMPLEX_RETSTYLE_UNKNOWN;
+    }
+
     // Typecast to function pointer for easier usage below
     double complex (*zdotc_normal)(                  int64_t *, double complex *, int64_t *, double complex *, int64_t *) = zdotc_addr;
     void           (*zdotc_retarg)(double complex *, int64_t *, double complex *, int64_t *, double complex *, int64_t *) = zdotc_addr;
+
+    // Typecast to function pointer for easier usage below
+    float complex (*cdotc_normal)(                 int64_t *, float complex *, int64_t *, float complex *, int64_t *) = cdotc_addr;
+    void          (*cdotc_retarg)(float complex *, int64_t *, float complex *, int64_t *, float complex *, int64_t *) = cdotc_addr;
 
     /*
      * First, check to see if `zdotc` zeros out the first argument if all arguments are zero.
      * Supposedly, most well-behaved implementations will return `0 + 0*I` if the length of
      * the inputs is zero; so if it is using a "return argument", that's a good way to find out.
-     * 
-     * We detect this by setting `retval` to an initial value of `0.0 + 1.0*I`.  This has the
-     * added benefit of being interpretable as `0` if looked at as an `int{32,64}_t *`, which
-     * makes this invocation safe across the full normal-return/argument-return vs. lp64/ilp64
-     * compatibility square.
+     *
+     * We detect this by setting `retval` to an initial value of `-1` typecast to a complex
+     * value.  The floating-point values are unimportant as they will be written to, but if
+     * it is interpreted as an `int{32,64}_t`, it will be a negative value (which is not
+     * allowed and should end the routine immediately).  This makes this invocation safe
+     * across the full normal/argument, lp64/ilp64, cdotc/zdotc compatibility cube.
      */
-    double complex retval = 0.0 + 1.0*I;
+    double complex retval_double = 0.0 + 1.0*I;
     int64_t zero = 0;
-    double complex zeroc = 0.0 + 0.0*I;
-    zdotc_retarg(&retval, &zero, &zeroc, &zero, &zeroc, &zero);
+    double complex zeroc_double = 0.0 + 0.0*I;
+    zdotc_retarg(&retval_double, &zero, &zeroc_double, &zero, &zeroc_double, &zero);
 
-    if (creal(retval) == 0.0 && cimag(retval) == 0.0) {
-        return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+    /*
+     * Next, do the same with `cdotc`, in order to detect situations where the ABI is
+     * automatically inserting an extra argument to return 128-bit-wide values.
+     * We call this `FNDA` for "Float Normal, Double Argument" style.
+     */
+    int64_t neg1 = -1;
+    float complex retval_float = *(complex float *)(&neg1);
+    float complex zeroc_float = 0.0f + 0.0f*I;
+    cdotc_retarg(&retval_float, &zero, &zeroc_float, &zero, &zeroc_float, &zero);
+
+    if (creal(retval_double) == 0.0 && cimag(retval_double) == 0.0) {
+        // If the double values were reset, and the float values were also,
+        // this is easy, we're just always argument-style:
+        if (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f) {
+            return LBT_COMPLEX_RETSTYLE_ARGUMENT;
+        }
+
+        // If the float values were not, let's try the normal return style:
+        retval_float = 0.0f + 1.0f*I;
+        retval_float = cdotc_normal(&zero, &zeroc_float, &zero, &zeroc_float, &zero);
+
+
+        // If this works, we are in FNDA style (currently only observed on Windows x64)
+        if (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f) {
+            return LBT_COMPLEX_RETSTYLE_FNDA;
+        }
+
+        // Otherwise, cdotc is throwing a fit and we don't know what's up.
+        return LBT_COMPLEX_RETSTYLE_UNKNOWN;
     }
 
-    // If it was _not_ reset, let's hazard a guess that we're dealing with a normal return style:
-    retval = 0.0 + 1.0*I;
-    retval = zdotc_normal(&zero, &zeroc, &zero, &zeroc, &zero);
-    if (creal(retval) == 0.0 && cimag(retval) == 0.0) {
+    // If our double values were _not_ reset, let's hazard a guess that
+    // we're dealing with a normal return style and test both types again:
+    retval_double = 0.0 + 1.0*I;
+    retval_double = zdotc_normal(&zero, &zeroc_double, &zero, &zeroc_double, &zero);
+    retval_float = 0.0f + 1.0f*I;
+    retval_float = cdotc_normal(&zero, &zeroc_float, &zero, &zeroc_float, &zero);
+
+
+    // We only test for both working; we don't have a retstyle for float
+    // being argument style and double being normal style.
+    if ((creal(retval_double) == 0.0 && cimag(retval_double) == 0.0) &&
+        (creal(retval_float) == 0.0f && cimag(retval_float) == 0.0f)) {
         return LBT_COMPLEX_RETSTYLE_NORMAL;
     }
-
-    // If that was not reset either, we have no idea what's going on.
-    return LBT_COMPLEX_RETSTYLE_UNKNOWN;
-}
 #endif // COMPLEX_RETSTYLE_AUTODETECTION
 
-#ifdef F2C_AUTODETECTION
+    // If we get here, zdotc and cdotc are being uncooperative and we
+    // do not appreciate it at all, not we don't my precious.
+    return LBT_COMPLEX_RETSTYLE_UNKNOWN;
+}
+
 int32_t autodetect_f2c(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_F2C", "plain")) {
+        return LBT_F2C_PLAIN;
+    }
+    if (env_lowercase_match("LBT_FORCE_F2C", "required")) {
+        return LBT_F2C_REQUIRED;
+    }
+#ifdef F2C_AUTODETECTION
     char symbol_name[MAX_SYMBOL_LEN];
 
     // Attempt BLAS `sdot()` test
@@ -273,19 +399,36 @@ int32_t autodetect_f2c(void * handle, const char * suffix) {
         // It's an f2c style calling convention
         return LBT_F2C_REQUIRED;
     }
+#endif // F2C_AUTODETECTION
+
     // We have no idea what happened; nothing works and everything is broken
     return LBT_F2C_UNKNOWN;
 }
-#endif // F2C_AUTODETECTION
+
+int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
+    if (env_lowercase_match("LBT_FORCE_CBLAS", "conformant")) {
+        return LBT_CBLAS_CONFORMANT;
+    }
+    if (env_lowercase_match("LBT_FORCE_CBLAS", "divergent")) {
+        return LBT_CBLAS_DIVERGENT;
+    }
 
 #ifdef CBLAS_DIVERGENCE_AUTODETECTION
-int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
     char symbol_name[MAX_SYMBOL_LEN];
+    char extra_underscore_suffix[MAX_SYMBOL_LEN];
+    snprintf(extra_underscore_suffix, MAX_SYMBOL_LEN, "_%s", suffix);
 
     build_symbol_name(symbol_name, "zdotc_", suffix);
     if (lookup_symbol(handle, symbol_name) != NULL ) {
         // If we have both `zdotc_64` and `cblas_zdotc_sub64`, it's all good:
         build_symbol_name(symbol_name, "cblas_zdotc_sub", suffix);
+        if (lookup_symbol(handle, symbol_name) != NULL ) {
+            return LBT_CBLAS_CONFORMANT;
+        }
+
+        // Do the fallback extra-underscore suffix search here, so we don't mistakenly
+        // mark MKL v2024 as CBLAS-divergent
+        build_symbol_name(symbol_name, "cblas_zdotc_sub", extra_underscore_suffix);
         if (lookup_symbol(handle, symbol_name) != NULL ) {
             return LBT_CBLAS_CONFORMANT;
         }
@@ -302,7 +445,8 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
             return LBT_CBLAS_DIVERGENT;
         }
     }
+#endif // CBLAS_DIVERGENCE_AUTODETECTION
+
     // If we can't even find `zdotc_64`, we don't know what this is.
     return LBT_CBLAS_UNKNOWN;
 }
-#endif // CBLAS_DIVERGENCE_AUTODETECTION
