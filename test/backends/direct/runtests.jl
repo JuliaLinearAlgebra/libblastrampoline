@@ -1,4 +1,6 @@
-using Libdl, Test, OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
+include(joinpath(@__DIR__, "..", "..", "common.jl"))
+using OpenBLAS_jll, OpenBLAS32_jll, MKL_jll
+
 if isdefined(Base, :pkgversion)
     openblas32_version = pkgversion(OpenBLAS32_jll)
     openblas32_version = VersionNumber(openblas32_version.major, openblas32_version.minor, openblas32_version.patch)
@@ -7,36 +9,7 @@ if isdefined(Base, :pkgversion)
     end
 end
 
-include("utils.jl")
-
-function unpack_loaded_libraries(config::lbt_config_t)
-    libs = LBTLibraryInfo[]
-    idx = 1
-    lib_ptr = unsafe_load(config.loaded_libs, idx)
-    while lib_ptr != C_NULL
-        push!(libs, LBTLibraryInfo(unsafe_load(lib_ptr), config.num_exported_symbols))
-
-        idx += 1
-        lib_ptr = unsafe_load(config.loaded_libs, idx)
-    end
-    return libs
-end
-
-function find_symbol_offset(config::lbt_config_t, symbol::String)
-    for sym_idx in 1:config.num_exported_symbols
-        if unsafe_string(unsafe_load(config.exported_symbols, sym_idx)) == symbol
-            return UInt32(sym_idx - 1)
-        end
-    end
-    return nothing
-end
-
-function bitfield_get(field::Vector{UInt8}, symbol_idx::UInt32)
-    return field[div(symbol_idx,8)+1] & (UInt8(0x01) << (symbol_idx%8))
-end
-
-lbt_link_name, lbt_prefix = build_libblastrampoline()
-lbt_handle = dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
+lbt_handle = open_lbt_handle()
 
 @testset "Config" begin
     @test lbt_handle != C_NULL

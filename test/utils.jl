@@ -85,9 +85,13 @@ end
 
 # Build blastrampoline into a temporary directory, and return that
 blastrampoline_build_dir = nothing
+# Fake linking name so that we can test from within Julia versions that actually load LBT natively.
+const blastrampoline_dev_link_name = "blastramp-dev"
 function build_libblastrampoline()
+    # NB: always return the same `(link_name, build_dir)` tuple, whether we built just now
+    # or are returning the cached result, so callers can safely destructure it every time.
     if blastrampoline_build_dir !== nothing
-        return blastrampoline_build_dir
+        return blastrampoline_dev_link_name, blastrampoline_build_dir
     end
 
     cflags_add = "-Werror" * (needs_m32() ? " -m32" : "")
@@ -97,14 +101,21 @@ function build_libblastrampoline()
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) clean`)
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(blastrampoline_build_dir))`)
 
-    # Give LBT a fake linking name so that we can test from within Julia versions that actually load LBT natively.
-    link_name = "blastramp-dev"
+    link_name = blastrampoline_dev_link_name
     cp(
         joinpath(blastrampoline_build_dir, binlib, blastrampoline_major_version()),
         joinpath(blastrampoline_build_dir, binlib, "lib$(link_name).$(shlib_ext)"),
     )
     println("$(blastrampoline_build_dir)/$(binlib)")
     return link_name, blastrampoline_build_dir
+end
+
+# Build (if necessary) and `dlopen()` libblastrampoline for the in-process tests.
+# We give it a fake linking name in `build_libblastrampoline()` so that we can test
+# from within Julia versions that load LBT natively.
+function open_lbt_handle()
+    lbt_link_name, lbt_prefix = build_libblastrampoline()
+    return dlopen("$(lbt_prefix)/$(binlib)/lib$(lbt_link_name).$(shlib_ext)", RTLD_GLOBAL | RTLD_DEEPBIND)
 end
 
 
@@ -196,4 +207,31 @@ end
 
 function lbt_get_default_func(handle)
     return ccall(dlsym(handle, :lbt_get_default_func), Ptr{Cvoid}, ())
+end
+
+# Helpers for inspecting an `lbt_config_t` from the in-process (`direct`/`accelerate`) tests
+function unpack_loaded_libraries(config::lbt_config_t)
+    libs = LBTLibraryInfo[]
+    idx = 1
+    lib_ptr = unsafe_load(config.loaded_libs, idx)
+    while lib_ptr != C_NULL
+        push!(libs, LBTLibraryInfo(unsafe_load(lib_ptr), config.num_exported_symbols))
+
+        idx += 1
+        lib_ptr = unsafe_load(config.loaded_libs, idx)
+    end
+    return libs
+end
+
+function find_symbol_offset(config::lbt_config_t, symbol::String)
+    for sym_idx in 1:config.num_exported_symbols
+        if unsafe_string(unsafe_load(config.exported_symbols, sym_idx)) == symbol
+            return UInt32(sym_idx - 1)
+        end
+    end
+    return nothing
+end
+
+function bitfield_get(field::Vector{UInt8}, symbol_idx::UInt32)
+    return field[div(symbol_idx,8)+1] & (UInt8(0x01) << (symbol_idx%8))
 end
