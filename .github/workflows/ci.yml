@@ -47,14 +47,14 @@ jobs:
           # Reference BLAS DLLs are not yet resolvable on Windows.
           - {backend: refblas, os: windows-latest}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ (matrix.os == 'ubuntu-24.04-arm' || matrix.os == 'macos-latest') && 'aarch64' || 'x64' }}
 
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
 
       # The `blas64` backend tests against a system-provided ILP64 reference BLAS/LAPACK.
       - name: Install system libblas64 / liblapack64 (Debian)
@@ -105,14 +105,14 @@ jobs:
           # Reference BLAS DLLs are not yet resolvable on Windows.
           - {backend: refblas, os: windows-latest}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.julia-version }}
           arch: x86
 
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
 
       # Linux: a 64-bit gcc with multilib can target i686 via `-m32` (utils.jl's
       # `needs_m32()` adds it automatically when GCC is 64-bit but Julia is 32-bit).
@@ -151,7 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Regenerate func_list and check for diff
         run: |
           cd ext/gensymbol
