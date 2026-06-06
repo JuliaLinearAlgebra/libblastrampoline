@@ -85,7 +85,66 @@ jobs:
         run: julia --project=test/backends/${{ matrix.backend }} -e 'import Pkg; Pkg.instantiate()'
 
       - name: Run ${{ matrix.backend }} tests
-        run: julia --project=test/backends/${{ matrix.backend }} test/backends/${{ matrix.backend }}/runtests.jl
+        run: julia --project=test/backends/${{ matrix.backend }} test/runtests.jl ${{ matrix.backend }}
+
+  # 32-bit (i686) Linux and Windows: GitHub only offers 64-bit runners, so we install a
+  # 32-bit Julia on the x86_64 runner (Pkg then resolves i686 JLL artifacts) and build the
+  # C tests / libblastrampoline as 32-bit (`-m32` on Linux via gcc-multilib; a native i686
+  # MinGW toolchain on Windows).
+  test-32bit:
+    name: ${{ matrix.backend }} / ${{ matrix.os }} (i686) / julia ${{ matrix.julia-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        backend: [openblas, refblas, direct]
+        os: [ubuntu-latest, windows-latest]
+        julia-version: ['1.10', 'nightly']
+        exclude:
+          # Reference BLAS DLLs are not yet resolvable on Windows.
+          - {backend: refblas, os: windows-latest}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: x86
+
+      - uses: julia-actions/cache@v2
+
+      # Linux: a 64-bit gcc with multilib can target i686 via `-m32` (utils.jl's
+      # `needs_m32()` adds it automatically when GCC is 64-bit but Julia is 32-bit).
+      - name: Install 32-bit build support (Debian)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib
+
+      # Windows: use a native i686 MinGW toolchain (MINGW32) so the C tests and
+      # libblastrampoline are built as 32-bit directly.
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        if: runner.os == 'Windows'
+        with:
+          msystem: MINGW32
+          path-type: inherit
+          install: >-
+            make
+            mingw-w64-i686-gcc
+      - name: Add MSYS2 tools to PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Add-Content -Path $env:GITHUB_PATH -Value "${{ steps.msys2.outputs.msys2-location }}\mingw32\bin"
+          Add-Content -Path $env:GITHUB_PATH -Value "${{ steps.msys2.outputs.msys2-location }}\usr\bin"
+
+      - name: Instantiate ${{ matrix.backend }} project
+        run: julia --project=test/backends/${{ matrix.backend }} -e 'import Pkg; Pkg.instantiate()'
+
+      - name: Run ${{ matrix.backend }} tests
+        run: julia --project=test/backends/${{ matrix.backend }} test/runtests.jl ${{ matrix.backend }}
 
   func-list-idempotency:
     name: func_list idempotency
