@@ -53,8 +53,11 @@ This support is only available on the `x86_64` and `i686` architectures, however
 Vendor-specific APIs such as `openblas_get_num_threads()` are not included in header files or exported from the library.
 See the [public header file](src/libblastrampoline.h) for the most up-to-date documentation on the `libblastrampoline` API.
 
-**Note**: all `lbt_*` functions should be considered thread-unsafe.
-Do not attempt to load two BLAS libraries on two different threads at the same time.
+### Threading
+
+By default, all `lbt_*` functions are thread-unsafe; do not reconfigure forwards from multiple threads at once.
+Building with `make LBT_THREADSAFE=1` adds a process-global lock around the mutating API (`lbt_forward()`, `lbt_set_forward()`, `lbt_set_forward_by_index()`).
+Readers and the BLAS/LAPACK call forwarding itself stay lock-free, so the model remains "configure under the lock, then use".
 
 ### Limitations
 

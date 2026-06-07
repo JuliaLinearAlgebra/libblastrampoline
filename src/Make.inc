@@ -104,6 +104,18 @@ ifeq ($(OS), Darwin)
   SYMBOL_TRIMMING := 1
 endif
 
+# Optional internal locking around the (otherwise thread-unsafe) library-loading and
+# forwarding API.  Off by default to preserve historical behavior; enable with
+# `make LBT_THREADSAFE=1`.
+LBT_THREADSAFE ?= 0
+ifeq ($(LBT_THREADSAFE),1)
+  LBT_CFLAGS += -DLBT_THREADSAFE
+  ifneq ($(OS),WINNT)
+    LBT_CFLAGS += -pthread
+    LBT_LDFLAGS += -pthread
+  endif
+endif
+
 ifeq ($(VERBOSE),0)
 ENDCOLOR := "\033[0m"
 CCCOLOR := "\033[34m"
