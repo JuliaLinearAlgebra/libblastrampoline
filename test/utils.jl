@@ -214,6 +214,10 @@ function lbt_get_default_func(handle)
     return ccall(dlsym(handle, :lbt_get_default_func), Ptr{Cvoid}, ())
 end
 
+function lbt_get_library_info(handle, lib)
+    return strip(unsafe_string(ccall(dlsym(handle, :lbt_get_library_info), Ptr{UInt8}, (Ptr{Cvoid},), lib)))
+end
+
 # Helpers for inspecting an `lbt_config_t` from the in-process (`direct`/`accelerate`) tests
 function unpack_loaded_libraries(config::lbt_config_t)
     libs = LBTLibraryInfo[]

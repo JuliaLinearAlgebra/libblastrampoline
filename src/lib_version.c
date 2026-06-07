@@ -1,0 +1,182 @@
+#include "libblastrampoline_internal.h"
+
+#include <ctype.h>
+
+/* We need to ask MKL for information about itself to get better information for the config.
+ *
+ * These are from mkl_types.h
+ */
+typedef struct {
+    int    MajorVersion;
+    int    MinorVersion;
+    int    UpdateVersion;
+    int    PatchVersion;
+    char * ProductStatus;
+    char * Build;
+    char * Processor;
+    char * Platform;
+} MKLVersion;
+
+
+// These are the addresses of the LBT functions for ilaver we export
+extern void ** ilaver_;
+extern void ** ilaver_64_;
+
+#define LEN_INFO_STR    512     //< Length of the entire string used to hold the library info
+#define LEN_SHORT_INFO  300     //< Length of the string used to get information from individual libraries
+#define LEN_LAPACK_INFO 25      //< Length of the string containing the LAPACK version info
+
+// Every library implements their version string handling differently, so this is a ratsnest
+// of conditions for the various libraries to try and get information that is useful to us...
+char* lbt_get_library_info(lbt_library_info_t* library)
+{
+    // Keep the string as a static lifetime so that it never gets deleted
+    static char info[LEN_INFO_STR];
+
+    // Remove stale information from info
+    info[0] = '\0';
+
+    // Get LAPACK information, which will say the LAPACK API the library uses
+    char lapack_ver[LEN_LAPACK_INFO];
+    char symbol_name_ilaver[MAX_SYMBOL_LEN];
+    build_symbol_name(symbol_name_ilaver, "ilaver_", library->suffix);
+    void* (*fptr_ilaver)(int*, int*, int*) = lookup_symbol(library->handle, symbol_name_ilaver);
+
+    // Make sure we don't accidentally call our own version of ilaver
+    if ((fptr_ilaver != NULL) && ((void*)fptr_ilaver != &ilaver_) && ((void*)fptr_ilaver != &ilaver_64_)) {
+        int lapack_major = 0;
+        int lapack_minor = 0;
+        int lapack_patch = 0;
+
+        fptr_ilaver(&lapack_major, &lapack_minor, &lapack_patch);
+        snprintf(lapack_ver, LEN_LAPACK_INFO, ", LAPACK v%d.%d.%d", lapack_major, lapack_minor, lapack_patch);
+    } else {
+        // Clear the version string if we can't compute one
+        lapack_ver[0] = '\0';
+    }
+
+
+    // OpenBLAS, config will have same suffix as the other functions
+    char symbol_name[MAX_SYMBOL_LEN];
+    build_symbol_name(symbol_name, "openblas_get_config", library->suffix);
+    char* (*fptr_openblas)() = lookup_symbol(library->handle, symbol_name);
+    if (fptr_openblas != NULL) {
+        char* tmp_info = fptr_openblas();
+
+        snprintf(info, LEN_INFO_STR, "%s%s", tmp_info, lapack_ver);
+        return info;
+    }
+
+    // MKL
+    char* (*fptr_mkl)(char*, int) = lookup_symbol(library->handle, "mkl_get_version_string");
+    if (fptr_mkl != NULL) {
+        char mkl_info[LEN_SHORT_INFO];
+        memset(mkl_info, 0, LEN_SHORT_INFO);
+
+        fptr_mkl(mkl_info, LEN_SHORT_INFO);
+
+        // MKL pads the output with spaces, so trim it to only the needed parts
+        char* back = mkl_info + strlen(mkl_info);
+        while(isspace(*--back));
+        *(back+1) = '\0';
+
+        snprintf(info, LEN_INFO_STR, "%s%s", mkl_info, lapack_ver);
+        return info;
+    }
+
+    // NVPL
+    int (*fptr_nvpl)() = lookup_symbol(library->handle, "nvpl_blas_get_version");
+    if (fptr_nvpl != NULL) {
+        int version = fptr_nvpl();
+
+        // The version int is of the form:
+        // NVPL_BLAS_VERSION_MAJOR * 10000 + NVPL_BLAS_VERSION_MINOR * 100 + NVPL_BLAS_VERSION_PATCH
+        int major = version / 10000;
+        int minor = (version - (major*10000)) / 100;
+        int patch = (version - (major*10000) - (minor*100));
+
+        snprintf(info, LEN_INFO_STR, "NVPL %d.%d.%d%s", major, minor, patch, lapack_ver);
+        return info;
+    }
+
+    // ARMPL
+    int (*fptr_armpl)(int*, int*, int*, char**) = lookup_symbol(library->handle, "armplversion");
+    if (fptr_armpl != NULL) {
+        int major = 0, minor = 0, patch = 0;
+        char* tag = NULL;
+        fptr_armpl(&major, &minor, &patch, &tag);
+
+        snprintf(info, LEN_INFO_STR, "ARMPL %d.%d.%d.%s%s", major, minor, patch, tag, lapack_ver);
+        return info;
+    }
+
+    // AOCL and BLIS share the same methods
+    char * (*fptr_blis_ver)() = lookup_symbol(library->handle, "bli_info_get_version_str");
+    if (fptr_blis_ver != NULL) {
+        int aocl_detected = 0;
+        int int_size = 0;
+        char* config = NULL;
+
+        // Raw version string
+        char* ver_str = fptr_blis_ver();
+
+        // Integer size
+        int (*fptr_blis_int)() = lookup_symbol(library->handle, "bli_info_get_blas_int_type_size");
+        if (fptr_blis_int != NULL) {
+            int_size = fptr_blis_int();
+        }
+
+        // Current architecture
+        int (*fptr_blis_arch)() = lookup_symbol(library->handle, "bli_arch_query_id");
+        char* (*fptr_blis_arch_str)(int) = lookup_symbol(library->handle, "bli_arch_string");
+        if (fptr_blis_arch != NULL && fptr_blis_arch_str != NULL) {
+            int arch = fptr_blis_arch();
+            config = fptr_blis_arch_str(arch);
+        }
+
+        // Determine if the library is AOCL or not - it uses the same exact symbols as BLIS, but it also exposes some new symbols
+        // that are AOCL-only that we can use to check if it is AOCL.
+        int (*fptr_aocl)() = lookup_symbol(library->handle, "bli_aocl_enable_instruction_query");
+        if (fptr_aocl != NULL) {
+            // AOCL
+            aocl_detected = 1;
+        }
+
+        snprintf(info, LEN_INFO_STR, "%s %s, %d-bit integer, %s%s",
+                 aocl_detected == 1 ? "AMD" : "BLIS",      // AOCL includes it's name in the string, BLIS does not
+                 ver_str,
+                 int_size,
+                 config,
+                 lapack_ver);
+
+        return info;
+    }
+
+    // FlexiBLAS
+    void (*fptr_flexi_ver)(int*, int*, int*) = lookup_symbol(library->handle, "flexiblas_get_version");
+    if (fptr_flexi_ver != NULL) {
+        int major = 0, minor = 0, patch = 0;
+        char backend[LEN_SHORT_INFO];
+
+        fptr_flexi_ver(&major, &minor, &patch);
+
+        int(*fptr_flexi_backend)(char*, int) = lookup_symbol(library->handle, "flexiblas_current_backend");
+        if (fptr_flexi_backend != NULL) {
+            fptr_flexi_backend(backend, LEN_SHORT_INFO);
+        }
+
+        snprintf(info, LEN_INFO_STR, "FlexiBLAS %d.%d.%d, backend: %s%s", major, minor, patch, backend, lapack_ver);
+        return info;
+    }
+
+    // Apple Accelerate
+    // Look for a special Apple-only symbol to detect the Accelerate library
+    void (*fptr_appaccel)() = lookup_symbol(library->handle, "appleblas_sgeadd");
+    if (fptr_appaccel != NULL) {
+        snprintf(info, LEN_INFO_STR, "Apple Accelerate%s", lapack_ver);
+        return info;
+    }
+
+
+    return "Unknown library";
+}
