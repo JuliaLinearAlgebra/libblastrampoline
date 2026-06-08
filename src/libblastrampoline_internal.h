@@ -92,7 +92,7 @@ int32_t autodetect_complex_return_style(void * handle, const char * suffix);
 int32_t autodetect_f2c(void * handle, const char * suffix);
 int32_t autodetect_cblas_divergence(void * handle, const char * suffix);
 
-// Functions in deepbindless_surrogates.c
+// Functions in deepbindless.c
 uint8_t push_fake_lsame();
 uint8_t pop_fake_lsame();
 int fake_lsame(char * ca, char * cb);
