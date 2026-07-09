@@ -15,6 +15,19 @@ LBT_DLLEXPORT uint8_t lbt_get_use_deepbind() {
     return use_deepbind;
 }
 
+/*
+ * Returns whether AddressSanitizer is loaded in this process. RTLD_DEEPBIND is
+ * incompatible with the sanitizers' libc interposition
+ * (c.f. https://github.com/google/sanitizers/issues/611)
+ */
+uint8_t running_under_sanitizer(void) {
+#if defined(LBT_DEEPBINDLESS) || !defined(RTLD_DEEPBIND)
+    return 0x00;
+#else
+    return dlsym(RTLD_DEFAULT, "__asan_init") != NULL ? 0x01 : 0x00;
+#endif
+}
+
 
 int lsame_idx = -1;
 const void *old_lsame32 = NULL, *old_lsame64 = NULL;
