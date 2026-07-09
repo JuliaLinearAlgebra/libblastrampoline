@@ -249,7 +249,9 @@ int32_t autodetect_interface(void * handle, const char * suffix) {
     // those.
     build_symbol_name(symbol_name, "dpotrf_", suffix);
     void * dpotrf = lookup_symbol(handle, symbol_name);
-    if (ilaver != NULL || dpotrf != NULL) {
+    // NB: if `ilaver` were non-NULL we'd already have returned above, so it's
+    // guaranteed NULL here; only `dpotrf` matters.
+    if (dpotrf != NULL) {
         return autodetect_lapack_interface_dpotrf(dpotrf);
     }
 
