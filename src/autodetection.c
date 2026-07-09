@@ -62,6 +62,8 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
         // Possibly-NULL suffix that we should search over
         suffix_hint,
 
+        "64_",
+
         // First, search for LP64-mangling suffixes, so that when we are loading libs from an
         // CLI environment, (where suffix hints are not easy) we want to give the most stable
         // configuration by default.
