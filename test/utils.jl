@@ -95,11 +95,16 @@ function build_libblastrampoline()
     end
 
     cflags_add = "-Werror" * (needs_m32() ? " -m32" : "")
+    # Build with the optional internal locking compiled in by default, so the
+    # `LBT_THREADSAFE` code paths (pthread / CRITICAL_SECTION) are exercised across the
+    # whole test matrix.  Set `LBT_THREADSAFE=0` in the environment to instead test the
+    # plain (no-op lock) build that ships by default.
+    threadsafe = get(ENV, "LBT_THREADSAFE", "1")
     dir = mktempdir()
     srcdir = joinpath(dirname(@__DIR__), "src")
     global blastrampoline_build_dir = joinpath(dir, "output")
     run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) clean`)
-    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) install builddir=$(pathesc(dir))/build prefix=$(pathesc(blastrampoline_build_dir))`)
+    run(`$(make) -sC $(pathesc(srcdir)) CFLAGS="$(cflags_add)" ARCH=$(Sys.ARCH) LBT_THREADSAFE=$(threadsafe) install builddir=$(pathesc(dir))/build prefix=$(pathesc(blastrampoline_build_dir))`)
 
     link_name = blastrampoline_dev_link_name
     cp(

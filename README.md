@@ -7,12 +7,13 @@ Using [PLT trampolines](https://en.wikipedia.org/wiki/Trampoline_(computing)) to
 These BLAS libraries are known to work with libblastrampoline (successfully tested in Julia):
 
 1. [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) (supported by default in Julia)
-2. [Intel oneMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html) (use in Julia through [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl))
-3. [Apple Accelerate](https://developer.apple.com/documentation/accelerate/blas) (use in Julia through [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl))
-4. [BLIS](https://github.com/flame/blis/) (use in Julia through [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl))
-5. Fujitsu BLAS (use in Julia through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl))
-6. [ARMPL BLAS](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries)
-7. [NVPL BLAS](https://docs.nvidia.com/nvpl/_static/blas/)
+2. [Reference BLAS and LAPACK](https://github.com/Reference-LAPACK/lapack) (use in Julia through [ReferenceBLAS_jll](https://github.com/JuliaBinaryWrappers/ReferenceBLAS_jll.jl) and [LAPACK_jll](https://github.com/JuliaBinaryWrappers/LAPACK_jll.jl))
+3. [Intel oneMKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html) (use in Julia through [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl))
+4. [Apple Accelerate](https://developer.apple.com/documentation/accelerate/blas) (use in Julia through [AppleAccelerate.jl](https://github.com/JuliaMath/AppleAccelerate.jl))
+5. [BLIS](https://github.com/flame/blis/) (use in Julia through [BLISBLAS.jl](https://github.com/carstenbauer/BLISBLAS.jl))
+6. Fujitsu BLAS (use in Julia through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl))
+7. [ARMPL BLAS](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries)
+8. [NVPL BLAS](https://docs.nvidia.com/nvpl/_static/blas/)
 
 ## Basic usage
 
@@ -52,8 +53,11 @@ This support is only available on the `x86_64` and `i686` architectures, however
 Vendor-specific APIs such as `openblas_get_num_threads()` are not included in header files or exported from the library.
 See the [public header file](src/libblastrampoline.h) for the most up-to-date documentation on the `libblastrampoline` API.
 
-**Note**: all `lbt_*` functions should be considered thread-unsafe.
-Do not attempt to load two BLAS libraries on two different threads at the same time.
+### Threading
+
+By default, all `lbt_*` functions are thread-unsafe; do not reconfigure forwards from multiple threads at once.
+Building with `make LBT_THREADSAFE=1` adds a process-global lock around the mutating API (`lbt_forward()`, `lbt_set_forward()`, `lbt_set_forward_by_index()`).
+Readers and the BLAS/LAPACK call forwarding itself stay lock-free, so the model remains "configure under the lock, then use".
 
 ### Limitations
 
