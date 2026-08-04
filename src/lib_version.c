@@ -25,6 +25,85 @@ extern void ** ilaver_64_;
 #define LEN_INFO_STR    512     //< Length of the entire string used to hold the library info
 #define LEN_SHORT_INFO  300     //< Length of the string used to get information from individual libraries
 #define LEN_LAPACK_INFO 25      //< Length of the string containing the LAPACK version info
+#define LEN_LBT_INFO    50      //< Length of the string containing LBT forwarding information
+
+void lbt_info_string(char* lbt_info, lbt_library_info_t* library)
+{
+    char lbt_int[6];
+    char lbt_f2c[6];
+    char lbt_cmplx[6];
+    char lbt_cblas[6];
+
+    // Integer interface detected
+    switch (library->interface) {
+    case LBT_INTERFACE_LP64:
+        snprintf(lbt_int, 6, "LP64");
+        break;
+
+    case LBT_INTERFACE_ILP64:
+        snprintf(lbt_int, 6, "ILP64");
+        break;
+
+    default:
+        snprintf(lbt_int, 6, "Unkwn");
+        break;
+    }
+
+    // F2C interface detected
+    switch (library->f2c)
+    {
+    case LBT_F2C_PLAIN:
+        snprintf(lbt_f2c, 6, "Plain");
+        break;
+
+    case LBT_F2C_REQUIRED:
+        snprintf(lbt_f2c, 6, "Reqd");
+        break;
+
+    default:
+        snprintf(lbt_f2c, 6, "Unkwn");
+        break;
+    }
+
+    // Complex return style
+    switch (library->complex_retstyle)
+    {
+    case LBT_COMPLEX_RETSTYLE_NORMAL:
+        snprintf(lbt_f2c, 6, "Nrml");
+        break;
+
+    case LBT_COMPLEX_RETSTYLE_ARGUMENT:
+        snprintf(lbt_f2c, 6, "Arg");
+        break;
+
+    case LBT_COMPLEX_RETSTYLE_FNDA:
+        snprintf(lbt_f2c, 6, "FNDA");
+        break;
+
+    default:
+        snprintf(lbt_f2c, 6, "Unkwn");
+        break;
+    }
+
+    // CBLAS type
+    switch (library->cblas)
+    {
+    case LBT_CBLAS_CONFORMANT:
+        snprintf(lbt_f2c, 6, "Nrml");
+        break;
+
+    case LBT_CBLAS_DIVERGENT:
+        snprintf(lbt_f2c, 6, "Diver");
+        break;
+
+    default:
+        snprintf(lbt_f2c, 6, "Unkwn");
+        break;
+    }
+
+    // Form the final string
+    snprintf(lbt_info, LEN_LBT_INFO, "; LBT: %s, f2c %s, cmplx , cblas %s", lbt_int, lbt_f2c, lbt_cmplx, lbt_cblas);
+}
 
 // Every library implements their version string handling differently, so this is a ratsnest
 // of conditions for the various libraries to try and get information that is useful to us...
@@ -49,12 +128,15 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         int lapack_patch = 0;
 
         fptr_ilaver(&lapack_major, &lapack_minor, &lapack_patch);
-        snprintf(lapack_ver, LEN_LAPACK_INFO, ", LAPACK v%d.%d.%d", lapack_major, lapack_minor, lapack_patch);
+        snprintf(lapack_ver, LEN_LAPACK_INFO, "; LAPACK v%d.%d.%d", lapack_major, lapack_minor, lapack_patch);
     } else {
         // Clear the version string if we can't compute one
         lapack_ver[0] = '\0';
     }
 
+    // Build a string to capture all the LBT forwarding information
+    char lbt_info[LEN_LBT_INFO];
+    lbt_info_string(lbt_info, library);
 
     // OpenBLAS, config will have same suffix as the other functions
     char symbol_name[MAX_SYMBOL_LEN];
@@ -63,7 +145,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
     if (fptr_openblas != NULL) {
         char* tmp_info = fptr_openblas();
 
-        snprintf(info, LEN_INFO_STR, "%s%s", tmp_info, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "%s%s%s", tmp_info, lapack_ver, lbt_info);
         return info;
     }
 
@@ -80,7 +162,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         while(isspace(*--back));
         *(back+1) = '\0';
 
-        snprintf(info, LEN_INFO_STR, "%s%s", mkl_info, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "%s%s%s", mkl_info, lapack_ver, lbt_info);
         return info;
     }
 
@@ -95,7 +177,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         int minor = (version - (major*10000)) / 100;
         int patch = (version - (major*10000) - (minor*100));
 
-        snprintf(info, LEN_INFO_STR, "NVPL %d.%d.%d%s", major, minor, patch, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "NVPL %d.%d.%d%s%s", major, minor, patch, lapack_ver, lbt_info);
         return info;
     }
 
@@ -106,7 +188,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
         char* tag = NULL;
         fptr_armpl(&major, &minor, &patch, &tag);
 
-        snprintf(info, LEN_INFO_STR, "ARMPL %d.%d.%d.%s%s", major, minor, patch, tag, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "ARMPL %d.%d.%d.%s%s%s", major, minor, patch, tag, lapack_ver, lbt_info);
         return info;
     }
 
@@ -142,12 +224,13 @@ char* lbt_get_library_info(lbt_library_info_t* library)
             aocl_detected = 1;
         }
 
-        snprintf(info, LEN_INFO_STR, "%s %s, %d-bit integer, %s%s",
+        snprintf(info, LEN_INFO_STR, "%s %s, %d-bit integer, %s%s%s",
                  aocl_detected == 1 ? "AMD" : "BLIS",      // AOCL includes it's name in the string, BLIS does not
                  ver_str,
                  int_size,
                  config,
-                 lapack_ver);
+                 lapack_ver,
+                 lbt_info);
 
         return info;
     }
@@ -165,7 +248,7 @@ char* lbt_get_library_info(lbt_library_info_t* library)
             fptr_flexi_backend(backend, LEN_SHORT_INFO);
         }
 
-        snprintf(info, LEN_INFO_STR, "FlexiBLAS %d.%d.%d, backend: %s%s", major, minor, patch, backend, lapack_ver);
+        snprintf(info, LEN_INFO_STR, "FlexiBLAS %d.%d.%d, backend: %s%s%s", major, minor, patch, backend, lapack_ver, lbt_info);
         return info;
     }
 
@@ -173,10 +256,11 @@ char* lbt_get_library_info(lbt_library_info_t* library)
     // Look for a special Apple-only symbol to detect the Accelerate library
     void (*fptr_appaccel)() = lookup_symbol(library->handle, "appleblas_sgeadd");
     if (fptr_appaccel != NULL) {
-        snprintf(info, LEN_INFO_STR, "Apple Accelerate%s", lapack_ver);
+        snprintf(info, LEN_INFO_STR, "Apple Accelerate%s%s", lapack_ver, lbt_info);
         return info;
     }
 
-
-    return "Unknown library";
+    // Fallback is unknown, but still report LAPACK (if possible) and LBT information
+    snprintf(info, LEN_INFO_STR, "Unknown library%s%s", lapack_ver, lbt_info);
+    return info;
 }
