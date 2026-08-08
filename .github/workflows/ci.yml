@@ -58,7 +58,9 @@ jobs:
           - {backend: blis, julia-version: 'nightly'}
           - {backend: blas64, julia-version: 'nightly'}
           - {backend: accelerate, julia-version: 'nightly'}
-          - {backend: aocl, julia-version: 'nightly'}
+          # AOCL is built with GCC 14 and requires a version of libstdc++ that is more
+          # recent than what comes with Julia 1.10 by default.
+          - {backend: aocl, julia-version: '1.10'}
     steps:
       - uses: actions/checkout@v7
 
