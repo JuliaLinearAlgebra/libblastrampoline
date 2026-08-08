@@ -27,7 +27,7 @@ jobs:
         # Each BLAS/LAPACK backend is tested in its own job (and its own process, with
         # its own `test/backends/<backend>/Project.toml`) so that only a single set of
         # BLAS/LAPACK libraries is ever loaded at once.
-        backend: [openblas, mkl, refblas, blis, blas64, accelerate, direct]
+        backend: [openblas, mkl, refblas, blis, blas64, accelerate, aocl, direct]
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-latest, macos-15-intel]
         julia-version: ['1.10', 'nightly']
         exclude:
@@ -38,6 +38,11 @@ jobs:
           - {backend: accelerate, os: ubuntu-latest}
           - {backend: accelerate, os: ubuntu-24.04-arm}
           - {backend: accelerate, os: windows-latest}
+          # AOCL_jll only ships an x86_64 Linux (glibc) build.
+          - {backend: aocl, os: ubuntu-24.04-arm}
+          - {backend: aocl, os: windows-latest}
+          - {backend: aocl, os: macos-latest}
+          - {backend: aocl, os: macos-15-intel}
           # blas64 uses the Debian `libblas64-dev`/`liblapack64-dev` packages.
           - {backend: blas64, os: windows-latest}
           - {backend: blas64, os: macos-latest}
@@ -53,6 +58,7 @@ jobs:
           - {backend: blis, julia-version: 'nightly'}
           - {backend: blas64, julia-version: 'nightly'}
           - {backend: accelerate, julia-version: 'nightly'}
+          - {backend: aocl, julia-version: 'nightly'}
     steps:
       - uses: actions/checkout@v7
 
