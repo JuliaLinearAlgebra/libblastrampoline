@@ -14,6 +14,7 @@ These BLAS libraries are known to work with libblastrampoline (successfully test
 6. Fujitsu BLAS (use in Julia through [FujitsuBLAS.jl](https://github.com/giordano/FujitsuBLAS.jl))
 7. [ARMPL BLAS](https://developer.arm.com/Tools%20and%20Software/Arm%20Performance%20Libraries)
 8. [NVPL BLAS](https://docs.nvidia.com/nvpl/_static/blas/)
+9. [AMD AOCL](https://www.amd.com/en/developer/aocl.html) (use in Julia through [AOCL.jl](https://github.com/JuliaLinearAlgebra/AOCL.jl))
 
 ## Basic usage
 
