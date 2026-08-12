@@ -239,6 +239,13 @@ LBT_DLLEXPORT const void * lbt_get_forward(const char * symbol_name, int32_t int
  */
 LBT_DLLEXPORT int32_t lbt_set_forward(const char * symbol_name, const void * addr, int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t verbose);
 
+
+/*
+ * Gets the information string about the requested `library` containing relevant information about
+ * its version and configuration (if available).
+ */
+LBT_DLLEXPORT char * lbt_get_library_info(lbt_library_info_t * library);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
