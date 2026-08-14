@@ -1,6 +1,14 @@
 #include "libblastrampoline_internal.h"
 #include <complex.h>
 
+// Declarations for the self-symbols in LBT that we use for our symbol suffix detection
+extern void ** isamax_;
+extern void ** isamax_64_;
+extern void ** dpotrf_;
+extern void ** dpotrf_64_;
+extern void ** cblas_zdotc_sub;
+extern void ** cblas_zdotc_sub64_;
+
 /*
  * Some vendors (such as Accelerate) decided to trim off the trailing underscore
  * from the F77 symbol names when adding their ILP64 symbol names.  So the
@@ -25,10 +33,16 @@ void build_symbol_name(char * out, const char *symbol_name, const char *suffix) 
     strncpy(out + symbol_len, suffix, MAX_SYMBOL_LEN - symbol_len);
 }
 
+typedef struct {
+    const char * symbol_name;
+    const void ** self_lp64_addr;
+    const void ** self_ilp64_addr;
+} autodetect_symbol_info_t;
+
 /*
  * Search for a symbol that ends in one of the given suffixes.  Returns NULL if not found.
  */
-const char * symbol_suffix_search(void * handle, const char * symbol_name, const char ** suffixes, const int num_suffixes) {
+const char * symbol_suffix_search(void * handle, autodetect_symbol_info_t* symbol, const char ** suffixes, const int num_suffixes) {
     char symbol_name_suffixed[MAX_SYMBOL_LEN];
     for (int suffix_idx=0; suffix_idx<num_suffixes; suffix_idx++) {
         // Skip NULL suffixes (the case where we have no `suffix_hint`)
@@ -36,8 +50,13 @@ const char * symbol_suffix_search(void * handle, const char * symbol_name, const
             continue;
         }
 
-        build_symbol_name(symbol_name_suffixed, symbol_name, suffixes[suffix_idx]);
-        if (lookup_symbol(handle, symbol_name_suffixed) != NULL) {
+        build_symbol_name(symbol_name_suffixed, symbol->symbol_name, suffixes[suffix_idx]);
+
+        void* sym = lookup_symbol(handle, symbol_name_suffixed);
+
+        // Make sure we haven't found our symbol from LBT by accident (since lookup_symbol on Linux will
+        // search dependencies of the library we are loading as well).
+        if ((sym != NULL) && (sym != symbol->self_ilp64_addr) && (sym != symbol->self_lp64_addr)) {
             return suffixes[suffix_idx];
         }
     }
@@ -52,11 +71,16 @@ const char * symbol_suffix_search(void * handle, const char * symbol_name, const
 const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
     // We auto-detect the symbol suffix of the given library by searching for common
     // BLAS and LAPACK symbols, combined with various suffixes that we know of.
-    const char * symbol_names[] = {
+
+    // We need to store the symbol addresses we expose for the symbol names we use - to ensure
+    // we don't accidentally detect any of our own symbols (such as when doing autodetection on
+    // a LAPACK library compiled with LBT as it's BLAS backend, where dlsym will search the entire
+    // dependency tree for a symbol, including us).
+    autodetect_symbol_info_t symbols[] = {
         // fortran BLAS symbol
-        "isamax_",
+        {"isamax_", (const void **)&isamax_, (const void **)&isamax_64_},
         // fortran LAPACK symbol
-        "dpotrf_",
+        {"dpotrf_", (const void **)&dpotrf_, (const void **)&dpotrf_64_,}
     };
     const char * suffixes[] = {
         // Possibly-NULL suffix that we should search over
@@ -82,8 +106,8 @@ const char * autodetect_symbol_suffix(void * handle, const char * suffix_hint) {
     };
 
     // If the suffix hint is NULL, just skip it when calling `lookup_symbol()`.
-    for (int symbol_idx=0; symbol_idx<sizeof(symbol_names)/sizeof(const char *); symbol_idx++) {
-        const char * suffix = symbol_suffix_search(handle, symbol_names[symbol_idx], suffixes, sizeof(suffixes)/sizeof(const char *));
+    for (int symbol_idx=0; symbol_idx<sizeof(symbols)/sizeof(autodetect_symbol_info_t); symbol_idx++) {
+        const char * suffix = symbol_suffix_search(handle, &(symbols[symbol_idx]), suffixes, sizeof(suffixes)/sizeof(const char *));
         if (suffix != NULL) {
             return suffix;
         }
@@ -431,10 +455,14 @@ int32_t autodetect_cblas_divergence(void * handle, const char * suffix) {
             return LBT_CBLAS_CONFORMANT;
         }
 
+        autodetect_symbol_info_t cblas_symbol[] = {
+            {"cblas_zdotc_sub", (const void **)&cblas_zdotc_sub, (const void **)&cblas_zdotc_sub64_},
+        };
+
         const char * lp64_suffixes[] = {
             "", "_", "__",
         };
-        const char * suffix = symbol_suffix_search(handle, "cblas_zdotc_sub", lp64_suffixes, sizeof(lp64_suffixes)/sizeof(const char *));
+        const char * suffix = symbol_suffix_search(handle, cblas_symbol, lp64_suffixes, sizeof(lp64_suffixes)/sizeof(const char *));
 
         // If we have `zdotc_64`, but we don't have `cblas_zdotc_sub64`, AND we have an
         // LP64-mangled `cblas_zdotc_sub`, then we know it's a library that has ILP64
