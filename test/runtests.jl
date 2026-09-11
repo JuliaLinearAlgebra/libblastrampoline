@@ -15,7 +15,7 @@
 #       Runs the named backends, each in its own process/project (same isolation).
 using Test
 
-const ALL_BACKENDS = ["openblas", "mkl", "refblas", "blis", "blas64", "accelerate", "direct"]
+const ALL_BACKENDS = ["openblas", "mkl", "refblas", "blis", "blas64", "accelerate", "aocl", "direct"]
 
 selected_backends = isempty(ARGS) ? ALL_BACKENDS : ARGS
 for backend in selected_backends
