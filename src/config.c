@@ -43,6 +43,7 @@ void clear_loaded_libraries() {
     for (int idx=0; idx<MAX_TRACKED_LIBS; ++idx) {
         if (lbt_config.loaded_libs[idx] != NULL) {
             free(lbt_config.loaded_libs[idx]->libname);
+            free((void *)lbt_config.loaded_libs[idx]->suffix);
             free(lbt_config.loaded_libs[idx]->active_forwards);
             //close_library(lbt_config.loaded_libs[idx]->handle);
             free(lbt_config.loaded_libs[idx]);
@@ -110,7 +111,12 @@ void record_library_load(const char * libname, void * handle, const char * suffi
     new_libinfo->libname = (char *) malloc(namelen);
     memcpy(new_libinfo->libname, libname, namelen);
     new_libinfo->handle = handle;
-    new_libinfo->suffix = suffix;
+    // Deep-copy the suffix: it may point to a caller-supplied `suffix_hint` (e.g. a stack
+    // buffer in `init()`), so we cannot retain the original pointer past this call.
+    size_t suffixlen = strlen(suffix) + 1;
+    char * suffix_copy = (char *) malloc(suffixlen);
+    memcpy(suffix_copy, suffix, suffixlen);
+    new_libinfo->suffix = suffix_copy;
     new_libinfo->active_forwards = (uint8_t *)malloc(sizeof(uint8_t)*(NUM_EXPORTED_FUNCS/8 + 1));
     memcpy(new_libinfo->active_forwards, forwards, sizeof(uint8_t)*(NUM_EXPORTED_FUNCS/8 + 1));
     new_libinfo->interface = interface;
