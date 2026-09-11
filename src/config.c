@@ -64,7 +64,8 @@ void clear_forwarding_mark(int32_t symbol_idx, int32_t interface) {
     }
 }
 
-void clear_other_forwards(int skip_idx, uint8_t * forwards, int32_t interface) {
+// Only used within this file; keep it out of the library's exported symbols.
+static void clear_other_forwards(int skip_idx, uint8_t * forwards, int32_t interface) {
     for (int idx=0; idx<MAX_TRACKED_LIBS; ++idx) {
         if (lbt_config.loaded_libs[idx] == NULL) {
             return;
