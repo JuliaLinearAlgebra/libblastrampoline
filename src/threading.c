@@ -149,7 +149,7 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
 
             if(nthreads == ACCELERATE_BLAS_THREADING_MULTI_THREADED) {
                 int (*fptr_acc_nthreads)(void) = lookup_symbol(lib->handle, "APPLE_NTHREADS");
-                if (fptr_acc != NULL) {
+                if (fptr_acc_nthreads != NULL) {
                     // In Accelerate, there is a symbol called APPLE_NTHREADS, which appears to be a function we
                     // can call to get an integer saying the number of CPU threads. There is no documentation for this
                     // anywhere accessible online, but testing two different CPUs seem to suggest it is CPU cores.
