@@ -50,6 +50,7 @@ void clear_loaded_libraries() {
             lbt_config.loaded_libs[idx] = NULL;
         }
     }
+    refresh_threading_cache();
 }
 
 void clear_forwarding_mark(int32_t symbol_idx, int32_t interface) {
@@ -129,4 +130,7 @@ void record_library_load(const char * libname, void * handle, const char * suffi
 
     // Next, we go through and un-set all other loaded libraries of the same interface's `forwards`:
     clear_other_forwards(free_idx, forwards, interface);
+
+    // Resolve the threading getters/setters for the newly-loaded library
+    refresh_threading_cache();
 }
