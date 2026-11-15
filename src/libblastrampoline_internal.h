@@ -63,6 +63,9 @@ void clear_forwarding_mark(int32_t symbol_idx, int32_t interface);
 void record_library_load(const char * libname, void * handle, const char * suffix, uint8_t * forwards,
                          int32_t interface, int32_t complex_retstyle, int32_t f2c, int32_t cblas);
 
+// Functions in `threading.c`
+void refresh_threading_cache();
+
 // Functions in `win_utils.c`
 #ifdef _OS_WINDOWS_
 int wchar_to_utf8(const wchar_t * wstr, char *str, size_t maxlen);
