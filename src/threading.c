@@ -134,7 +134,7 @@ LBT_DLLEXPORT int32_t lbt_get_num_threads() {
                 fverptr(&ver);
 
                 // MKL considers 2025.2 to be a major of 2025 and an update of 2 (not a minor)
-                if(ver.MajorVersion >= 2025 && ver.UpdateVersion >= 2) {
+                if(ver.MajorVersion > 2025 || (ver.MajorVersion == 2025 && ver.UpdateVersion >= 2)) {
                     int new_threads_lapack = fptr(MKL_DOMAIN_LAPACK);
                     max_threads = max(max_threads, new_threads_lapack);
                 }
